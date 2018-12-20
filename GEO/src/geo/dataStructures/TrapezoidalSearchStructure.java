@@ -44,7 +44,6 @@ public class TrapezoidalSearchStructure {
         }
         
         public SearchNode findNode(String label) {
-            System.out.println("Searching in " + this.label + " for label " + label);
             if (label == null || label.equals("")) {
                 return null;
             }
@@ -54,10 +53,6 @@ public class TrapezoidalSearchStructure {
             if (this.label.equals(label)) {
                 sn = this;
                 return sn;
-            } 
-            
-            if (this.left == null && this.right == null) {
-                sn = null;
             }
             
             if (sn == null) {
@@ -71,8 +66,38 @@ public class TrapezoidalSearchStructure {
                     sn = this.right.findNode(label);
                 }
             }
-            if (sn != null) {
-                System.out.println("Found " + sn.label + " in " + this.label);
+            
+            return sn;
+        }
+        
+        public SearchNode findSpecificNode(String parentLabel, String label) {
+            if (label == null || label.equals("") || parentLabel == null || parentLabel.equals("")) {
+                return null;
+            }
+            
+            SearchNode sn = null;
+            
+            if (this.label.equals(parentLabel)) {
+                if (this.left != null && this.left.label.equals(label)) {
+                    sn = this.left;
+                    return sn;
+                }
+                else if (this.right != null && this.right.label.equals(label)) {
+                    sn = this.right;
+                    return sn;
+                }
+            }
+            
+            if (sn == null) {
+                if (this.left != null) {
+                    sn = this.left.findSpecificNode(parentLabel, label);
+                }
+            }
+            
+            if (sn == null) {
+                if (this.right != null) {
+                    sn = this.right.findSpecificNode(parentLabel, label);
+                }
             }
             
             return sn;
@@ -89,18 +114,44 @@ public class TrapezoidalSearchStructure {
             }
         }
         
-        public void removeNode(String label) {
-            if (label == null || label.equals("")) {
+        public void removeSpecificNode(String parentLabel, String label) {
+            if (label == null || label.equals("") || parentLabel == null || parentLabel.equals("")) {
                 return;
-            }            
+            }
             
-            if (this.left != null && this.left.label.equals(label) && this.left.left == null && this.left.right == null) {
-                this.left = null;
-                return;
-            }         
+            if (this.label.equals(parentLabel)) {
+                if (this.left.label.equals(label)) {
+                    System.out.println("Node " + this.left.label + " removed left of " + this.label);
+                    this.left = null;
+                    return;
+                }
+                else if (this.right.label.equals(label)) {
+                    System.out.println("Node " + this.right.label + " removed right of " + this.label);
+                    this.right = null;
+                    return;
+                }
+            }
             
-            if (this.right != null && this.right.label.equals(label) && this.right.left == null && this.right.right == null) {
-                this.right = null;
+            if (this.left != null) {
+                this.left.removeSpecificNode(parentLabel, label);
+            }
+            
+            if (this.right != null) {
+                this.right.removeSpecificNode(parentLabel, label);
+            }
+        }
+        
+        public void print() {
+            print("", true);
+        }
+
+        private void print(String prefix, boolean isTail) {
+            System.out.println(prefix + (isTail ? "└── " : "├── ") + this.label);
+            if (this.left != null) {
+                this.left.print(prefix + (isTail ? "    " : "│   "), false);
+            }
+            if (this.right != null) {
+                this.right.print(prefix + (isTail ? "    " : "│   "), false);
             }
         }
     }
@@ -124,12 +175,21 @@ public class TrapezoidalSearchStructure {
         SearchNode sn = new SearchNode(label);
         SearchNode tn = this.tree.findNode(toLabel);
         if (tn != null) {
-            System.out.println("Found node for " + toLabel + " -- " + tn.label);
             tn.addNode(sn, side);
         }
     }
     
-    public void RemoveNode(String label) {
+    public void AddNode(String parentLabel, String toLabel, String label, int side) {
+        // side == 0 --> left, side == 1 --> right
+        SearchNode sn = new SearchNode(label);
+        //SearchNode tn = this.tree.findNode(toLabel);
+        SearchNode tn = this.tree.findSpecificNode(parentLabel, toLabel);
+        if (tn != null) {
+            tn.addNode(sn, side);
+        }
+    }
+    
+    public void RemoveNode(String parentLabel, String label) {
         if (label == null || label.equals("")) {
             return;
         }
@@ -138,7 +198,31 @@ public class TrapezoidalSearchStructure {
             this.tree = null;
         }
         else if (tree != null){
-            this.tree.removeNode(label);
+            this.tree.removeSpecificNode(parentLabel, label);
+        }
+    }
+    
+    public void LinkNodes(String parent1Label, String label1, String parent2Label, String label2, int side) {
+        if (parent1Label == null || parent1Label.equals("") || parent2Label == null || parent2Label.equals("")
+                || label1 == null || label1.equals("") || label2 == null || label2.equals("")) {
+            return;
+        }
+        
+        // link 1 as parent of 2
+        if (this.tree != null) {
+            SearchNode sn1 = this.tree.findSpecificNode(parent1Label, label1);
+            SearchNode sn2 = this.tree.findSpecificNode(parent2Label, label2);
+            
+            if (sn1 != null) {
+                sn1.addNode(sn2, side);
+            }           
+        }
+    }
+    
+    public void Print() {
+        if (this.tree != null) {
+            System.out.println("Printing tree structure, first child in the tree is the left child node.");
+            this.tree.print();
         }
     }
 }
