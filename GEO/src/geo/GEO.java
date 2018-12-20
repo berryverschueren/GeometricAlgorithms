@@ -57,7 +57,6 @@ public class GEO {
         tss.AddNode(l9, l15, 1);
         tss.AddNode(l9, l11, l14, 1);
         
-        // TODO::
         // Link existing nodes --> find p2-s2-t7 and link as child of q2-s2-(t7)
         tss.LinkNodes(l9, l11, l9, l11, 0);
         tss.AddNode(l9, l11, l13, 0);
