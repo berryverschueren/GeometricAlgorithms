@@ -5,6 +5,9 @@
  */
 package geo.dataStructures;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Berry-PC
@@ -46,4 +49,20 @@ public class Edge {
         this.v2 = v2;
     }
     
+    // 0 = left 
+    // 1 = right
+    public Vertex getSpecificVertex(int point) {        
+        int firstx = Integer.MAX_VALUE, nextx = Integer.MAX_VALUE, firsty = Integer.MAX_VALUE, nexty = Integer.MAX_VALUE;
+        List<Vertex> vertices = new ArrayList<>();
+        vertices.add(this.v1);
+        vertices.add(this.v2);
+        switch (point) {
+            case 0:
+                return this.v1.getX() < this.v2.getX() ? this.v1 : this.v2;
+            case 1:
+                return this.v1.getX() > this.v2.getX() ? this.v1 : this.v2;
+            default:
+                return null;
+        }
+    }
 }

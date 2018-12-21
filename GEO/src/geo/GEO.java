@@ -5,7 +5,12 @@
  */
 package geo;
 
+import geo.dataStructures.Edge;
+import geo.dataStructures.TrapezoidalMap;
 import geo.dataStructures.TrapezoidalSearchStructure;
+import geo.dataStructures.Vertex;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -19,6 +24,7 @@ public class GEO {
     public static void main(String[] args) {
         // TODO code application logic here
         TestTrapezoidalSearchStructure();
+        TestTrapezoidalMapConstruction();
     }
     
     public static void TestTrapezoidalSearchStructure() {
@@ -64,4 +70,13 @@ public class GEO {
         tss.Print();
     }
     
+    public static void TestTrapezoidalMapConstruction() {
+        TrapezoidalMap tm = new TrapezoidalMap();
+        
+        List<Edge> segments = new ArrayList<>();
+        segments.add(new Edge("s1", new Vertex(2,3,"p1"), new Vertex(6,4,"q1")));
+        segments.add(new Edge("s2", new Vertex(3,1,"p2"), new Vertex(8,2,"q2")));
+        
+        tm.Construct(segments);
+    }
 }
