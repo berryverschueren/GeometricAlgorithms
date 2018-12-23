@@ -7,13 +7,14 @@ package geo.dataStructures;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
  * @author Berry
  */
-public class Trapezoid {
-    private String label;
+public class Trapezoid extends TrapezoidShape {
+    //private String label;
     private Vertex v1, v2, v3, v4;
     private Edge e1, e2, e3, e4;
 
@@ -21,7 +22,7 @@ public class Trapezoid {
     }
 
     public Trapezoid(String label, Vertex v1, Vertex v2, Vertex v3, Vertex v4, Edge e1, Edge e2, Edge e3, Edge e4) {
-        this.label = label;
+        super(label);//this.label = label;
         this.v1 = v1;
         this.v2 = v2;
         this.v3 = v3;
@@ -30,10 +31,6 @@ public class Trapezoid {
         this.e2 = e2;
         this.e3 = e3;
         this.e4 = e4;
-    }
-
-    public String getLabel() {
-        return label;
     }
 
     public Vertex getV1() {
@@ -66,10 +63,6 @@ public class Trapezoid {
 
     public Edge getE4() {
         return e4;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
     }
 
     public void setV1(Vertex v1) {
@@ -128,8 +121,11 @@ public class Trapezoid {
                     Vertex v2 = getSpecificVertex(2);
                     Vertex v3 = edges.get(i).getV1();
                     Vertex v4 = edges.get(i).getV2();
-                    if (((v3.getX() == v1.getX() && v3.getY() == v1.getY()) && (v4.getX() == v2.getX() && v4.getY() == v2.getY()))
-                            || ((v4.getX() == v1.getX() && v4.getY() == v1.getY()) && (v3.getX() == v2.getX() && v3.getY() == v2.getY()))){
+                    if (v1 != null && v2 != null && v3 != null && v4 != null && 
+                            ((Objects.equals(v3.getX(), v1.getX()) && Objects.equals(v3.getY(), v1.getY())) 
+                            && (Objects.equals(v4.getX(), v2.getX()) && Objects.equals(v4.getY(), v2.getY())))
+                            || ((Objects.equals(v4.getX(), v1.getX()) && Objects.equals(v4.getY(), v1.getY())) 
+                            && (Objects.equals(v3.getX(), v2.getX()) && Objects.equals(v3.getY(), v2.getY())))){
                         return edges.get(i);
                     }
                 }
@@ -157,7 +153,7 @@ public class Trapezoid {
     // 2 = right top
     // 3 = right bottom
     public Vertex getSpecificVertex(int point) {  
-        int firstx, nextx, firsty, nexty;
+        Double firstx, nextx, firsty;
         List<Vertex> vertices = new ArrayList<>();
         vertices.add(this.v1);
         vertices.add(this.v2);
@@ -165,9 +161,9 @@ public class Trapezoid {
         vertices.add(this.v4);
         switch (point) {
             case 0:
-                firstx = Integer.MAX_VALUE; 
-                nextx = Integer.MAX_VALUE; 
-                firsty = Integer.MAX_VALUE;
+                firstx = Double.MAX_VALUE; 
+                nextx = Double.MAX_VALUE; 
+                firsty = Double.MAX_VALUE;
                 for (int i = 0; i < vertices.size(); i++) {
                     if (vertices.get(i).getX() <= firstx) {
                         nextx = firstx;
@@ -177,7 +173,7 @@ public class Trapezoid {
                     }
                 }                
                 for (int i = 3; i > -1; i--) {
-                    if (vertices.get(i).getX() != firstx && vertices.get(i).getX() != nextx) {
+                    if (!Objects.equals(vertices.get(i).getX(), firstx) && !Objects.equals(vertices.get(i).getX(), nextx)) {
                         vertices.remove(i);
                     }
                 }
@@ -187,15 +183,15 @@ public class Trapezoid {
                     }
                 }
                 for (int i = 1; i > -1; i--) {
-                    if (vertices.get(i).getY() != firsty) { 
+                    if (!Objects.equals(vertices.get(i).getY(), firsty)) { 
                         vertices.remove(i);
                     }
                 }
                 return vertices.get(0);
             case 1:
-                firstx = Integer.MAX_VALUE; 
-                nextx = Integer.MAX_VALUE; 
-                firsty = Integer.MIN_VALUE;
+                firstx = Double.MAX_VALUE; 
+                nextx = Double.MAX_VALUE; 
+                firsty = Double.MIN_VALUE;
                 for (int i = 0; i < vertices.size(); i++) {
                     if (vertices.get(i).getX() <= firstx) {
                         nextx = firstx;
@@ -205,7 +201,7 @@ public class Trapezoid {
                     }
                 }                
                 for (int i = 3; i > -1; i--) {
-                    if (vertices.get(i).getX() != firstx && vertices.get(i).getX() != nextx) {
+                    if (!Objects.equals(vertices.get(i).getX(), firstx) && !Objects.equals(vertices.get(i).getX(), nextx)) {
                         vertices.remove(i);
                     }
                 }
@@ -215,15 +211,15 @@ public class Trapezoid {
                     }
                 }
                 for (int i = 1; i > -1; i--) {
-                    if (vertices.get(i).getY() != firsty) {
+                    if (!Objects.equals(vertices.get(i).getY(), firsty)) {
                         vertices.remove(i);
                     }
                 }
                 return vertices.get(0);
             case 2:
-                firstx = Integer.MIN_VALUE; 
-                nextx = Integer.MIN_VALUE; 
-                firsty = Integer.MIN_VALUE;
+                firstx = Double.MIN_VALUE; 
+                nextx = Double.MIN_VALUE; 
+                firsty = Double.MIN_VALUE;
                 for (int i = 0; i < vertices.size(); i++) {
                     if (vertices.get(i).getX() >= firstx) {
                         nextx = firstx;
@@ -233,7 +229,7 @@ public class Trapezoid {
                     }
                 }                
                 for (int i = 3; i > -1; i--) {
-                    if (vertices.get(i).getX() != firstx && vertices.get(i).getX() != nextx) {
+                    if (!Objects.equals(vertices.get(i).getX(), firstx) && !Objects.equals(vertices.get(i).getX(), nextx)) {
                         vertices.remove(i);
                     }
                 }
@@ -243,15 +239,15 @@ public class Trapezoid {
                     }
                 }
                 for (int i = 1; i > -1; i--) {
-                    if (vertices.get(i).getY() != firsty) {
+                    if (!Objects.equals(vertices.get(i).getY(), firsty)) {
                         vertices.remove(i);
                     }
                 }
                 return vertices.get(0);
             case 3:
-                firstx = Integer.MIN_VALUE; 
-                nextx = Integer.MIN_VALUE; 
-                firsty = Integer.MAX_VALUE;
+                firstx = Double.MIN_VALUE; 
+                nextx = Double.MIN_VALUE; 
+                firsty = Double.MAX_VALUE;
                 for (int i = 0; i < vertices.size(); i++) {
                     if (vertices.get(i).getX() >= firstx) {
                         nextx = firstx;
@@ -261,7 +257,7 @@ public class Trapezoid {
                     }
                 }                
                 for (int i = 3; i > -1; i--) {
-                    if (vertices.get(i).getX() != firstx && vertices.get(i).getX() != nextx) {
+                    if (!Objects.equals(vertices.get(i).getX(), firstx) && !Objects.equals(vertices.get(i).getX(), nextx)) {
                         vertices.remove(i);
                     }
                 }
@@ -271,7 +267,7 @@ public class Trapezoid {
                     }
                 }
                 for (int i = 1; i > -1; i--) {
-                    if (vertices.get(i).getY() != firsty) {
+                    if (!Objects.equals(vertices.get(i).getY(), firsty)) {
                         vertices.remove(i);
                     }
                 }
@@ -279,5 +275,10 @@ public class Trapezoid {
             default:
                 return null;
         }
+    }
+    
+    public void print() {
+        System.out.println("Trapezoid " + this.getLabel() + ": ((" + this.v1.getX() + ", " + this.v1.getY() + "), (" + this.v2.getX() + ", " + this.v2.getY() + "), (" + 
+                this.v3.getX() + ", " + this.v3.getY() + "), (" +this.v4.getX() + ", " + this.v4.getY() + "))");
     }
 }

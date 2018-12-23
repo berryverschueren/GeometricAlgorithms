@@ -9,38 +9,29 @@ package geo.dataStructures;
  *
  * @author Berry-PC
  */
-public class Vertex {
-    private String label;
-    private int x, y;
+public class Vertex extends TrapezoidShape {
+    private Double x, y;
     
     public Vertex() {}
-    public Vertex(int x, int y, String label) {
+    public Vertex(Double x, Double y, String label) {
+        super(label);
         this.x = x;
         this.y = y;
-        this.label = label;
     }
     
-    public int getX() {
+    public Double getX() {
         return this.x;
     }
     
-    public int getY() {
+    public Double getY() {
         return this.y;
     }
     
-    public String getLabel() {
-        return this.label;
-    }
-    
-    public void setX(int x) {
+    public void setX(Double x) {
         this.x = x;
     }
     
-    public void setY(int y) {
+    public void setY(Double y) {
         this.y = y;
-    }
-    
-    public void setLabel(String label) {
-        this.label = label;
     }
 }

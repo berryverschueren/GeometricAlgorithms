@@ -12,21 +12,16 @@ import java.util.List;
  *
  * @author Berry-PC
  */
-public class Edge {
-    private String label;
+public class Edge extends TrapezoidShape {
     private Vertex v1, v2;
 
     public Edge() {
     }
 
     public Edge(String label, Vertex v1, Vertex v2) {
-        this.label = label;
+        super(label);//this.label = label;
         this.v1 = v1;
         this.v2 = v2;
-    }
-
-    public String getLabel() {
-        return label;
     }
 
     public Vertex getV1() {
@@ -35,10 +30,6 @@ public class Edge {
 
     public Vertex getV2() {
         return v2;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
     }
 
     public void setV1(Vertex v1) {
@@ -64,5 +55,9 @@ public class Edge {
             default:
                 return null;
         }
+    }
+    
+    public void print() {
+        System.out.println("Edge " + this.getLabel() + ": ((" + this.v1.getX() + ", " + this.v1.getY() + "), (" + this.v2.getX() + ", " + this.v2.getY() + "))");
     }
 }
