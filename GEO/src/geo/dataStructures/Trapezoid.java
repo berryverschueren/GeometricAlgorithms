@@ -14,10 +14,13 @@ import java.util.Objects;
  * @author Berry
  */
 public class Trapezoid extends TrapezoidShape {
-    //private String label;
+    // Coordinates
     private Vertex v1, v2, v3, v4;
     private Edge e1, e2, e3, e4;
-
+    // Shape defined by
+    private Vertex left, right;
+    private Edge bottom, top;
+    
     public Trapezoid() {
     }
 
@@ -31,6 +34,38 @@ public class Trapezoid extends TrapezoidShape {
         this.e2 = e2;
         this.e3 = e3;
         this.e4 = e4;
+    }
+
+    public void setLeft(Vertex left) {
+        this.left = left;
+    }
+
+    public void setRight(Vertex right) {
+        this.right = right;
+    }
+
+    public void setBottom(Edge bottom) {
+        this.bottom = bottom;
+    }
+
+    public void setTop(Edge top) {
+        this.top = top;
+    }
+
+    public Vertex getLeft() {
+        return left;
+    }
+
+    public Vertex getRight() {
+        return right;
+    }
+
+    public Edge getBottom() {
+        return bottom;
+    }
+
+    public Edge getTop() {
+        return top;
     }
 
     public Vertex getV1() {
