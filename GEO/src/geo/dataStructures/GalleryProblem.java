@@ -15,6 +15,16 @@ public class GalleryProblem {
     private int speed;
     private int globalTime;
     private int observationTime;
-    
+
+    public GalleryProblem() {
+    }
+
+    public GalleryProblem(Gallery gellery, int guards, int speed, int globalTime, int observationTime) {
+        this.gellery = gellery;
+        this.guards = guards;
+        this.speed = speed;
+        this.globalTime = globalTime;
+        this.observationTime = observationTime;
+    }
     
 }
