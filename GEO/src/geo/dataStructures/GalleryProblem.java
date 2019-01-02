@@ -10,17 +10,17 @@ package geo.dataStructures;
  * @author Kaj75
  */
 public class GalleryProblem {
-    private Gallery gellery;
+    private Gallery gallery;
     private int guards;
-    private int speed;
-    private int globalTime;
-    private int observationTime;
+    private double speed;
+    private double globalTime;
+    private double observationTime;
 
     public GalleryProblem() {
     }
 
-    public GalleryProblem(Gallery gellery, int guards, int speed, int globalTime, int observationTime) {
-        this.gellery = gellery;
+    public GalleryProblem(Gallery gallery, int guards, double speed, double globalTime, double observationTime) {
+        this.gallery = gallery;
         this.guards = guards;
         this.speed = speed;
         this.globalTime = globalTime;
