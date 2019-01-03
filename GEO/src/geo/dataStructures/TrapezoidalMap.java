@@ -8,6 +8,7 @@ package geo.dataStructures;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import math.geom2d.Vector2D;
 
 /**
@@ -31,425 +32,844 @@ public class TrapezoidalMap {
     public TrapezoidalMap() {
         this.trapezoidCounter = 0;
     }
-
-    public void Construct(List<Edge> segments) {
-        int n = segments.size();
-        
+    
+    public void construct(List<Edge> segments) {
+        // compute bounding box based on most extreme points of all segments
         Trapezoid boundingBox = DetermineBoundingBox(segments);
-        
-        if (boundingBox == null) { 
+        // exit if there is no bounding box found
+        if (boundingBox == null) {
             return;
         }
         
+        // set up trapezoid list and add bounding box
         this.trapezoids = new ArrayList<>();
         this.trapezoids.add(boundingBox);
+        // set up search structure as well
         this.tree = boundingBox;
+        // compute random permutation of the segments
+        //Collections.shuffle(segments);
         
-        // UNCOMMENT TODO compute random permutation of segments
-        // Collections.shuffle(segments);
-        
-        for (int i = 0; i < n; i++) {
-            List<Trapezoid> intersectedTrapezoids = DoesSegmentIntersectTrapezoid(segments.get(i));
-                        
-            if (intersectedTrapezoids != null && intersectedTrapezoids.size() > 0) {
-                
-                // sort intersected trapezoids based on left vertex X coord, ascending
-                intersectedTrapezoids.sort(new TrapezoidComparator());
+        // loop over the segments
+        for (int i = 0; i < segments.size(); i++) {
+            // compute intersected trapezoids
+            List<Trapezoid> it = DoesSegmentIntersectTrapezoid(segments.get(i));
             
-                Trapezoid trapezoidToBeContinued = null;
-                // continued above segment = 1, below segment = -1, neutral = 0
-                int trapezoidToBeContinuedState = 0;
+            // verify that there are any
+            if (it == null || it.isEmpty()) {
+                continue;
+            }
+            
+            // sort trapezoids based on their bottom left vertex's x coordinate
+            it.sort(new TrapezoidComparator());
+            
+            // trapezoid to be continued in the next intersected trapezoid
+            Trapezoid ct = null;
+            
+            // loop over all intersected trapezoids
+            for (int j = 0; j < it.size(); j++) {
+                // short named variables for readability
+                Trapezoid t = it.get(j);
+                Edge s = segments.get(i); 
                 
-                for (int j = 0; j < intersectedTrapezoids.size(); j++) {
-                        intersectedTrapezoids.get(j).print();
-                        segments.get(i).print();
+                // print for feedback
+                t.print();
+                s.print();
+                
+                // vertices of s lie on top of edges of t
+                // s is contained in t
+                if (DoesTrapezoidContainSegment(t, s)
+                        && Objects.equals(t.getLeft().getX(), s.getSpecificVertex(0).getX()) 
+                        && Objects.equals(t.getLeft().getY(), s.getSpecificVertex(0).getY())
+                        && Objects.equals(t.getRight().getX(), s.getSpecificVertex(1).getX()) 
+                        && Objects.equals(t.getRight().getY(), s.getSpecificVertex(1).getY())) {
                     
-                    if (DoesTrapezoidContainSegment(intersectedTrapezoids.get(j), segments.get(i))) {
-                        System.out.println("Segment: " + segments.get(i).getLabel() + ", is completely contained in trapezoid: " + intersectedTrapezoids.get(j).getLabel());
+                    // <editor-fold defaultstate="collapsed" desc="contained LLRR">
+                    
+                    // split intersected trapezoid into 2 trapezoids
+                    // upper and lower part above and below segment
+                    System.out.println(s.getLabel() + " contained in " + t.getLabel());
+                    System.out.println("Both endpoints lie on the trapezoid");
+                    
+                    // trapezoid above segment
+                    Trapezoid t1 = CreateTrapezoidByVertices(s.getSpecificVertex(0), t.getSpecificVertex(1), 
+                            t.getSpecificVertex(2), s.getSpecificVertex(1));
+                    t1.setLeft(s.getSpecificVertex(0));
+                    t1.setRight(s.getSpecificVertex(1));
+                    t1.setBottom(s);
+                    t1.setTop(t.getTop());
+                    
+                    // trapezoid below segment
+                    Trapezoid t2 = CreateTrapezoidByVertices(t.getSpecificVertex(0), s.getSpecificVertex(0), 
+                            s.getSpecificVertex(1), t.getSpecificVertex(3));
+                    t2.setLeft(s.getSpecificVertex(0));
+                    t2.setRight(s.getSpecificVertex(1));
+                    t2.setBottom(t.getBottom());
+                    t2.setTop(s);
+                    
+                    // remove intersected trapezoid from the list
+                    this.trapezoids.remove(t);
+                    
+                    // add the new trapezoids to the list
+                    this.trapezoids.add(t1);
+                    this.trapezoids.add(t2);
+                    
+                    // print for feedback
+                    t1.print();
+                    t2.print();
+                    
+                    // TODO tree structure
+                    
+                    continue;
+                    
+                    // </editor-fold>
+                }
+                // left vertex of s lies on top of left edge of t
+                // s is contained in t
+                else if (DoesTrapezoidContainSegment(t, s)
+                        && Objects.equals(t.getLeft().getX(), s.getSpecificVertex(0).getX()) 
+                        && Objects.equals(t.getLeft().getY(), s.getSpecificVertex(0).getY())) {
+                    
+                    // <editor-fold defaultstate="collapsed" desc="contained LL">
+
+                    // split intersected trapezoid into 3 trapezoids
+                    // upper and lower part above and below segment
+                    // and a trapezoid to the right of the segment
+                    System.out.println(s.getLabel() + " contained in " + t.getLabel());
+                    System.out.println("Left endpoint lies on the trapezoid");
+
+                    // compute the required vertices for the new trapezoids
+                    Edge e1 = new Edge("e1", s.getSpecificVertex(1), new Vertex(s.getSpecificVertex(1).getX(), 10000.0, "tv1"));
+                    Edge e2 = new Edge("e2", s.getSpecificVertex(1), new Vertex(s.getSpecificVertex(1).getX(), -10000.0, "tv2"));
+                    Vertex v1 = GetIntersectionPointOfSegments(t.getSpecificEdge(1), e1);
+                    Vertex v2 = GetIntersectionPointOfSegments(t.getSpecificEdge(3), e2);
+                    
+                    // trapezoid above segment
+                    Trapezoid t1 = CreateTrapezoidByVertices(s.getSpecificVertex(0), t.getSpecificVertex(1), 
+                            v1, s.getSpecificVertex(1));
+                    t1.setLeft(s.getSpecificVertex(0));
+                    t1.setRight(s.getSpecificVertex(1));
+                    t1.setBottom(s);
+                    t1.setTop(t1.getSpecificEdge(1));
+                    
+                    // trapezoid below segment
+                    Trapezoid t2 = CreateTrapezoidByVertices(t.getSpecificVertex(0), s.getSpecificVertex(0),
+                            s.getSpecificVertex(1), v2);
+                    t2.setLeft(s.getSpecificVertex(0));
+                    t2.setRight(s.getSpecificVertex(1));
+                    t2.setBottom(t2.getSpecificEdge(3));
+                    t2.setTop(s);                    
+                    
+                    // trapezoid right of segment
+                    Trapezoid t3 = CreateTrapezoidByVertices(v2, v1, t.getSpecificVertex(2), t.getSpecificVertex(3));
+                    t3.setLeft(s.getSpecificVertex(1));
+                    t3.setRight(t.getRight());
+                    t3.setBottom(t3.getSpecificEdge(3));
+                    t3.setTop(t3.getSpecificEdge(1));
+                    
+                    // remove intersected trapezoid from the list
+                    this.trapezoids.remove(t);
+                    
+                    // add the new trapezoids to the list
+                    this.trapezoids.add(t1);
+                    this.trapezoids.add(t2);
+                    this.trapezoids.add(t3);
+                    
+                    // print for feedback
+                    t1.print();
+                    t2.print();
+                    t3.print();
+                    
+                    // TODO tree structure
+                    
+                    continue;
+                    
+                    // </editor-fold>
+                }
+                // right vertex of s lies on top of right edge of t
+                // s is contained in t
+                else if (DoesTrapezoidContainSegment(t, s)
+                        && Objects.equals(t.getRight().getX(), s.getSpecificVertex(1).getX()) 
+                        && Objects.equals(t.getRight().getY(), s.getSpecificVertex(1).getY())) {
+                    
+                    // <editor-fold defaultstate="collapsed" desc="contained RR">
+                    
+                    // split intersected trapezoid into 3 trapezoids
+                    // upper and lower part above and below segment
+                    // and a trapezoid to the left of the segment               
+                    System.out.println(s.getLabel() + " contained in " + t.getLabel());
+                    System.out.println("Right endpoint lies on the trapezoid");
+                    
+                    // compute the required vertices for the new trapezoids
+                    Edge e1 = new Edge("e1", s.getSpecificVertex(0), new Vertex(s.getSpecificVertex(0).getX(), 10000.0, "tv1"));
+                    Edge e2 = new Edge("e2", s.getSpecificVertex(0), new Vertex(s.getSpecificVertex(0).getX(), -10000.0, "tv2"));
+                    Vertex v1 = GetIntersectionPointOfSegments(t.getSpecificEdge(1), e1);
+                    Vertex v2 = GetIntersectionPointOfSegments(t.getSpecificEdge(3), e2);
+                    
+                    // trapezoid above segment
+                    Trapezoid t1 = CreateTrapezoidByVertices(s.getSpecificVertex(0), v1, 
+                            t.getSpecificVertex(2), s.getSpecificVertex(1));
+                    t1.setLeft(s.getSpecificVertex(0));
+                    t1.setRight(s.getSpecificVertex(1));
+                    t1.setBottom(s);
+                    t1.setTop(t1.getSpecificEdge(1));
+                    
+                    // trapezoid below segment
+                    Trapezoid t2 = CreateTrapezoidByVertices(v2, s.getSpecificVertex(0),
+                            s.getSpecificVertex(1), t.getSpecificVertex(3));
+                    t2.setLeft(s.getSpecificVertex(0));
+                    t2.setRight(s.getSpecificVertex(1));
+                    t2.setBottom(t2.getSpecificEdge(3));
+                    t2.setTop(s);                    
+                    
+                    // trapezoid left of segment
+                    Trapezoid t3 = CreateTrapezoidByVertices(t.getSpecificVertex(0), t.getSpecificVertex(1), v1, v2);
+                    t3.setLeft(t.getLeft());
+                    t3.setRight(s.getSpecificVertex(0));
+                    t3.setBottom(t3.getSpecificEdge(3));
+                    t3.setTop(t3.getSpecificEdge(1));
+                    
+                    // remove intersected trapezoid from the list
+                    this.trapezoids.remove(t);
+                    
+                    // add the new trapezoids to the list
+                    this.trapezoids.add(t1);
+                    this.trapezoids.add(t2);
+                    this.trapezoids.add(t3);
+                    
+                    // print for feedback
+                    t1.print();
+                    t2.print();
+                    t3.print();
+                    
+                    // TODO tree structure
+                    
+                    continue;
+                    
+                    // </editor-fold>
+                }
+                // s is contained in t
+                else if (DoesTrapezoidContainSegment(t, s)) {
+                    
+                    // <editor-fold defaultstate="collapsed" desc="contained">
+                    
+                    // split intersected trapezoid into 4 trapezoids
+                    System.out.println(s.getLabel() + " contained in " + t.getLabel());
+                    
+                    // compute the required vertices for the new trapezoids
+                    Edge e1 = new Edge("e1", s.getSpecificVertex(0), new Vertex(s.getSpecificVertex(0).getX(), 10000.0, "tv1"));
+                    Edge e2 = new Edge("e2", s.getSpecificVertex(0), new Vertex(s.getSpecificVertex(0).getX(), -10000.0, "tv2"));
+                    Edge e3 = new Edge("e3", s.getSpecificVertex(1), new Vertex(s.getSpecificVertex(1).getX(), 10000.0, "tv3"));
+                    Edge e4 = new Edge("e4", s.getSpecificVertex(1), new Vertex(s.getSpecificVertex(1).getX(), -10000.0, "tv4"));
+                    Vertex v1 = GetIntersectionPointOfSegments(t.getSpecificEdge(1), e1);
+                    Vertex v2 = GetIntersectionPointOfSegments(t.getSpecificEdge(3), e2);
+                    Vertex v3 = GetIntersectionPointOfSegments(t.getSpecificEdge(1), e3);
+                    Vertex v4 = GetIntersectionPointOfSegments(t.getSpecificEdge(3), e4);
+                    
+                    // trapezoid above segment
+                    Trapezoid t1 = CreateTrapezoidByVertices(s.getSpecificVertex(0), v1, 
+                            v3, s.getSpecificVertex(1));
+                    t1.setLeft(s.getSpecificVertex(0));
+                    t1.setRight(s.getSpecificVertex(1));
+                    t1.setBottom(s);
+                    t1.setTop(t1.getSpecificEdge(1));
+                    
+                    // trapezoid below segment
+                    Trapezoid t2 = CreateTrapezoidByVertices(v2, s.getSpecificVertex(0),
+                            s.getSpecificVertex(1), v4);
+                    t2.setLeft(s.getSpecificVertex(0));
+                    t2.setRight(s.getSpecificVertex(1));
+                    t2.setBottom(t2.getSpecificEdge(3));
+                    t2.setTop(s);                    
+                    
+                    // trapezoid left of segment
+                    Trapezoid t3 = CreateTrapezoidByVertices(t.getSpecificVertex(0), t.getSpecificVertex(1), v1, v2);
+                    t3.setLeft(t.getLeft());
+                    t3.setRight(s.getSpecificVertex(0));
+                    t3.setBottom(t3.getSpecificEdge(3));
+                    t3.setTop(t3.getSpecificEdge(1));
+                    
+                    // trapezoid right of segment
+                    Trapezoid t4 = CreateTrapezoidByVertices(v4, v3, t.getSpecificVertex(2), t.getSpecificVertex(3));
+                    t4.setLeft(s.getSpecificVertex(1));
+                    t4.setRight(t.getRight());
+                    t4.setBottom(t4.getSpecificEdge(3));
+                    t4.setTop(t4.getSpecificEdge(1));
+                    
+                    // remove intersected trapezoid from the list
+                    this.trapezoids.remove(t);
+                    
+                    // add the new trapezoids to the list
+                    this.trapezoids.add(t1);
+                    this.trapezoids.add(t2);
+                    this.trapezoids.add(t3);
+                    this.trapezoids.add(t4);
+                    
+                    // print for feedback
+                    t1.print();
+                    t2.print();
+                    t3.print();
+                    t4.print();
+                    
+                    // TODO tree structure
+                    
+                    continue;
+                    
+                    // </editor-fold>
+                }
+                // left vertex of s lies on top of left edge of t
+                // s starts in t
+                else if (DoesTrapezoidContainVertex(t, s.getSpecificVertex(0))
+                        && Objects.equals(t.getLeft().getX(), s.getSpecificVertex(0).getX())
+                        && Objects.equals(t.getLeft().getY(), s.getSpecificVertex(0).getY())) {
+                
+                    // <editor-fold defaultstate="collapsed" desc="starts LL">
+                    
+                    // split intersected trapezoid into 2 trapezoids
+                    // upper and lower part above and below segment
+                    System.out.println(s.getLabel() + " starts in " + t.getLabel());
+                    System.out.println("Left endpoint lies on left edge of the trapezoid");
+                    
+                    // compute side of exit intersection
+                    Vertex v1 = GetIntersectionPointOfSegments(s, t.getSpecificEdge(2));
+                    
+                    // if segments don't intersect, go to the next intersected trapezoid
+                    if (v1 == null || v1.getX() == null || v1.getY() == null) {
+                        continue;
+                    }
+                    
+                    boolean exitAbove = v1.getY() > t.getRight().getY();
+                    
+                    // if it exits above the defined right vertex of the intersected trapezoid
+                    if (exitAbove) {
                         
-                        Vertex tempv1 = new Vertex(segments.get(i).getSpecificVertex(0).getX(), segments.get(i).getSpecificVertex(0).getY(), "tempv1");
-                        Vertex tempv2 = new Vertex(segments.get(i).getSpecificVertex(0).getX(), 10000.0, "tempv2");
-                        Vertex tempv3 = new Vertex(segments.get(i).getSpecificVertex(0).getX(), -10000.0, "tempv3");
-                        Edge tempe1 = new Edge("tempe1", tempv1, tempv2);
-                        Edge tempe2 = new Edge("tempe2", tempv1, tempv3);
+                        // trapezoid below segment 
+                        Trapezoid t1 = CreateTrapezoidByVertices(t.getSpecificVertex(0), s.getSpecificVertex(0), 
+                                v1, t.getSpecificVertex(3));
+                        t1.setRight(t.getRight());
+                        t1.setLeft(s.getSpecificVertex(0));
+                        t1.setBottom(t.getBottom());
+                        t1.setTop(t1.getSpecificEdge(1));
                         
-                        // point on outer trapezoid top edge intersecting edge upwards from left vertex of inserted segment.
-                        Vertex v1 = GetIntersectionPointOfSegments(intersectedTrapezoids.get(j).getSpecificEdge(1), tempe1);
+                        // trapezoid above segment continues
+                        ct = new Trapezoid();
+                        ct.setV1(s.getSpecificVertex(0));
+                        ct.setV2(t.getSpecificVertex(1));
+                        ct.setLeft(s.getSpecificVertex(0));
                         
-                        // point on outer trapezoid bottom edge intersecting edge downwards from left vertex of inserted segment.
-                        Vertex v2 = GetIntersectionPointOfSegments(intersectedTrapezoids.get(j).getSpecificEdge(3), tempe2);
+                        // remove intersected trapezoid from the list
+                        this.trapezoids.remove(t);
+
+                        // add the new trapezoids to the list
+                        this.trapezoids.add(t1);
+                    
+                        // print for feedback
+                        t1.print();
+
+                        // TODO tree structure
                         
-                        tempv1 = new Vertex(segments.get(i).getSpecificVertex(1).getX(), segments.get(i).getSpecificVertex(1).getY(), "tempv1");
-                        tempv2 = new Vertex(segments.get(i).getSpecificVertex(1).getX(), 10000.0, "tempv2");
-                        tempv3 = new Vertex(segments.get(i).getSpecificVertex(1).getX(), -10000.0, "tempv3");
-                        tempe1 = new Edge("tempe1", tempv1, tempv2);
-                        tempe2 = new Edge("tempe2", tempv1, tempv3);
+                        continue;
+                    }
+                    // otherwise it exits below
+                    else {
                         
-                        // point on outer trapezoid top edge intersecting edge downwards from right vertex of inserted segment.
-                        Vertex v3 = GetIntersectionPointOfSegments(intersectedTrapezoids.get(j).getSpecificEdge(1), tempe1);
+                        // trapezoid above segment 
+                        Trapezoid t1 = CreateTrapezoidByVertices(s.getSpecificVertex(0), t.getSpecificVertex(1), 
+                                t.getSpecificVertex(2), v1);
+                        t1.setRight(t.getRight());
+                        t1.setLeft(s.getSpecificVertex(0));
+                        t1.setBottom(t1.getSpecificEdge(3));
+                        t1.setTop(t.getTop());
                         
-                        // point on outer trapezoid bottom edge intersecting edge downwards from right vertex of inserted segment.
-                        Vertex v4 = GetIntersectionPointOfSegments(intersectedTrapezoids.get(j).getSpecificEdge(3), tempe2);
+                        // trapezoid below segment continues
+                        ct = new Trapezoid();
+                        ct.setV1(t.getSpecificVertex(0));
+                        ct.setV2(s.getSpecificVertex(0));
+                        ct.setLeft(s.getSpecificVertex(0));
                         
-                        // trapezoid left of left vertex of intersected segment
-                        Trapezoid t1 = CreateTrapezoidByVertices(intersectedTrapezoids.get(j).getSpecificVertex(0),
-                                intersectedTrapezoids.get(j).getSpecificVertex(1), v1, v2);
-                        // set trapezoid definements
-                        t1.setRight(segments.get(i).getSpecificVertex(0));
-                        t1.setLeft(intersectedTrapezoids.get(j).getSpecificVertex(1));
-                        t1.setBottom(intersectedTrapezoids.get(j).getSpecificEdge(3));
-                        t1.setTop(intersectedTrapezoids.get(j).getSpecificEdge(1));
+                        // remove intersected trapezoid from the list
+                        this.trapezoids.remove(t);
+
+                        // add the new trapezoids to the list
+                        this.trapezoids.add(t1);
+                    
+                        // print for feedback
+                        t1.print();
+
+                        // TODO tree structure
                         
-                        // trapezoid below inserted segment
-                        Trapezoid t2 = CreateTrapezoidByVertices(v2, segments.get(i).getSpecificVertex(0), 
-                                segments.get(i).getSpecificVertex(1), v4);
-                        // set trapezoid definements
-                        t2.setRight(segments.get(i).getSpecificVertex(1));
-                        t2.setLeft(segments.get(i).getSpecificVertex(0));
-                        t2.setBottom(intersectedTrapezoids.get(j).getSpecificEdge(3));
-                        t2.setTop(segments.get(i));
+                        continue;
+                    }
+                    
+                    // </editor-fold>
+                }
+                // left vertex of s lies on top of right edge of t
+                // s starts in t
+                else if (DoesTrapezoidContainVertex(t, s.getSpecificVertex(0))
+                        && Objects.equals(t.getRight().getX(), s.getSpecificVertex(0).getX())
+                        && Objects.equals(t.getRight().getY(), s.getSpecificVertex(0).getY())) {
+                    
+                    // <editor-fold defaultstate="collapsed" desc="starts LR">
+                    
+                    System.out.println(s.getLabel() + " starts in " + t.getLabel());
+                    System.out.println("Left endpoint lies on right edge of the trapezoid");
+                    
+                    continue;
+                    
+                    // </editor-fold>
+                }
+                // s starts in t
+                else if (DoesTrapezoidContainVertex(t, s.getSpecificVertex(0))) {
+                    
+                    // <editor-fold defaultstate="collapsed" desc="starts">
+                    
+                    // split intersected trapezoid into 3 trapezoids
+                    // upper and lower part above and below segment
+                    // and a trapezoid to the left of the segment
+                    System.out.println(s.getLabel() + " starts in " + t.getLabel());
+                    
+                    // compute side of exit intersection
+                    Vertex v1 = GetIntersectionPointOfSegments(s, t.getSpecificEdge(2));
+                    boolean exitAbove = v1.getY() > t.getRight().getY();
                         
-                        // trapezoid above inserted segment
-                        Trapezoid t3 = CreateTrapezoidByVertices(segments.get(i).getSpecificVertex(0), v1, v3,
-                                segments.get(i).getSpecificVertex(1));
-                        // set trapezoid definements
-                        t3.setRight(segments.get(i).getSpecificVertex(1));
-                        t3.setLeft(segments.get(i).getSpecificVertex(0));
-                        t3.setBottom(segments.get(i));
-                        t3.setTop(intersectedTrapezoids.get(j).getSpecificEdge(1));
+                    // compute the required vertices for the new trapezoids
+                    Edge e1 = new Edge("e1", s.getSpecificVertex(0), new Vertex(s.getSpecificVertex(0).getX(), 10000.0, "tv1"));
+                    Edge e2 = new Edge("e2", s.getSpecificVertex(0), new Vertex(s.getSpecificVertex(0).getX(), -10000.0, "tv2"));
+                    Vertex v2 = GetIntersectionPointOfSegments(t.getSpecificEdge(1), e1);
+                    Vertex v3 = GetIntersectionPointOfSegments(t.getSpecificEdge(3), e2);
+                                        
+                    // if it exits above the defined right vertex of the intersected trapezoid
+                    if (exitAbove) {
                         
-                        // trapezoid right of right vertex of inserted segment
-                        Trapezoid t4 = CreateTrapezoidByVertices(v4, v3, intersectedTrapezoids.get(j).getSpecificVertex(2),
-                                intersectedTrapezoids.get(j).getSpecificVertex(3));
-                        // set trapezoid definements
-                        t4.setRight(intersectedTrapezoids.get(j).getSpecificVertex(2));
-                        t4.setLeft(segments.get(i).getSpecificVertex(0));
-                        t4.setBottom(intersectedTrapezoids.get(j).getSpecificEdge(3));
-                        t4.setTop(intersectedTrapezoids.get(j).getSpecificEdge(1));
-                                                
-                        for (int k = this.trapezoids.size() - 1; k > -1; k--) {
-                            if (this.trapezoids.get(k).getLabel().equals(intersectedTrapezoids.get(j).getLabel())) {
-                                this.trapezoids.remove(k);
-                            }
-                        }
+                        // trapezoid below segment 
+                        Trapezoid t1 = CreateTrapezoidByVertices(v3, s.getSpecificVertex(0), 
+                                v1, t.getSpecificVertex(3));
+                        t1.setRight(t.getRight());
+                        t1.setLeft(s.getSpecificVertex(0));
+                        t1.setBottom(t1.getSpecificEdge(3));
+                        t1.setTop(t1.getSpecificEdge(1));
                         
+                        // trapezoid left of segment
+                        Trapezoid t2 = CreateTrapezoidByVertices(t.getSpecificVertex(0), t.getSpecificVertex(1), 
+                                v2, v3);
+                        t2.setRight(s.getSpecificVertex(0));
+                        t2.setLeft(t.getLeft());
+                        t2.setBottom(t2.getSpecificEdge(3));
+                        t2.setTop(t2.getSpecificEdge(1));
+                                               
+                        // trapezoid above segment continues
+                        ct = new Trapezoid();
+                        ct.setV1(s.getSpecificVertex(0));
+                        ct.setV2(v2);
+                        ct.setLeft(s.getSpecificVertex(0));
+                        
+                        // remove intersected trapezoid from the list
+                        this.trapezoids.remove(t);
+
+                        // add the new trapezoids to the list
+                        this.trapezoids.add(t1);
+                        this.trapezoids.add(t2);
+                    
+                        // print for feedback
                         t1.print();
                         t2.print();
-                        t3.print();
-                        t4.print();
+
+                        // TODO tree structure
                         
+                        continue;
+                    }
+                    // otherwise it exits below
+                    else {
+                    
+                        // trapezoid above segment 
+                        Trapezoid t1 = CreateTrapezoidByVertices(s.getSpecificVertex(0), v2, 
+                                t.getSpecificVertex(2), v1);
+                        t1.setRight(t.getRight());
+                        t1.setLeft(s.getSpecificVertex(0));
+                        t1.setBottom(t1.getSpecificEdge(3));
+                        t1.setTop(t1.getSpecificEdge(1));
+                        
+                        // trapezoid left of segment
+                        Trapezoid t2 = CreateTrapezoidByVertices(t.getSpecificVertex(0), t.getSpecificVertex(1), 
+                                v2, v3);
+                        t2.setRight(s.getSpecificVertex(0));
+                        t2.setLeft(t.getLeft());
+                        t2.setBottom(t2.getSpecificEdge(3));
+                        t2.setTop(t2.getSpecificEdge(1));
+                        
+                        // trapezoid below segment continues
+                        ct = new Trapezoid();
+                        ct.setV1(v3);
+                        ct.setV2(s.getSpecificVertex(0));
+                        ct.setLeft(s.getSpecificVertex(0));
+                        
+                        // remove intersected trapezoid from the list
+                        this.trapezoids.remove(t);
+
+                        // add the new trapezoids to the list
+                        this.trapezoids.add(t1);
+                        this.trapezoids.add(t2);
+                    
+                        // print for feedback
+                        t1.print();
+                        t2.print();
+
+                        // TODO tree structure
+                        
+                        continue;
+                    }
+                    
+                    // </editor-fold>
+                }
+                // right vertex of s lies on top of left edge of t
+                // s ends in t
+                else if (DoesTrapezoidContainVertex(t, s.getSpecificVertex(1))
+                        && Objects.equals(t.getLeft().getX(), s.getSpecificVertex(1).getX())
+                        && Objects.equals(t.getLeft().getY(), s.getSpecificVertex(1).getY())) {
+                    
+                    // <editor-fold defaultstate="collapsed" desc="ends RL">
+                    
+                    System.out.println(s.getLabel() + " ends in " + t.getLabel());
+                    System.out.println("Right endpoint lies on left edge of the trapezoid");
+                    
+                    continue;
+                    
+                    // </editor-fold>
+                }
+                // right vertex of s lies on top of right edge of t
+                // s ends in t
+                else if (DoesTrapezoidContainVertex(t, s.getSpecificVertex(1))
+                        && Objects.equals(t.getRight().getX(), s.getSpecificVertex(1).getX())
+                        && Objects.equals(t.getRight().getY(), s.getSpecificVertex(1).getY())) {
+                    
+                    // <editor-fold defaultstate="collapsed" desc="ends RR">
+                    
+                    // split intersected trapezoid into 2 trapezoids
+                    // upper and lower part above and below segment
+                    System.out.println(s.getLabel() + " ends in " + t.getLabel());
+                    System.out.println("Right endpoint lies on right edge of the trapezoid");
+                    
+                    // compute side of entrance intersection
+                    Vertex v1 = GetIntersectionPointOfSegments(s, t.getSpecificEdge(0));
+                    
+                    // if segments don't intersect, go to the next intersected trapezoid
+                    if (v1 == null || v1.getX() == null || v1.getY() == null) {
+                        continue;
+                    }
+                    
+                    boolean entersAbove = v1.getY() > t.getLeft().getY();
+                                        
+                    // if it enters above the defined left vertex of the intersected trapezoid
+                    if (entersAbove) {
+                        
+                        // trapezoid below segment 
+                        Trapezoid t1 = CreateTrapezoidByVertices(t.getSpecificVertex(0), v1, 
+                                s.getSpecificVertex(1), t.getSpecificVertex(3));
+                        t1.setRight(s.getSpecificVertex(1));
+                        t1.setLeft(t.getLeft());
+                        t1.setBottom(t.getBottom());
+                        t1.setTop(t1.getSpecificEdge(1));
+                                               
+                        // trapezoid above segment ends
+                        Trapezoid t2 = CreateTrapezoidByVertices(ct.getV1(), ct.getV2(), t.getSpecificVertex(2), s.getSpecificVertex(1));
+                        t2.setLeft(ct.getLeft());
+                        t2.setRight(s.getSpecificVertex(1));
+                        t2.setBottom(s);
+                        t2.setTop(t2.getSpecificEdge(1));
+                        
+                        // remove intersected trapezoid from the list
+                        this.trapezoids.remove(t);
+
+                        // add the new trapezoids to the list
+                        this.trapezoids.add(t1);
+                        this.trapezoids.add(t2);
+                    
+                        // print for feedback
+                        t1.print();
+                        t2.print();
+
+                        // TODO tree structure
+                        
+                        continue;
+                    }
+                    // otherwise it exits below
+                    else {
+                    
+                        // trapezoid above segment
+                        Trapezoid t1 = CreateTrapezoidByVertices(v1, t.getSpecificVertex(1), 
+                                t.getSpecificVertex(2), s.getSpecificVertex(1));
+                        t1.setRight(s.getSpecificVertex(1));
+                        t1.setLeft(t.getLeft());
+                        t1.setBottom(t1.getSpecificEdge(3));
+                        t1.setTop(t.getTop());                      
+                        
+                        // trapezoid below segment ends
+                        Trapezoid t2 = CreateTrapezoidByVertices(ct.getV1(), ct.getV2(), s.getSpecificVertex(1), t.getSpecificVertex(3));
+                        t2.setLeft(ct.getLeft());
+                        t2.setRight(s.getSpecificVertex(1));
+                        t2.setBottom(t2.getSpecificEdge(3));
+                        t2.setTop(s);
+                        
+                        // remove intersected trapezoid from the list
+                        this.trapezoids.remove(t);
+
+                        // add the new trapezoids to the list
+                        this.trapezoids.add(t1);
+                        this.trapezoids.add(t2);
+                    
+                        // print for feedback
+                        t1.print();
+                        t2.print();
+                        
+                        // TODO tree structure
+                        
+                        continue;
+                    }
+                    
+                    // </editor-fold>
+                }
+                // s ends in t
+                else if (DoesTrapezoidContainVertex(t, s.getSpecificVertex(1))) {
+                    
+                    // <editor-fold defaultstate="collapsed" desc="ends">
+                    
+                    // split intersected trapezoid into 3 trapezoids
+                    // upper and lower part above and below segment
+                    // and a trapezoid to the right of the segment
+                    System.out.println(s.getLabel() + " ends in " + t.getLabel());
+                    
+                    // compute side of entrance intersection
+                    Vertex v1 = GetIntersectionPointOfSegments(s, t.getSpecificEdge(0));
+                    boolean entersAbove = v1.getY() > t.getLeft().getY();
+                        
+                    // compute the required vertices for the new trapezoids
+                    Edge e1 = new Edge("e1", s.getSpecificVertex(1), new Vertex(s.getSpecificVertex(1).getX(), 10000.0, "tv1"));
+                    Edge e2 = new Edge("e2", s.getSpecificVertex(1), new Vertex(s.getSpecificVertex(1).getX(), -10000.0, "tv2"));
+                    Vertex v2 = GetIntersectionPointOfSegments(t.getSpecificEdge(1), e1);
+                    Vertex v3 = GetIntersectionPointOfSegments(t.getSpecificEdge(3), e2);
+                                        
+                    // if it enters above the defined left vertex of the intersected trapezoid
+                    if (entersAbove) {
+                        
+                        // trapezoid below segment 
+                        Trapezoid t1 = CreateTrapezoidByVertices(t.getSpecificVertex(0), v1, 
+                                s.getSpecificVertex(1), v3);
+                        t1.setRight(s.getSpecificVertex(1));
+                        t1.setLeft(t.getLeft());
+                        t1.setBottom(t1.getSpecificEdge(3));
+                        t1.setTop(t1.getSpecificEdge(1));
+                        
+                        // trapezoid right of segment
+                        Trapezoid t2 = CreateTrapezoidByVertices(v2, t.getSpecificVertex(2), 
+                                t.getSpecificVertex(3), v3);
+                        t2.setRight(t.getRight());
+                        t2.setLeft(s.getSpecificVertex(1));
+                        t2.setBottom(t2.getSpecificEdge(3));
+                        t2.setTop(t2.getSpecificEdge(1));
+                                               
+                        // trapezoid above segment ends
+                        Trapezoid t3 = CreateTrapezoidByVertices(ct.getV1(), ct.getV2(), v2, s.getSpecificVertex(1));
+                        t3.setLeft(ct.getLeft());
+                        t3.setRight(s.getSpecificVertex(1));
+                        t3.setBottom(s);
+                        t3.setTop(t3.getSpecificEdge(1));
+                        
+                        // remove intersected trapezoid from the list
+                        this.trapezoids.remove(t);
+
+                        // add the new trapezoids to the list
                         this.trapezoids.add(t1);
                         this.trapezoids.add(t2);
                         this.trapezoids.add(t3);
-                        this.trapezoids.add(t4);
+                    
+                        // print for feedback
+                        t1.print();
+                        t2.print();
+                        t3.print();
+
+                        // TODO tree structure
                         
-                        if (this.tree.getLeft() == null && this.tree.getRight() == null) {
-                            segments.get(i).addNode(t3, 1);
-                            segments.get(i).addNode(t2, 0);
-                            segments.get(i).getSpecificVertex(1).addNode(t4, 1);
-                            segments.get(i).getSpecificVertex(1).addNode(segments.get(i), 0);
-                            segments.get(i).getSpecificVertex(0).addNode(segments.get(i).getSpecificVertex(1), 1);
-                            segments.get(i).getSpecificVertex(0).addNode(t1, 0);
-                            this.tree = segments.get(i).getSpecificVertex(0);                         
-                        } else {
-                            List<TrapezoidShape> parents = this.tree.findNode(intersectedTrapezoids.get(j).getLabel()).getParents();
-                            int side = parents.get(0).getLeft().getLabel().equals(intersectedTrapezoids.get(j).getLabel()) ? 0 : 1;
-                            if (parents.size() == 1) {
-                                this.tree.removeNode(parents.get(0).getLabel(), intersectedTrapezoids.get(j).getLabel());
-                                segments.get(i).addNode(t3, 1);
-                                segments.get(i).addNode(t2, 0);
-                                segments.get(i).getSpecificVertex(1).addNode(t4, 1);
-                                segments.get(i).getSpecificVertex(1).addNode(segments.get(i), 0);
-                                segments.get(i).getSpecificVertex(0).addNode(segments.get(i).getSpecificVertex(1), 1);
-                                segments.get(i).getSpecificVertex(0).addNode(t1, 0);
-                                parents.get(0).addNode(segments.get(i).getSpecificVertex(0), side);
-                            }
-                        }
-                    } 
-                    // segment starts in this trapezoid
-                    else if (DoesTrapezoidContainVertex(intersectedTrapezoids.get(j), segments.get(i).getSpecificVertex(0))) {
-                        System.out.println("Segment: " + segments.get(i).getLabel() + ", starts in trapezoid: " + intersectedTrapezoids.get(j).getLabel());
-                        
-                        Vertex tempv1 = new Vertex(segments.get(i).getSpecificVertex(0).getX(), segments.get(i).getSpecificVertex(0).getY(), "tempv1");
-                        Vertex tempv2 = new Vertex(segments.get(i).getSpecificVertex(0).getX(), 10000.0, "tempv2");
-                        Vertex tempv3 = new Vertex(segments.get(i).getSpecificVertex(0).getX(), -10000.0, "tempv3");
-                        Edge tempe1 = new Edge("tempe1", tempv1, tempv2);
-                        Edge tempe2 = new Edge("tempe2", tempv1, tempv3);
-                        
-                        // point on outer trapezoid top edge intersecting edge upwards from left vertex of inserted segment.
-                        Vertex v1 = GetIntersectionPointOfSegments(intersectedTrapezoids.get(j).getSpecificEdge(1), tempe1);
-                        
-                        // point on outer trapezoid bottom edge intersecting edge downwards from left vertex of inserted segment.
-                        Vertex v2 = GetIntersectionPointOfSegments(intersectedTrapezoids.get(j).getSpecificEdge(3), tempe2);
-                        
-                        // trapezoid left of left vertex of intersected segment
-                        Trapezoid t1 = CreateTrapezoidByVertices(intersectedTrapezoids.get(j).getSpecificVertex(0),
-                                intersectedTrapezoids.get(j).getSpecificVertex(1), v1, v2);
-                        // set trapezoid definements
-                        t1.setRight(segments.get(i).getSpecificVertex(0));
-                        t1.setLeft(intersectedTrapezoids.get(j).getSpecificVertex(1));
-                        t1.setBottom(intersectedTrapezoids.get(j).getSpecificEdge(3));
-                        t1.setTop(intersectedTrapezoids.get(j).getSpecificEdge(1));
-                                                
-                        Vertex tempv4 = GetIntersectionPointOfSegments(segments.get(i), intersectedTrapezoids.get(j).getSpecificEdge(2));
-                        boolean crossesEdgeAboveDefinedVertex = intersectedTrapezoids.get(j).getRight().getY() < tempv4.getY();
-                        
-                        if (crossesEdgeAboveDefinedVertex) {
-                            System.out.println("Crosses edge above defined vertex");
-                            // trapezoid below inserted segment
-                            Trapezoid t2 = CreateTrapezoidByVertices(v2, segments.get(i).getSpecificVertex(0), 
-                                    tempv4, intersectedTrapezoids.get(j).getSpecificVertex(3));
-                            // set trapezoid definements
-                            t2.setRight(intersectedTrapezoids.get(j).getRight());
-                            t2.setLeft(segments.get(i).getSpecificVertex(0));
-                            t2.setBottom(intersectedTrapezoids.get(j).getBottom());
-                            t2.setTop(segments.get(i));     
-                            
-                            t1.print();
-                            t2.print();
-                            
-                            this.trapezoids.remove(intersectedTrapezoids.get(j));
-                            this.trapezoids.add(t1);
-                            this.trapezoids.add(t2);
-                            
-                            // TODO update tree structure accordingly
-                            
-                            // top trapezoid that continues in the next intersected trapezoid
-                            trapezoidToBeContinued = new Trapezoid();
-                            trapezoidToBeContinued.setV1(segments.get(i).getSpecificVertex(0));
-                            trapezoidToBeContinued.setV2(v1);
-                            trapezoidToBeContinued.setLeft(segments.get(i).getSpecificVertex(0));
-                            trapezoidToBeContinued.setBottom(segments.get(i));
-                            trapezoidToBeContinuedState = 1;
-                        } else {
-                            System.out.println("Crosses edge below defined vertex");
-                            // trapezoid above inserted segment
-                            Trapezoid t3 = CreateTrapezoidByVertices(segments.get(i).getSpecificVertex(0), v1,
-                                    intersectedTrapezoids.get(j).getSpecificVertex(2), tempv4);
-                            // set trapezoid definements
-                            t3.setRight(intersectedTrapezoids.get(j).getRight());
-                            t3.setLeft(segments.get(i).getSpecificVertex(0));
-                            t3.setBottom(segments.get(i));
-                            t3.setTop(intersectedTrapezoids.get(j).getTop());     
-                            
-                            t1.print();
-                            t3.print();
-                            
-                            this.trapezoids.remove(intersectedTrapezoids.get(j));
-                            this.trapezoids.add(t1);
-                            this.trapezoids.add(t3);
-                            
-                            // TODO update tree structure accordingly
-                            
-                            // bottom trapezoid that continues in the next intersected trapezoid
-                            trapezoidToBeContinued = new Trapezoid();
-                            trapezoidToBeContinued.setV1(v2);
-                            trapezoidToBeContinued.setV2(segments.get(i).getSpecificVertex(0));
-                            trapezoidToBeContinued.setLeft(segments.get(i).getSpecificVertex(0));
-                            trapezoidToBeContinued.setTop(segments.get(i));
-                            trapezoidToBeContinuedState = -1;
-                        } 
+                        continue;
                     }
-                    // segment ends in this trapezoid
-                    else if (DoesTrapezoidContainVertex(intersectedTrapezoids.get(j), segments.get(i).getSpecificVertex(1))) {
-                        System.out.println("Segment: " + segments.get(i).getLabel() + ", ends in trapezoid: " + intersectedTrapezoids.get(j).getLabel());
-                        
-                        Vertex tempv1 = new Vertex(segments.get(i).getSpecificVertex(1).getX(), segments.get(i).getSpecificVertex(1).getY(), "tempv1");
-                        Vertex tempv2 = new Vertex(segments.get(i).getSpecificVertex(1).getX(), 10000.0, "tempv2");
-                        Vertex tempv3 = new Vertex(segments.get(i).getSpecificVertex(1).getX(), -10000.0, "tempv3");
-                        Edge tempe1 = new Edge("tempe1", tempv1, tempv2);
-                        Edge tempe2 = new Edge("tempe2", tempv1, tempv3);
-                        
-                        // point on outer trapezoid top edge intersecting edge downwards from right vertex of inserted segment.
-                        Vertex v3 = GetIntersectionPointOfSegments(intersectedTrapezoids.get(j).getSpecificEdge(1), tempe1);
-                        
-                        // point on outer trapezoid bottom edge intersecting edge downwards from right vertex of inserted segment.
-                        Vertex v4 = GetIntersectionPointOfSegments(intersectedTrapezoids.get(j).getSpecificEdge(3), tempe2);
-                        
-                        // trapezoid right of right vertex of inserted segment
-                        Trapezoid t1 = CreateTrapezoidByVertices(v4, v3, intersectedTrapezoids.get(j).getSpecificVertex(2), 
-                                intersectedTrapezoids.get(j).getSpecificVertex(3));
-                        // set trapezoid definements
-                        t1.setRight(intersectedTrapezoids.get(j).getRight());
-                        t1.setLeft(segments.get(i).getSpecificVertex(0));
-                        t1.setBottom(intersectedTrapezoids.get(j).getBottom());
-                        t1.setTop(intersectedTrapezoids.get(j).getTop());
-                        
-                        Vertex tempv4 = GetIntersectionPointOfSegments(segments.get(i), intersectedTrapezoids.get(j).getSpecificEdge(0));
-                        boolean crossesEdgeAboveDefinedVertex = intersectedTrapezoids.get(j).getLeft().getY() < tempv4.getY();
-                                                
-                        if (crossesEdgeAboveDefinedVertex) {
-                            System.out.println("Crosses edge above defined vertex");
-                            // trapezoid below inserted segment
-                            Trapezoid t2 = CreateTrapezoidByVertices(intersectedTrapezoids.get(j).getSpecificVertex(0), tempv4, 
-                                    segments.get(i).getSpecificVertex(1), v4);
-                            // set trapezoid definements
-                            t2.setRight(segments.get(i).getSpecificVertex(1));
-                            t2.setLeft(intersectedTrapezoids.get(j).getLeft());
-                            t2.setBottom(intersectedTrapezoids.get(j).getBottom());
-                            t2.setTop(segments.get(i));                            
-                            
-                            // top trapezoid that continues from previous intersected trapezoid has to be closed
-                            if (trapezoidToBeContinuedState == 1) {
-                                trapezoidToBeContinued.setV3(v3);
-                                trapezoidToBeContinued.setV4(segments.get(i).getSpecificVertex(1));
-                                trapezoidToBeContinued = FinishTrapezoidWithVertices(trapezoidToBeContinued);
-                                trapezoidToBeContinued.setRight(segments.get(i).getSpecificVertex(1));
-                                trapezoidToBeContinued.setTop(intersectedTrapezoids.get(j).getTop());
-                            }
-                            
-                            t1.print();
-                            t2.print();
-                            trapezoidToBeContinued.print();
-                            
-                            this.trapezoids.remove(intersectedTrapezoids.get(j));
-                            this.trapezoids.add(t1);
-                            this.trapezoids.add(t2);
-                            this.trapezoids.add(trapezoidToBeContinued);
-                            
-                            // TODO update tree structure accordingly
-                            
-                            trapezoidToBeContinued = null;
-                            trapezoidToBeContinuedState = 0;
-                            
-                        } else {
-                            System.out.println("Crosses edge below defined vertex");
-                            // trapezoid above inserted segment
-                            Trapezoid t3 = CreateTrapezoidByVertices(tempv4, intersectedTrapezoids.get(j).getSpecificVertex(1),
-                                    v3, segments.get(i).getSpecificVertex(1));
-                            // set trapezoid definements
-                            t3.setRight(segments.get(i).getSpecificVertex(1));
-                            t3.setLeft(intersectedTrapezoids.get(j).getLeft());
-                            t3.setBottom(segments.get(i));
-                            t3.setTop(intersectedTrapezoids.get(j).getTop());                            
-                            
-                            // bottom trapezoid that continues from the previous intersected trapezoid has to be closed
-                            if (trapezoidToBeContinuedState == -1) {
-                                trapezoidToBeContinued.setV3(segments.get(i).getSpecificVertex(1));
-                                trapezoidToBeContinued.setV4(v4);
-                                trapezoidToBeContinued = FinishTrapezoidWithVertices(trapezoidToBeContinued);
-                                trapezoidToBeContinued.setRight(segments.get(i).getSpecificVertex(1));
-                                trapezoidToBeContinued.setBottom(intersectedTrapezoids.get(j).getBottom());
-                            }
-                            
-                            t1.print();
-                            t3.print();
-                            trapezoidToBeContinued.print();
-                            
-                            this.trapezoids.remove(intersectedTrapezoids.get(j));
-                            this.trapezoids.add(t1);
-                            this.trapezoids.add(t3);
-                            this.trapezoids.add(trapezoidToBeContinued);
-                            
-                            // TODO update tree structure accordingly
-                            
-                            trapezoidToBeContinued = null;
-                            trapezoidToBeContinuedState = 0;
-                        }
-                    }
-                    // segment completely intersects trapezoid
+                    // otherwise it exits below
                     else {
-                        System.out.println("Segment: " + segments.get(i).getLabel() + ", intersects trapezoid: " + intersectedTrapezoids.get(j).getLabel());
+                    
+                        // trapezoid above segment
+                        Trapezoid t1 = CreateTrapezoidByVertices(v1, t.getSpecificVertex(1),
+                                v2, s.getSpecificVertex(1));
+                        t1.setRight(s.getSpecificVertex(1));
+                        t1.setLeft(t.getLeft());
+                        t1.setBottom(t1.getSpecificEdge(3));
+                        t1.setTop(t1.getSpecificEdge(1));
                         
-                        // 2 cases
-                        // 1st and 2nd crossing both below defining vertices
-                        // 1st and 2nd crossing both above defining vertices
-                        // 1st on the oposite side                        
+                        // trapezoid right of segment
+                        Trapezoid t2 = CreateTrapezoidByVertices(v2, t.getSpecificVertex(2), 
+                                t.getSpecificVertex(3), v3);
+                        t2.setRight(t.getRight());
+                        t2.setLeft(s.getSpecificVertex(1));
+                        t2.setBottom(t2.getSpecificEdge(3));
+                        t2.setTop(t2.getSpecificEdge(1));
+                                               
+                        // trapezoid below segment ends
+                        Trapezoid t3 = CreateTrapezoidByVertices(ct.getV1(), ct.getV2(), s.getSpecificVertex(1), v3);
+                        t3.setLeft(ct.getLeft());
+                        t3.setRight(s.getSpecificVertex(1));
+                        t3.setBottom(t3.getSpecificEdge(3));
+                        t3.setTop(s);
                         
-                        Vertex tempv4 = GetIntersectionPointOfSegments(segments.get(i), intersectedTrapezoids.get(j).getSpecificEdge(0));
-                        boolean crossesLeftEdgeAboveDefinedVertex = intersectedTrapezoids.get(j).getLeft().getY() < tempv4.getY();
+                        // remove intersected trapezoid from the list
+                        this.trapezoids.remove(t);
+
+                        // add the new trapezoids to the list
+                        this.trapezoids.add(t1);
+                        this.trapezoids.add(t2);
+                        this.trapezoids.add(t3);
+                    
+                        // print for feedback
+                        t1.print();
+                        t2.print();
+                        t3.print();
                         
-                        Vertex tempv5 = GetIntersectionPointOfSegments(segments.get(i), intersectedTrapezoids.get(j).getSpecificEdge(2));
-                        boolean crossesRightEdgeAboveDefinedVertex = intersectedTrapezoids.get(j).getLeft().getY() < tempv5.getY();
+                        // TODO tree structure
                         
-                        if (crossesLeftEdgeAboveDefinedVertex && crossesRightEdgeAboveDefinedVertex) {
-                            System.out.println("Crosses both edges above defined vertices");
-                            Trapezoid t1 = CreateTrapezoidByVertices(intersectedTrapezoids.get(j).getSpecificVertex(0), tempv4,
-                                    tempv5, intersectedTrapezoids.get(j).getSpecificVertex(3));
-                            // set trapezoid definements
-                            t1.setRight(segments.get(i).getSpecificVertex(3));
-                            t1.setLeft(intersectedTrapezoids.get(j).getSpecificVertex(0));
-                            t1.setBottom(intersectedTrapezoids.get(j).getSpecificEdge(3));
-                            t1.setTop(segments.get(i));
-                            
-                            t1.print();
-                            
-                            this.trapezoids.remove(intersectedTrapezoids.get(j));
-                            this.trapezoids.add(t1);
-                            
-                            // TODO update tree structure accordingly
-                        }
-                        else if (!crossesLeftEdgeAboveDefinedVertex && !crossesRightEdgeAboveDefinedVertex) {
-                            System.out.println("Crosses both edges below defined vertices");
-                            Trapezoid t1 = CreateTrapezoidByVertices(tempv4, intersectedTrapezoids.get(j).getSpecificVertex(1), 
-                                    intersectedTrapezoids.get(j).getSpecificVertex(2), tempv5);
-                            // set trapezoid definements
-                            t1.setRight(segments.get(i).getSpecificVertex(2));
-                            t1.setLeft(intersectedTrapezoids.get(j).getSpecificVertex(1));
-                            t1.setBottom(segments.get(i));
-                            t1.setTop(intersectedTrapezoids.get(j).getSpecificEdge(1));
-                            
-                            t1.print();
-                            
-                            this.trapezoids.remove(intersectedTrapezoids.get(j));
-                            this.trapezoids.add(t1);
-                                
-                            // TODO update tree structure accordingly
-                        }
-                        else if (crossesLeftEdgeAboveDefinedVertex && !crossesRightEdgeAboveDefinedVertex) {
-                            System.out.println("Crosses left edge above defined vertex and right edge below defined vertex");
-                            if (trapezoidToBeContinuedState == 1) {
-                                trapezoidToBeContinued.setV3(intersectedTrapezoids.get(j).getSpecificVertex(2));
-                                trapezoidToBeContinued.setV4(tempv5);
-                                trapezoidToBeContinued = CreateTrapezoidByVertices(trapezoidToBeContinued.getV1(), trapezoidToBeContinued.getV2(), 
-                                        trapezoidToBeContinued.getV3(), trapezoidToBeContinued.getV4());
-                                
-                                trapezoidToBeContinued.print();
-                                
-                                this.trapezoids.remove(intersectedTrapezoids.get(j));
-                                this.trapezoids.add(trapezoidToBeContinued);
-                                
-                                // TODO update tree structure accordingly
-                                
-                                trapezoidToBeContinued = new Trapezoid();
-                                trapezoidToBeContinued.setV1(intersectedTrapezoids.get(j).getSpecificVertex(0));
-                                trapezoidToBeContinued.setV2(tempv4);
-                                trapezoidToBeContinuedState = -1;
-                            }
-                        }
-                        else if (!crossesLeftEdgeAboveDefinedVertex && crossesRightEdgeAboveDefinedVertex) {
-                            System.out.println("Crosses left edge below defined vertex and right edge above defined vertex");
-                            if (trapezoidToBeContinuedState == 1) {
-                                trapezoidToBeContinued.setV3(tempv5);
-                                trapezoidToBeContinued.setV4(intersectedTrapezoids.get(j).getSpecificVertex(3));
-                                trapezoidToBeContinued = CreateTrapezoidByVertices(trapezoidToBeContinued.getV1(), trapezoidToBeContinued.getV2(), 
-                                        trapezoidToBeContinued.getV3(), trapezoidToBeContinued.getV4());
-                                
-                                trapezoidToBeContinued.print();
-                                
-                                this.trapezoids.remove(intersectedTrapezoids.get(j));
-                                this.trapezoids.add(trapezoidToBeContinued);
-                                
-                                // TODO update tree structure accordingly
-                                
-                                trapezoidToBeContinued = new Trapezoid();
-                                trapezoidToBeContinued.setV1(tempv4);
-                                trapezoidToBeContinued.setV2(intersectedTrapezoids.get(j).getSpecificVertex(1));
-                                trapezoidToBeContinuedState = 1;
-                            }                            
-                        }
+                        continue;
                     }
-                    System.out.println("-------------------------");
+                    
+                    // </editor-fold>
                 }
-                // TODO remove trapezoids from list and replace by new trapezoids that appear because of the insertion of segment i
-                // TODO remove leaves for the trapezoids from the search structure and create new leaves for the new trapezoids
-                // TODO link the new leaves to the existing inner nodes by adding some new inner nodes
+                // s completely intersects t
+                else if (ct != null) {
+                    
+                    // <editor-fold defaultstate="collapsed" desc="intersects">
+                    
+                    // split intersected trapezoid into 2 trapezoids
+                    // upper and lower part above and below segment
+                    System.out.println(s.getLabel() + " completely intersects " + t.getLabel());
+                    
+                    // compute side of entrance intersection
+                    Vertex v1 = GetIntersectionPointOfSegments(s, t.getSpecificEdge(0));
+                    boolean entersAbove = v1.getY() > t.getLeft().getY();
+                    
+                    // compute side of exit intersection
+                    Vertex v2 = GetIntersectionPointOfSegments(s, t.getSpecificEdge(2));
+                    boolean exitsAbove = v2.getY() > t.getRight().getY();
+                    
+                    // if it enters above the defined left vertex of the intersected trapezoid
+                    // and it exits above the defined right vertex of the intersected trapezoid
+                    if (entersAbove && exitsAbove) {
+                        
+                        // trapezoid below segment
+                        Trapezoid t1 = CreateTrapezoidByVertices(t.getSpecificVertex(0), v1, 
+                                v2, t.getSpecificVertex(3));
+                        t1.setRight(t.getRight());
+                        t1.setLeft(t.getLeft());
+                        t1.setBottom(t.getBottom());
+                        t1.setTop(t1.getSpecificEdge(1));
+                        
+                        // remove intersected trapezoid from the list
+                        this.trapezoids.remove(t);
+
+                        // add the new trapezoids to the list
+                        this.trapezoids.add(t1);
+                    
+                        // print for feedback
+                        t1.print();
+                    
+                        // TODO tree structure
+
+                        continue;
+                    }
+                    // if it enters above the defined left vertex of the intersected trapezoid
+                    // and it exits below the defined right vertex of the intersected trapezoid
+                    else if (entersAbove && !exitsAbove) {
+                        
+                        // trapezoid above segment ends
+                        Trapezoid t1 = CreateTrapezoidByVertices(ct.getV1(), ct.getV2(), t.getSpecificVertex(2), v2);
+                        t1.setLeft(ct.getLeft());
+                        t1.setRight(t.getRight());
+                        t1.setBottom(t1.getSpecificEdge(3));
+                        t1.setTop(t1.getSpecificEdge(1));
+                        
+                        // remove intersected trapezoid from the list
+                        this.trapezoids.remove(t);
+                        
+                        // add the new trapezoids to the list
+                        this.trapezoids.add(t1);
+                    
+                        // print for feedback
+                        t1.print();
+                        
+                        // trapezoid below segment continues
+                        ct = new Trapezoid();
+                        ct.setV1(t.getSpecificVertex(0));
+                        ct.setV2(v1);
+                        ct.setLeft(t.getLeft());
+                    
+                        // TODO tree structure
+
+                        continue;
+                        
+                    }
+                    // if it enters below the defined left vertex of the intersected trapezoid
+                    // and it exits above the defined right vertex of the intersected trapezoid
+                    else if (!entersAbove && exitsAbove) {
+                        
+                        // trapezoid below segment ends
+                        Trapezoid t1 = CreateTrapezoidByVertices(ct.getV1(), ct.getV2(), v2, t.getSpecificVertex(3));
+                        t1.setLeft(ct.getLeft());
+                        t1.setRight(t.getRight());
+                        t1.setBottom(t1.getSpecificEdge(3));
+                        t1.setTop(t1.getSpecificEdge(1));
+                        
+                        // remove intersected trapezoid from the list
+                        this.trapezoids.remove(t);
+                        
+                        // add the new trapezoids to the list
+                        this.trapezoids.add(t1);
+                    
+                        // print for feedback
+                        t1.print();
+                        
+                        // trapezoid above segment continues
+                        ct = new Trapezoid();
+                        ct.setV1(v1);
+                        ct.setV2(t.getSpecificVertex(1));
+                        ct.setLeft(t.getLeft());
+                    
+                        // TODO tree structure
+
+                        continue;
+                        
+                    }
+                    // if it enters below the defined left vertex of the intersected trapezoid
+                    // and it exits below the defined right vertex of the intersected trapezoid
+                    else {
+                        
+                        // trapezoid above segment
+                        Trapezoid t1 = CreateTrapezoidByVertices(v1, t.getSpecificVertex(1),
+                                t.getSpecificVertex(2), v2);
+                        t1.setRight(t.getRight());
+                        t1.setLeft(t.getLeft());
+                        t1.setBottom(t1.getSpecificEdge(3));
+                        t1.setTop(t.getTop());
+                        
+                        // remove intersected trapezoid from the list
+                        this.trapezoids.remove(t);
+
+                        // add the new trapezoids to the list
+                        this.trapezoids.add(t1);
+                    
+                        // print for feedback
+                        t1.print();
+                        
+                        // TODO tree structure
+
+                        continue;
+                    }
+                    
+                    // </editor-fold>
+                }
             }
         }
-        for (int j = 0; j < this.trapezoids.size(); j++) {
-            this.trapezoids.get(j).print();
-        }
-        this.tree.print();
     }
     
     public Trapezoid CreateTrapezoidByVertices(Vertex v1, Vertex v2, Vertex v3, Vertex v4) {
@@ -504,6 +924,10 @@ public class TrapezoidalMap {
         boundingBox.setE2(new Edge("e2", boundingBox.getV2(), boundingBox.getV3()));
         boundingBox.setE3(new Edge("e3", boundingBox.getV3(), boundingBox.getV4()));
         boundingBox.setE4(new Edge("e4", boundingBox.getV4(), boundingBox.getV1()));
+        boundingBox.setLeft(boundingBox.getV1());
+        boundingBox.setRight(boundingBox.getV4());
+        boundingBox.setTop(boundingBox.getE2());
+        boundingBox.setBottom(boundingBox.getE4());
         boundingBox.setLabel("R");
         
         return boundingBox;
@@ -517,13 +941,14 @@ public class TrapezoidalMap {
         }
         
         for (int i = 0; i < this.trapezoids.size(); i++) {
-            if (TrapezoidalMap.this.DoSegmentsIntersect(this.trapezoids.get(i).getE1(), segment)) {
+            
+            if (DoSegmentsIntersect(this.trapezoids.get(i).getE1(), segment)) {
                 intersectedTrapezoids.add(this.trapezoids.get(i));
-            } else if (TrapezoidalMap.this.DoSegmentsIntersect(this.trapezoids.get(i).getE2(), segment)) { 
+            } else if (DoSegmentsIntersect(this.trapezoids.get(i).getE2(), segment)) { 
                 intersectedTrapezoids.add(this.trapezoids.get(i));
-            } else if (TrapezoidalMap.this.DoSegmentsIntersect(this.trapezoids.get(i).getE3(), segment)) { 
+            } else if (DoSegmentsIntersect(this.trapezoids.get(i).getE3(), segment)) { 
                 intersectedTrapezoids.add(this.trapezoids.get(i));
-            } else if (TrapezoidalMap.this.DoSegmentsIntersect(this.trapezoids.get(i).getE4(), segment)) { 
+            } else if (DoSegmentsIntersect(this.trapezoids.get(i).getE4(), segment)) { 
                 intersectedTrapezoids.add(this.trapezoids.get(i));
             } else if (DoesTrapezoidContainSegment(this.trapezoids.get(i), segment)) { 
                 intersectedTrapezoids.add(this.trapezoids.get(i));

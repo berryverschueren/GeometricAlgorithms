@@ -14,6 +14,13 @@ public class Vertex extends TrapezoidShape {
     private int artFlag, exitFlag;
     
     public Vertex() {}
+    
+    public Vertex(Double x, Double y, String label) {
+        super(label);
+        this.x = x;
+        this.y = y;
+    }
+    
     public Vertex(Double x, Double y, int exitFlag, int artFlag, String label) {
         super(label);
         this.x = x;

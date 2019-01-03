@@ -9,18 +9,15 @@ import geo.dataStructures.Edge;
 import geo.dataStructures.TrapezoidalMap;
 import geo.dataStructures.Vertex;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 
@@ -36,22 +33,36 @@ public class GEOFX extends Application {
     public void start(Stage primaryStage) {
         TrapezoidalMap tm = new TrapezoidalMap();
         List<Edge> segments = new ArrayList<>();
-        segments.add(new Edge("s2", new Vertex(4.0,1.0,"p2"), new Vertex(8.0,2.0,"q2"))); 
-        segments.add(new Edge("s1", new Vertex(2.0,3.0,"p1"), new Vertex(6.0,4.0,"q1")));
-        segments.add(new Edge("s3", new Vertex(3.0,3.0,"p3"), new Vertex(5.0,3.0,"q3")));  
-        tm.Construct(segments.subList(0, sliceCount));
+        
+//        segments.add(new Edge("s4", new Vertex(1.0,6.0,"p4"), new Vertex(4.0,5.0,"q4"))); 
+//        segments.add(new Edge("s5", new Vertex(9.0,3.0,"p5"), new Vertex(10.0,1.0,"q5"))); 
+//        segments.add(new Edge("s6", new Vertex(10.0,1.0,"p6"), new Vertex(12.0,3.0,"q6"))); 
+//        segments.add(new Edge("s1", new Vertex(2.0,3.0,"p1"), new Vertex(6.0,4.0,"q1")));
+//        segments.add(new Edge("s2", new Vertex(4.0,1.0,"p2"), new Vertex(8.0,2.0,"q2"))); 
+//        segments.add(new Edge("s3", new Vertex(3.0,3.0,"p3"), new Vertex(5.0,2.0,"q3"))); 
+        
+        segments.add(new Edge("s2", new Vertex(6.0,2.0,"p2"), new Vertex(12.0,7.0,"q1")));
+        segments.add(new Edge("s4", new Vertex(1.0,6.0,"p4"), new Vertex(5.0,13.0,"q4")));
+        segments.add(new Edge("s3", new Vertex(5.0,13.0,"p3"), new Vertex(12.0,7.0,"q3")));          
+        segments.add(new Edge("s1", new Vertex(1.0,6.0,"p1"), new Vertex(6.0,2.0,"q1")));  
+        
+        tm.construct(segments.subList(0, sliceCount));
+//        tm.construct(segments);
         
         primaryStage.setTitle("Drawing Operations Test");
         Group root = new Group();
-        Canvas canvas = new Canvas(300, 250);
+        Canvas canvas = new Canvas(500, 500);
         
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent t) -> {
+            if (sliceCount >= segments.size()) {
+                sliceCount = 0;
+            }
             if (t.getClickCount() > 1) {
                 sliceCount = 1;
             } else {
                 sliceCount++;
             }
-            tm.Construct(segments.subList(0, sliceCount));
+            tm.construct(segments.subList(0, sliceCount));
             drawShapes(canvas, tm);  
         });
         

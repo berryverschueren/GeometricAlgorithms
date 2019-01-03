@@ -34,6 +34,6 @@ public class GEO {
         
         segments.add(new Edge("s2", new Vertex(4.0,1.0,"p2"), new Vertex(8.0,2.0,"q2")));
         
-        tm.Construct(segments);
+        tm.construct(segments);
     }
 }
