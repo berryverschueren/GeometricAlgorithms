@@ -46,7 +46,7 @@ public class TrapezoidalMap {
         this.trapezoids.add(boundingBox);
         // set up search structure as well
         this.tree = boundingBox;
-        // compute random permutation of the segments
+        // compute random permutation of the segments 
         //Collections.shuffle(segments);
         
         // loop over the segments
@@ -72,16 +72,15 @@ public class TrapezoidalMap {
                 Edge s = segments.get(i); 
                 
                 // print for feedback
+                System.out.println("--------------------------------------------------");
                 t.print();
                 s.print();
                 
                 // vertices of s lie on top of edges of t
                 // s is contained in t
                 if (DoesTrapezoidContainSegment(t, s)
-                        && Objects.equals(t.getLeft().getX(), s.getSpecificVertex(0).getX()) 
-                        && Objects.equals(t.getLeft().getY(), s.getSpecificVertex(0).getY())
-                        && Objects.equals(t.getRight().getX(), s.getSpecificVertex(1).getX()) 
-                        && Objects.equals(t.getRight().getY(), s.getSpecificVertex(1).getY())) {
+                        && Objects.equals(t.getLeft().getX(), s.getSpecificVertex(0).getX())
+                        && Objects.equals(t.getRight().getX(), s.getSpecificVertex(1).getX()) ) {
                     
                     // <editor-fold defaultstate="collapsed" desc="contained LLRR">
                     
@@ -126,8 +125,7 @@ public class TrapezoidalMap {
                 // left vertex of s lies on top of left edge of t
                 // s is contained in t
                 else if (DoesTrapezoidContainSegment(t, s)
-                        && Objects.equals(t.getLeft().getX(), s.getSpecificVertex(0).getX()) 
-                        && Objects.equals(t.getLeft().getY(), s.getSpecificVertex(0).getY())) {
+                        && Objects.equals(t.getLeft().getX(), s.getSpecificVertex(0).getX())) {
                     
                     // <editor-fold defaultstate="collapsed" desc="contained LL">
 
@@ -188,8 +186,7 @@ public class TrapezoidalMap {
                 // right vertex of s lies on top of right edge of t
                 // s is contained in t
                 else if (DoesTrapezoidContainSegment(t, s)
-                        && Objects.equals(t.getRight().getX(), s.getSpecificVertex(1).getX()) 
-                        && Objects.equals(t.getRight().getY(), s.getSpecificVertex(1).getY())) {
+                        && Objects.equals(t.getRight().getX(), s.getSpecificVertex(1).getX())) { 
                     
                     // <editor-fold defaultstate="collapsed" desc="contained RR">
                     
@@ -319,8 +316,7 @@ public class TrapezoidalMap {
                 // left vertex of s lies on top of left edge of t
                 // s starts in t
                 else if (DoesTrapezoidContainVertex(t, s.getSpecificVertex(0))
-                        && Objects.equals(t.getLeft().getX(), s.getSpecificVertex(0).getX())
-                        && Objects.equals(t.getLeft().getY(), s.getSpecificVertex(0).getY())) {
+                        && Objects.equals(t.getLeft().getX(), s.getSpecificVertex(0).getX())) {
                 
                     // <editor-fold defaultstate="collapsed" desc="starts LL">
                     
@@ -341,7 +337,7 @@ public class TrapezoidalMap {
                     
                     // if it exits above the defined right vertex of the intersected trapezoid
                     if (exitAbove) {
-                        
+                        System.out.println("Exits above defined right vertex");
                         // trapezoid below segment 
                         Trapezoid t1 = CreateTrapezoidByVertices(t.getSpecificVertex(0), s.getSpecificVertex(0), 
                                 v1, t.getSpecificVertex(3));
@@ -371,6 +367,7 @@ public class TrapezoidalMap {
                     }
                     // otherwise it exits below
                     else {
+                        System.out.println("Exits below defined right vertex");
                         
                         // trapezoid above segment 
                         Trapezoid t1 = CreateTrapezoidByVertices(s.getSpecificVertex(0), t.getSpecificVertex(1), 
@@ -405,8 +402,7 @@ public class TrapezoidalMap {
                 // left vertex of s lies on top of right edge of t
                 // s starts in t
                 else if (DoesTrapezoidContainVertex(t, s.getSpecificVertex(0))
-                        && Objects.equals(t.getRight().getX(), s.getSpecificVertex(0).getX())
-                        && Objects.equals(t.getRight().getY(), s.getSpecificVertex(0).getY())) {
+                        && Objects.equals(t.getRight().getX(), s.getSpecificVertex(0).getX())) {
                     
                     // <editor-fold defaultstate="collapsed" desc="starts LR">
                     
@@ -439,6 +435,7 @@ public class TrapezoidalMap {
                                         
                     // if it exits above the defined right vertex of the intersected trapezoid
                     if (exitAbove) {
+                        System.out.println("Exits above defined right vertex");
                         
                         // trapezoid below segment 
                         Trapezoid t1 = CreateTrapezoidByVertices(v3, s.getSpecificVertex(0), 
@@ -479,6 +476,7 @@ public class TrapezoidalMap {
                     }
                     // otherwise it exits below
                     else {
+                        System.out.println("Exits below defined right vertex");
                     
                         // trapezoid above segment 
                         Trapezoid t1 = CreateTrapezoidByVertices(s.getSpecificVertex(0), v2, 
@@ -523,8 +521,7 @@ public class TrapezoidalMap {
                 // right vertex of s lies on top of left edge of t
                 // s ends in t
                 else if (DoesTrapezoidContainVertex(t, s.getSpecificVertex(1))
-                        && Objects.equals(t.getLeft().getX(), s.getSpecificVertex(1).getX())
-                        && Objects.equals(t.getLeft().getY(), s.getSpecificVertex(1).getY())) {
+                        && Objects.equals(t.getLeft().getX(), s.getSpecificVertex(1).getX())) {
                     
                     // <editor-fold defaultstate="collapsed" desc="ends RL">
                     
@@ -538,8 +535,7 @@ public class TrapezoidalMap {
                 // right vertex of s lies on top of right edge of t
                 // s ends in t
                 else if (DoesTrapezoidContainVertex(t, s.getSpecificVertex(1))
-                        && Objects.equals(t.getRight().getX(), s.getSpecificVertex(1).getX())
-                        && Objects.equals(t.getRight().getY(), s.getSpecificVertex(1).getY())) {
+                        && Objects.equals(t.getRight().getX(), s.getSpecificVertex(1).getX())) {
                     
                     // <editor-fold defaultstate="collapsed" desc="ends RR">
                     
@@ -554,12 +550,17 @@ public class TrapezoidalMap {
                     // if segments don't intersect, go to the next intersected trapezoid
                     if (v1 == null || v1.getX() == null || v1.getY() == null) {
                         continue;
+                    } 
+                    else if (Objects.equals(v1.getX(), s.getSpecificVertex(1).getX()) 
+                            && Objects.equals(v1.getY(), s.getSpecificVertex(1).getY())) {
+                        continue;
                     }
                     
                     boolean entersAbove = v1.getY() > t.getLeft().getY();
                                         
                     // if it enters above the defined left vertex of the intersected trapezoid
                     if (entersAbove) {
+                        System.out.println("Enters above defined left vertex");
                         
                         // trapezoid below segment 
                         Trapezoid t1 = CreateTrapezoidByVertices(t.getSpecificVertex(0), v1, 
@@ -591,8 +592,9 @@ public class TrapezoidalMap {
                         
                         continue;
                     }
-                    // otherwise it exits below
+                    // otherwise it enters below
                     else {
+                        System.out.println("Enters below defined left vertex");
                     
                         // trapezoid above segment
                         Trapezoid t1 = CreateTrapezoidByVertices(v1, t.getSpecificVertex(1), 
@@ -649,6 +651,7 @@ public class TrapezoidalMap {
                                         
                     // if it enters above the defined left vertex of the intersected trapezoid
                     if (entersAbove) {
+                        System.out.println("Enters above defined left vertex");
                         
                         // trapezoid below segment 
                         Trapezoid t1 = CreateTrapezoidByVertices(t.getSpecificVertex(0), v1, 
@@ -690,8 +693,9 @@ public class TrapezoidalMap {
                         
                         continue;
                     }
-                    // otherwise it exits below
+                    // otherwise it enters below
                     else {
+                        System.out.println("Enters below defined left vertex");
                     
                         // trapezoid above segment
                         Trapezoid t1 = CreateTrapezoidByVertices(v1, t.getSpecificVertex(1),
@@ -747,15 +751,26 @@ public class TrapezoidalMap {
                     
                     // compute side of entrance intersection
                     Vertex v1 = GetIntersectionPointOfSegments(s, t.getSpecificEdge(0));
+                    
+                    if (v1 == null || v1.getX() == null || v1.getY() == null) {
+                        continue;
+                    }
+                    
                     boolean entersAbove = v1.getY() > t.getLeft().getY();
                     
                     // compute side of exit intersection
                     Vertex v2 = GetIntersectionPointOfSegments(s, t.getSpecificEdge(2));
+                    
+                    if (v2 == null || v2.getX() == null || v2.getY() == null) {
+                        continue;
+                    }
+                    
                     boolean exitsAbove = v2.getY() > t.getRight().getY();
                     
                     // if it enters above the defined left vertex of the intersected trapezoid
                     // and it exits above the defined right vertex of the intersected trapezoid
                     if (entersAbove && exitsAbove) {
+                        System.out.println("Enters and exits above defined vertices");
                         
                         // trapezoid below segment
                         Trapezoid t1 = CreateTrapezoidByVertices(t.getSpecificVertex(0), v1, 
@@ -781,6 +796,7 @@ public class TrapezoidalMap {
                     // if it enters above the defined left vertex of the intersected trapezoid
                     // and it exits below the defined right vertex of the intersected trapezoid
                     else if (entersAbove && !exitsAbove) {
+                        System.out.println("Enters above defined left vertex and exits below defined right vertex");
                         
                         // trapezoid above segment ends
                         Trapezoid t1 = CreateTrapezoidByVertices(ct.getV1(), ct.getV2(), t.getSpecificVertex(2), v2);
@@ -812,6 +828,7 @@ public class TrapezoidalMap {
                     // if it enters below the defined left vertex of the intersected trapezoid
                     // and it exits above the defined right vertex of the intersected trapezoid
                     else if (!entersAbove && exitsAbove) {
+                        System.out.println("Enters below defined left vertex and exits above defined right vertex");
                         
                         // trapezoid below segment ends
                         Trapezoid t1 = CreateTrapezoidByVertices(ct.getV1(), ct.getV2(), v2, t.getSpecificVertex(3));
@@ -843,6 +860,7 @@ public class TrapezoidalMap {
                     // if it enters below the defined left vertex of the intersected trapezoid
                     // and it exits below the defined right vertex of the intersected trapezoid
                     else {
+                        System.out.println("Enters and exits below defined vertices");
                         
                         // trapezoid above segment
                         Trapezoid t1 = CreateTrapezoidByVertices(v1, t.getSpecificVertex(1),
@@ -870,6 +888,55 @@ public class TrapezoidalMap {
                 }
             }
         }
+    }
+    
+    public void removeInnerTrapezoids(List<Polygon> polygons) {
+        List<Trapezoid> outerTrapezoids = new ArrayList<>();
+        
+        // loop trapezoids
+        for (int i = 0; i < this.trapezoids.size(); i++) {
+            
+            // take halfway points of vertical segments
+            Vertex hp1 = HalfwayPoint(this.trapezoids.get(i).getSpecificEdge(0));
+            Vertex hp2 = HalfwayPoint(this.trapezoids.get(i).getSpecificEdge(2));
+            
+            // variable to remember if tagged
+            boolean isContained = false;
+            
+            // loop polygons
+            for (int j = 0; j < polygons.size(); j++) {
+                
+                // tag if one of the halfway points is contained in a polygon
+                if (DoesPolygonContainVertex(polygons.get(j), hp1) 
+                        || DoesPolygonContainVertex(polygons.get(j), hp2)) {
+                    isContained = true;
+                    
+                    // no need to look further
+                    break;
+                }
+            }
+            
+            // if not tagged
+            if (!isContained) {
+                
+                // legit trapezoid for further processing
+                outerTrapezoids.add(this.trapezoids.get(i));
+            }
+        }
+        
+        // overwrite set of trapezoids with legit ones
+        this.trapezoids = outerTrapezoids;
+    }
+    
+    public Vertex HalfwayPoint(Edge e) {
+        return HalfwayPoint(e.getV1(), e.getV2());
+    }
+    
+    public Vertex HalfwayPoint(Vertex v1, Vertex v2) {
+        // the midpoint formula
+        double x = (v1.getX() + v2.getX()) / 2;
+        double y = (v1.getY() + v2.getY()) / 2;
+        return new Vertex(x, y, "hp");
     }
     
     public Trapezoid CreateTrapezoidByVertices(Vertex v1, Vertex v2, Vertex v3, Vertex v4) {
@@ -1036,8 +1103,30 @@ public class TrapezoidalMap {
         // return true if count is odd
         return count%2 == 1;
     }
+    
+    public boolean DoesPolygonContainVertex(Polygon p, Vertex v) {
+        Vertex extreme = new Vertex(10000.0, v.getY(), "Extreme Point");
+        Vertex[] polygon = (Vertex[]) p.getVertices().toArray();
+        int count = 0, i = 0, n = polygon.length;
+        do {
+            int next = (i + 1) % n;
+            if (DoSegmentsIntersect(polygon[i], polygon[next], v, extreme)) {
+                if (Orientation(polygon[i], v, polygon[next]) == 0) {
+                    return OnSegment(polygon[i], v, polygon[next]);
+                }
+                count++;
+            }
+            i = next;
+        } while (i != 0);
+        return count % 2 == 1;
+    }
 
     public Vertex GetIntersectionPointOfSegments(Edge e1, Edge e2) {
+        if (e1 == null || e1.getV1() == null || e1.getV2() == null
+                || e2 == null || e2.getV1() == null || e2.getV2() == null) {
+            return null;
+        }
+        
         Vertex intersectionPoint = new Vertex();
         
         Vector2D p = new Vector2D(e1.getV1().getX(), e1.getV1().getY());
