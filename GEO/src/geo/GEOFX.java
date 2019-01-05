@@ -9,6 +9,7 @@ import geo.dataStructures.Edge;
 import geo.dataStructures.TrapezoidalMap;
 import geo.dataStructures.Vertex;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -37,11 +38,14 @@ public class GEOFX extends Application {
         
 //        List<Edge> segments = testSet2();
         
-        List<Edge> segments = testSet3();
+//        List<Edge> segments = testSet3();
         
+        List<Edge> segments = testSet4();
+        
+        //Collections.shuffle(segments);      
         tm.construct(segments.subList(0, sliceCount));
   
-//        tm.construct(segments);
+        //tm.construct(segments);
         
         primaryStage.setTitle("Drawing Operations Test");
         Group root = new Group();
@@ -56,6 +60,9 @@ public class GEOFX extends Application {
             } else {
                 sliceCount++;
             }
+            System.out.println("--------------------------------------------------");
+            System.out.println("--------------------------------------------------");
+            tm.ResetTrapezoidLabels();
             tm.construct(segments.subList(0, sliceCount));
             drawShapes(canvas, tm);  
         });
@@ -142,6 +149,30 @@ public class GEOFX extends Application {
         segments.add(new Edge("s14", new Vertex(16.0,12.0,"p14"), new Vertex(15.0,9.0,"q14")));
         segments.add(new Edge("s15", new Vertex(15.0,17.0,"p15"), new Vertex(18.0,24.0,"q15")));          
         segments.add(new Edge("s16", new Vertex(18.0,24.0,"p16"), new Vertex(14.0,23.0,"q16")));          
+        segments.add(new Edge("s17", new Vertex(14.0,23.0,"p17"), new Vertex(13.0,21.0,"q17")));          
+        segments.add(new Edge("s18", new Vertex(13.0,21.0,"p18"), new Vertex(15.0,17.0,"q18")));          
+        return segments;
+    }
+    
+    private List<Edge> testSet4() {
+        List<Edge> segments = new ArrayList<>();
+        segments.add(new Edge("s10", new Vertex(15.0,9.0,"p10"), new Vertex(18.0,6.0,"q10")));
+        segments.add(new Edge("s14", new Vertex(16.0,12.0,"p14"), new Vertex(15.0,9.0,"q14")));
+        segments.add(new Edge("s16", new Vertex(18.0,24.0,"p16"), new Vertex(14.0,23.0,"q16")));          
+        segments.add(new Edge("s5", new Vertex(23.0,25.0,"p5"), new Vertex(12.0,26.0,"q5")));
+        segments.add(new Edge("s13", new Vertex(20.0,11.0,"p13"), new Vertex(16.0,12.0,"q13")));
+        
+        segments.add(new Edge("s1", new Vertex(14.0,2.0,"p1"), new Vertex(23.0,3.0,"q1")));
+        segments.add(new Edge("s2", new Vertex(23.0,3.0,"p2"), new Vertex(27.0,8.0,"q2")));
+        segments.add(new Edge("s3", new Vertex(27.0,8.0,"p3"), new Vertex(20.0,20.0,"q3")));          
+        segments.add(new Edge("s4", new Vertex(20.0,20.0,"p4"), new Vertex(23.0,25.0,"q4")));          
+        segments.add(new Edge("s6", new Vertex(12.0,26.0,"p6"), new Vertex(6.0,19.0,"q6")));
+        segments.add(new Edge("s7", new Vertex(6.0,19.0,"p7"), new Vertex(13.0,15.0,"q7")));          
+        segments.add(new Edge("s8", new Vertex(13.0,15.0,"p8"), new Vertex(7.0,10.0,"q8")));          
+        segments.add(new Edge("s9", new Vertex(7.0,10.0,"p9"), new Vertex(14.0,2.0,"q8")));
+        segments.add(new Edge("s11", new Vertex(18.0,6.0,"p11"), new Vertex(21.0,7.0,"q11")));          
+        segments.add(new Edge("s12", new Vertex(21.0,7.0,"p12"), new Vertex(20.0,11.0,"q12")));          
+        segments.add(new Edge("s15", new Vertex(15.0,17.0,"p15"), new Vertex(18.0,24.0,"q15")));          
         segments.add(new Edge("s17", new Vertex(14.0,23.0,"p17"), new Vertex(13.0,21.0,"q17")));          
         segments.add(new Edge("s18", new Vertex(13.0,21.0,"p18"), new Vertex(15.0,17.0,"q18")));          
         return segments;

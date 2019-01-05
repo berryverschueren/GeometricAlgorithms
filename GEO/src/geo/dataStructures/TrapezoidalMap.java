@@ -118,8 +118,6 @@ public class TrapezoidalMap {
                     
                     // TODO tree structure
                     
-                    continue;
-                    
                     // </editor-fold>
                 }
                 // left vertex of s lies on top of left edge of t
@@ -179,8 +177,6 @@ public class TrapezoidalMap {
                     
                     // TODO tree structure
                     
-                    continue;
-                    
                     // </editor-fold>
                 }
                 // right vertex of s lies on top of right edge of t
@@ -239,8 +235,6 @@ public class TrapezoidalMap {
                     t3.print();
                     
                     // TODO tree structure
-                    
-                    continue;
                     
                     // </editor-fold>
                 }
@@ -309,8 +303,6 @@ public class TrapezoidalMap {
                     
                     // TODO tree structure
                     
-                    continue;
-                    
                     // </editor-fold>
                 }
                 // left vertex of s lies on top of left edge of t
@@ -362,8 +354,6 @@ public class TrapezoidalMap {
                         t1.print();
 
                         // TODO tree structure
-                        
-                        continue;
                     }
                     // otherwise it exits below
                     else {
@@ -393,8 +383,6 @@ public class TrapezoidalMap {
                         t1.print();
 
                         // TODO tree structure
-                        
-                        continue;
                     }
                     
                     // </editor-fold>
@@ -408,8 +396,6 @@ public class TrapezoidalMap {
                     
                     System.out.println(s.getLabel() + " starts in " + t.getLabel());
                     System.out.println("Left endpoint lies on right edge of the trapezoid");
-                    
-                    continue;
                     
                     // </editor-fold>
                 }
@@ -471,8 +457,6 @@ public class TrapezoidalMap {
                         t2.print();
 
                         // TODO tree structure
-                        
-                        continue;
                     }
                     // otherwise it exits below
                     else {
@@ -512,8 +496,6 @@ public class TrapezoidalMap {
                         t2.print();
 
                         // TODO tree structure
-                        
-                        continue;
                     }
                     
                     // </editor-fold>
@@ -527,8 +509,6 @@ public class TrapezoidalMap {
                     
                     System.out.println(s.getLabel() + " ends in " + t.getLabel());
                     System.out.println("Right endpoint lies on left edge of the trapezoid");
-                    
-                    continue;
                     
                     // </editor-fold>
                 }
@@ -589,8 +569,6 @@ public class TrapezoidalMap {
                         t2.print();
 
                         // TODO tree structure
-                        
-                        continue;
                     }
                     // otherwise it enters below
                     else {
@@ -623,8 +601,6 @@ public class TrapezoidalMap {
                         t2.print();
                         
                         // TODO tree structure
-                        
-                        continue;
                     }
                     
                     // </editor-fold>
@@ -690,8 +666,6 @@ public class TrapezoidalMap {
                         t3.print();
 
                         // TODO tree structure
-                        
-                        continue;
                     }
                     // otherwise it enters below
                     else {
@@ -734,8 +708,6 @@ public class TrapezoidalMap {
                         t3.print();
                         
                         // TODO tree structure
-                        
-                        continue;
                     }
                     
                     // </editor-fold>
@@ -790,8 +762,6 @@ public class TrapezoidalMap {
                         t1.print();
                     
                         // TODO tree structure
-
-                        continue;
                     }
                     // if it enters above the defined left vertex of the intersected trapezoid
                     // and it exits below the defined right vertex of the intersected trapezoid
@@ -820,10 +790,7 @@ public class TrapezoidalMap {
                         ct.setV2(v1);
                         ct.setLeft(t.getLeft());
                     
-                        // TODO tree structure
-
-                        continue;
-                        
+                        // TODO tree structure                        
                     }
                     // if it enters below the defined left vertex of the intersected trapezoid
                     // and it exits above the defined right vertex of the intersected trapezoid
@@ -852,10 +819,7 @@ public class TrapezoidalMap {
                         ct.setV2(t.getSpecificVertex(1));
                         ct.setLeft(t.getLeft());
                     
-                        // TODO tree structure
-
-                        continue;
-                        
+                        // TODO tree structure                        
                     }
                     // if it enters below the defined left vertex of the intersected trapezoid
                     // and it exits below the defined right vertex of the intersected trapezoid
@@ -880,8 +844,6 @@ public class TrapezoidalMap {
                         t1.print();
                         
                         // TODO tree structure
-
-                        continue;
                     }
                     
                     // </editor-fold>
@@ -967,6 +929,10 @@ public class TrapezoidalMap {
         this.trapezoidCounter++;
         label += this.trapezoidCounter + "";
         return label;
+    }
+    
+    public void ResetTrapezoidLabels() {
+        this.trapezoidCounter = 0;
     }
     
     public Trapezoid DetermineBoundingBox(List<Edge> segments) {
