@@ -11,7 +11,7 @@ package geo.dataStructures;
  */
 public class Vertex extends TrapezoidShape {
     private Double x, y;
-    private int artFlag, exitFlag;
+    private int artFlag=0, exitFlag=0;
     
     public Vertex() {}
     
@@ -58,12 +58,12 @@ public class Vertex extends TrapezoidShape {
     public void setY(Double y) {
         this.y = y;
     }
-   
-    public void setExitFlag() {
+    //1 = true
+    public void setExitFlag(int exitFlag) {
         this.exitFlag = exitFlag;
     }
-    
-    public void setArtFlag() {
+    //1 = true
+    public void setArtFlag(int artFlag) {
         this.artFlag = artFlag;
     }
     
