@@ -5,6 +5,8 @@
  */
 package geo.dataStructures;
 
+import java.util.List;
+
 /**
  *
  * @author Berry-PC
@@ -12,6 +14,9 @@ package geo.dataStructures;
 public class Robber {
     private String label;
     private int x, y;
+    private double initX, initY;
+    private List<PathRobber> path;
+    
 
     public Robber() {
     }
@@ -46,5 +51,34 @@ public class Robber {
         this.y = y;
     }
     
-    
+    public Robber(double initX, double initY, List<PathRobber> path) {
+        this.path = path;
+        this.initX = initX; //starting x
+        this.initY = initY; //starting y
+    }
+
+    public double getInitX() {
+        return initX;
+    }
+
+    public double getInitY() {
+        return initY;
+    }
+
+    public List<PathRobber> getPath() {
+        return path;
+    }
+
+    public void setInitX(double initX) {
+        this.initX = initX;
+    }
+
+    public void setInitY(double initY) {
+        this.initY = initY;
+    }
+
+    public void setPath(List<PathRobber> path) {
+        this.path = path;
+    }
+
 }

@@ -26,5 +26,25 @@ public class GalleryProblem {
         this.globalTime = globalTime;
         this.observationTime = observationTime;
     }
+
+    public Gallery getGallery() {
+        return gallery;
+    }
+
+    public int getGuards() {
+        return guards;
+    }
+
+    public double getSpeed() {
+        return speed;
+    }
+
+    public double getGlobalTime() {
+        return globalTime;
+    }
+
+    public double getObservationTime() {
+        return observationTime;
+    }
     
 }

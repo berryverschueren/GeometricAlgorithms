@@ -5,6 +5,9 @@
 5, 1, 0, 0
 4, 7, 0, 1
 1, 5, 1, 0
+2, 2, 0
+3, 3, 0
+1, 1, 0
 
 1. n, h, e, a
    n=number of vertices, h=number of holes, e=number of exits, a= number of pieces of art

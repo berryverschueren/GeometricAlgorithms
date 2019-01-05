@@ -5,6 +5,8 @@
  */
 package geo.dataStructures;
 
+import java.util.List;
+
 /**
  *
  * @author Berry-PC
@@ -12,6 +14,8 @@ package geo.dataStructures;
 public class Guard {
     private String label;
     private int x, y;
+    private List<PathGuard> path;
+    private double initX, initY;
 
     public Guard() {
     }
@@ -20,6 +24,12 @@ public class Guard {
         this.label = label;
         this.x = x;
         this.y = y;
+    }
+    
+    public Guard(double initX, double initY, List<PathGuard> path) {
+        this.path = path;
+        this.initX = initX; //starting x
+        this.initY = initY; //starting y
     }
 
     public String getLabel() {
@@ -32,6 +42,10 @@ public class Guard {
 
     public int getY() {
         return y;
+    }
+    
+    public List<PathGuard> getPath() {
+        return path;
     }
 
     public void setLabel(String label) {
@@ -46,4 +60,7 @@ public class Guard {
         this.y = y;
     }
     
+    public void setPath() {
+        this.path = path; 
+    }
 }

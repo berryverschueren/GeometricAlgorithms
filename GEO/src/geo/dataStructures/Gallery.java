@@ -26,5 +26,37 @@ public class Gallery {
         this.outerPolygon = outerPolygon;
         this.innerPolygons = innerPolygons;
     }
+
+    public int getExits() {
+        return exits;
+    }
+
+    public void setExits(int exits) {
+        this.exits = exits;
+    }
+
+    public int getArtPieces() {
+        return artPieces;
+    }
+
+    public void setArtPieces(int artPieces) {
+        this.artPieces = artPieces;
+    }
+
+    public Polygon getOuterPolygon() {
+        return outerPolygon;
+    }
+
+    public void setOuterPolygon(Polygon outerPolygon) {
+        this.outerPolygon = outerPolygon;
+    }
+
+    public List<Polygon> getInnerPolygons() {
+        return innerPolygons;
+    }
+
+    public void setInnerPolygons(List<Polygon> innerPolygons) {
+        this.innerPolygons = innerPolygons;
+    }
     
 }

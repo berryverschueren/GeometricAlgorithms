@@ -46,44 +46,42 @@ public class ReadInputGallerySpecification extends Vertex {
             FileReader reader = new FileReader(filename);
 
             Scanner input = new Scanner(reader);
-
-            input.useDelimiter("[, \n]");
+            
+            input.useDelimiter(",\\s*");
             
             /** line 1 */
             numOfVertices = input.nextInt();
-            input.next();
+            //System.out.println(numOfVertices);
             numOfHoles = input.nextInt();
-            input.next();
+            //System.out.println(numOfHoles);
             numOfExits = input.nextInt();
-            input.next();
+            //System.out.println(numOfExits);
             numOfArts = input.nextInt();
+            //System.out.println(numOfArts);
             
             /** line 2 */
             int[] verticesPerHole = new int[numOfHoles];
             
             for (int i = 0; i < numOfHoles; i++) {
                 verticesPerHole[i] = input.nextInt();
-                input.next();
             }
             
             /** line 3 */
             numOfGuards = input.nextInt();
-            input.next();
+            //System.out.println(numOfGuards);
             vmaxGuards = input.nextDouble();
-            input.next();
+            //System.out.println(vmaxGuards);
             globalTime = input.nextDouble();
-            input.next();
+            //System.out.println(globalTime);
             deltaT = input.nextDouble();
+            //System.out.println(deltaT);
             
             /** line 4 to 4+n */
             
             //first vertex, to ensure first edge can be made
             x = input.nextDouble();
-            input.next();
             y = input.nextDouble();
-            input.next();
             artFlag = input.nextInt();
-            input.next();
             exitFlag = input.nextInt();
 
             Vertex firstVertex = new Vertex(x, y, artFlag, exitFlag, "label");
@@ -94,13 +92,10 @@ public class ReadInputGallerySpecification extends Vertex {
             //rest of vertices
             for (int j = 0; j < numOfVertices-1; j++) {
                 x = input.nextDouble();
-                input.next();
                 y = input.nextDouble();
-                input.next();
                 artFlag = input.nextInt();
-                input.next();
                 exitFlag = input.nextInt();
-                //System.out.println("next vertex: x=" + x + ", y = " + y);
+                //System.out.println("current vertex: x=" + x + ", y = " + y);
                 //System.out.println("previous vertex: x = " + oldVertex.getX() + " y = " + oldVertex.getY());
                 Vertex vertex = new Vertex(x, y, artFlag, exitFlag, "label");
                 Edge edge = new Edge("label", oldVertex, vertex);
@@ -123,24 +118,20 @@ public class ReadInputGallerySpecification extends Vertex {
                 
                 //first vertex, to ensure first edge can be made
                 x = input.nextDouble();
-                input.next();
                 y = input.nextDouble();
-                input.next();
                 artFlag = input.nextInt();
 
                 firstVertex = new Vertex(x, y, artFlag, "label");
-                //System.out.println("first vertex: x=" + x + ", y = " + y);
+                //System.out.println("first vertex hole: x=" + x + ", y = " + y);
 
                 oldVertex = firstVertex;
 
                 for (int j = 0; j < verticesPerHole[i]-1; j++) {
                     x = input.nextDouble();
-                    input.next();
                     y = input.nextDouble();
-                    input.next();
                     artFlag = input.nextInt();
-                    //System.out.println("next vertex: x=" + x + ", y = " + y);
-                    //System.out.println("previous vertex: x = " + oldVertex.getX() + " y = " + oldVertex.getY());
+                    //System.out.println("current vertex hole: x=" + x + ", y = " + y);
+                    //System.out.println("previous vertex hole: x = " + oldVertex.getX() + " y = " + oldVertex.getY());
                     Vertex vertex = new Vertex(x, y, artFlag, "label");
                     Edge edge = new Edge("label", oldVertex, vertex);
 
@@ -164,16 +155,16 @@ public class ReadInputGallerySpecification extends Vertex {
         galleryProblem = new GalleryProblem(gallery, numOfGuards, vmaxGuards, globalTime, deltaT); 
     }
 
-//    public static void main(String[] args) {
-//        readInput("ArtGallerySpecification.txt");
-//        System.out.println("num of vert = " + numOfVertices);
-//        System.out.println("num of holes = " + numOfHoles);
-//        System.out.println("num of exits = " + numOfExits);
-//        System.out.println("num of arts = " + numOfArts);
-//        System.out.println("num of guards = " + numOfGuards);
-//        System.out.println("vmax guards = " + vmaxGuards);
-//        System.out.println("global time limit T = " + globalTime);
-//        System.out.println("observation time delta t = " + deltaT);
-//    }
+/**    public static void main(String[] args) {
+        readInputArtGallerySpecification("ArtGallery1.txt");
+        System.out.println("num of vert = " + numOfVertices);
+        System.out.println("num of holes = " + numOfHoles);
+        System.out.println("num of exits = " + numOfExits);
+        System.out.println("num of arts = " + numOfArts);
+        System.out.println("num of guards = " + numOfGuards);
+        System.out.println("vmax guards = " + vmaxGuards);
+        System.out.println("global time limit T = " + globalTime);
+        System.out.println("observation time delta t = " + deltaT);
+    }*/
 
 }
