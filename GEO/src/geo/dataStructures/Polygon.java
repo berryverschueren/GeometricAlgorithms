@@ -111,4 +111,8 @@ public class Polygon {
         return vertices.size();
     }
     //endregion
+
+    public boolean contains(Vertex vertex) {
+        return vertices.contains(vertex);
+    }
 }
