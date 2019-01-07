@@ -76,12 +76,13 @@ public class FXMLDocumentController implements Initializable {
 //    }
     @FXML
     private void handleButtonKaj(ActionEvent event) {
-        int a=2;
+        finalEdge();
+        int a=1;
     }
     
     @FXML
     private void handleButtonBerry(ActionEvent event) {
-        
+        finalEdge();
         Group root = new Group();
         Stage stage = new Stage();
         stage.setTitle("My New Stage Title");
@@ -135,7 +136,18 @@ public class FXMLDocumentController implements Initializable {
     
     @FXML
     private void handleButtonCarina(ActionEvent event) {
-
+        finalEdge();
+    }
+    
+    private void finalEdge(){
+        List<Vertex> vertices = polygon.getVertices();
+        Edge edge = new Edge(vertices.get(0),vertices.get(vertices.size()-1));
+        polygon.addEdge(edge);
+        for(Polygon poly : innerPolygon){
+            List<Vertex> verticesI = poly.getVertices();
+            Edge edgeI = new Edge(verticesI.get(0),verticesI.get(verticesI.size()-1));
+            poly.addEdge(edgeI);
+        }
     }
 
     @FXML

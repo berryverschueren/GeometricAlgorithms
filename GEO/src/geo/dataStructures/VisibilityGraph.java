@@ -161,8 +161,8 @@ public class VisibilityGraph {
         
         for(Edge edge : edges){
             if(tree.containsValue(edge)){
-            
-        }
+                tree.remove(edge);
+            }
         }
     }
     //GetIntersectionPointOfSegments posible
