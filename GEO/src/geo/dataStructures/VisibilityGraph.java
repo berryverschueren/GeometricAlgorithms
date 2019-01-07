@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -25,9 +26,11 @@ import math.geom2d.Point2D;
 public class VisibilityGraph {
     private Polygon visibilityGraph;
     private List<Polygon> innerpolygon;
+    private TrapezoidalMap mapFunction;
 
     public VisibilityGraph() {
         innerpolygon = new ArrayList<>();
+        mapFunction = new TrapezoidalMap();
     }
     
     public Polygon visibilityGraphAlgorithm(List<Polygon> innerpolygon){
@@ -86,22 +89,31 @@ public class VisibilityGraph {
         //todo: goes wrong when polygon has values larger than a miljoen 
         //expensive but no other easy solution
         for(Edge edge : allEdges(innerpolygon)){
-            Point intersection = lineLineIntersection(  new Point(vertex.getX(), vertex.getY()), 
-                                                        new Point(vertex.getX().floatValue()+1000000, vertex.getY().floatValue()),  
-                                                        new Point(edge.getV1().getX(), edge.getV1().getY()), 
-                                                        new Point(edge.getV2().getX(), edge.getV2().getY())
-            );
+            Vertex intersection = mapFunction.GetIntersectionPointOfSegments(new Edge("",vertex, new Vertex(vertex.getX()+1000000,vertex.getY(),"")), edge);
+//            Point intersection = lineLineIntersection(  new Point(vertex.getX(), vertex.getY()), 
+//                                                        new Point(vertex.getX().floatValue()+1000000, vertex.getY().floatValue()),  
+//                                                        new Point(edge.getV1().getX(), edge.getV1().getY()), 
+//                                                        new Point(edge.getV2().getX(), edge.getV2().getY())
+//            );
             if(intersection!=null){
-                double distance = Point2D.distance(vertex.getX(), vertex.getY(), intersection.x, intersection.y);
+                double distance = Point2D.distance(vertex.getX(), vertex.getY(), intersection.getX(), intersection.getY());
                 tree.put(distance, edge);
             }
         }
         //balanced search tree
-        
+        boolean minIVisibility = false;
         for (int i = 0; i < sortedList.size()-1 ; i++) {
-            if(visible(sortedList.get(i), vertex, innerpolygon)){
-                
+            boolean visible = visible(i, sortedList, vertex, innerpolygon, tree, minIVisibility);
+            if(visible){
+                minIVisibility = true;
+            }else{
+                minIVisibility = false;
             }
+            //find edges of vertex
+            Vertex vertexI = sortedList.get(i);
+            //remove edges in tree
+            removeEdges(vertexI, innerpolygon, tree);
+            //add edges in tree
         }
 //        4. for i ← 1 to n
 //        5. do if VISIBLE(wi) then Add wi to W.
@@ -132,39 +144,61 @@ public class VisibilityGraph {
         return edges;
     }
     
-    private Point lineLineIntersection(Point A, Point B, Point C, Point D) 
-    { 
-        // Line AB represented as a1x + b1y = c1 
-        double a1 = B.y - A.y; 
-        double b1 = A.x - B.x; 
-        double c1 = a1*(A.x) + b1*(A.y); 
-       
-        // Line CD represented as a2x + b2y = c2 
-        double a2 = D.y - C.y; 
-        double b2 = C.x - D.x; 
-        double c2 = a2*(C.x)+ b2*(C.y); 
-       
-        double determinant = a1*b2 - a2*b1; 
-       
-        if (determinant == 0) 
-        { 
-            // The lines are parallel. This is simplified 
-            // by returning a pair of FLT_MAX 
-            return null;
-        } 
-        else
-        { 
-            double x = (b2*c1 - b1*c2)/determinant; 
-            double y = (a1*c2 - a2*c1)/determinant; 
-            
-            
-            if(between(x, A.x, B.x)&&between(x, C.x, D.x)&&between(y, A.y, B.y)&&between(y, C.y, D.y)){
-                return new Point(x, y); 
-            }else{
-                return null;
+    private void removeEdges(Vertex vertexI, List<Polygon> polygons, TreeMap<Double, Edge> tree) {
+        Polygon polygon = null;
+        for(Polygon poly : polygons){
+            if(poly.getVertices().contains(vertexI)){
+                polygon = poly;
+                break;
             }
-        } 
-    } 
+        }
+        List<Edge> edges = new ArrayList<>();
+        for(Edge edge : polygon.getEdges()){
+            if(edge.containsVertex(vertexI)){
+                edges.add(edge);
+            }   
+        }
+        
+        for(Edge edge : edges){
+            if(tree.containsValue(edge)){
+            
+        }
+        }
+    }
+    //GetIntersectionPointOfSegments posible
+//    private Point lineLineIntersection(Point A, Point B, Point C, Point D) 
+//    { 
+//        // Line AB represented as a1x + b1y = c1 
+//        double a1 = B.y - A.y; 
+//        double b1 = A.x - B.x; 
+//        double c1 = a1*(A.x) + b1*(A.y); 
+//       
+//        // Line CD represented as a2x + b2y = c2 
+//        double a2 = D.y - C.y; 
+//        double b2 = C.x - D.x; 
+//        double c2 = a2*(C.x)+ b2*(C.y); 
+//       
+//        double determinant = a1*b2 - a2*b1; 
+//       
+//        if (determinant == 0) 
+//        { 
+//            // The lines are parallel. This is simplified 
+//            // by returning a pair of FLT_MAX 
+//            return null;
+//        } 
+//        else
+//        { 
+//            double x = (b2*c1 - b1*c2)/determinant; 
+//            double y = (a1*c2 - a2*c1)/determinant; 
+//            
+//            
+//            if(between(x, A.x, B.x)&&between(x, C.x, D.x)&&between(y, A.y, B.y)&&between(y, C.y, D.y)){
+//                return new Point(x, y); 
+//            }else{
+//                return null;
+//            }
+//        } 
+//    } 
 
     private boolean between(double x, double x0, double x1) {
         if(x0==x1){
@@ -195,25 +229,86 @@ public class VisibilityGraph {
     
     
 
-    private boolean visible(Vertex vertex, Vertex p, List<Polygon> innerpolygon) {
-        java.awt.Polygon poly = new java.awt.Polygon();
-        java.awt.Polygon linePoly = new java.awt.Polygon();
-        
+    private boolean visible(int i, List<Vertex> sortedList, Vertex p, List<Polygon> innerpolygon, TreeMap<Double, Edge> tree, boolean minIVisibility) {
+//        java.awt.Polygon poly = new java.awt.Polygon();
+//        java.awt.Polygon linePoly = new java.awt.Polygon();
+        boolean intersectsPolygon = false;
+        Vertex vertex = sortedList.get(i);
+        Edge P = new Edge(p,vertex);
+        //1. if pwi intersects the interior of the obstacle of which wi is a vertex, locally at wi
+        outerloop:
         for(Polygon polygon : innerpolygon){
             if(polygon.contains(vertex)){
-                for(Vertex v : polygon.getVertices()){
-                    poly.addPoint(v.getX().intValue(), v.getY().intValue());
+                for(Edge edge : polygon.getEdges()){
+                    if(!edge.containsVertex(vertex)){
+                        Vertex intersection = mapFunction.GetIntersectionPointOfSegments(P, edge);
+                        if(intersection!=null){
+                            intersectsPolygon=true;
+                            break outerloop;
+                        }
+                    }
+                }
+            }
+        }
+        //2. then return false
+        if(intersectsPolygon){
+            return false;
+            //3. else if i = 1 or wi−1 is not on the segment pwi  
+        }  
+        if(i==0 || !mapFunction.OnSegment(p, sortedList.get(1-i), vertex)){
+            //4. then Search in T for the edge e in the leftmost leaf.
+            Edge edge = null;
+            Entry<Double, Edge> entry = tree.firstEntry();//.pollFirstEntry();
+            if(entry != null) {
+                edge = entry.getValue();
+                //pwi intersects e
+                if(mapFunction.GetIntersectionPointOfSegments(edge, P)!=null){
+                    return false;
+                }else{
+                    return true;
+                }
+            }else{
+                return true;
+            }
+        }else{
+            //8. else if wi−1 is not visible
+            if(!minIVisibility){
+                return false;
+            }else{
+                Edge edge = new Edge(vertex, sortedList.get(1-i));
+                boolean anyEdgeIntersects = searchIntersectingEdge(tree, edge);
+               //Search in T for an edge e that intersects wi−1wi.
+               //if e exists
+                if(anyEdgeIntersects){
+                    return false;       
+                }else{
+                    return true;
                 }
             }
         }
         
-        linePoly.addPoint(vertex.getX().intValue(), vertex.getY().intValue());
         
-        Area area = new Area(poly);
-        Area lineArea = new Area(poly);
-        area.contains(0, 0);
-        return true;
+        
+        
+//        linePoly.addPoint(vertex.getX().intValue(), vertex.getY().intValue());
+//        
+//        Area area = new Area(poly);
+//        Area lineArea = new Area(poly);
+//        area.contains(0, 0);
     }
+
+    private boolean searchIntersectingEdge(TreeMap<Double, Edge> tree, Edge edge) {
+        boolean foundIntersection = false;
+        for(Entry<Double, Edge> entry : tree.entrySet()) {
+           Edge value = entry.getValue();
+           if(mapFunction.GetIntersectionPointOfSegments(edge, edge)!=null){
+               return true;
+           }
+        }
+        return foundIntersection;
+    }
+
+
 }
 //for lineLineIntersection method
 class Point 

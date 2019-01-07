@@ -7,6 +7,7 @@ package javafxapplication2;
 
 import geo.dataStructures.Polygon;
 import geo.dataStructures.Vertex;
+import geo.dataStructures.VisibilityGraph;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,10 +64,29 @@ public class FXMLDocumentController implements Initializable {
 //        
 //        //todo generator
 //    }
+    @FXML
+    private void handleButtonKaj(ActionEvent event) {
+        int a=2;
+    }
+    
+    @FXML
+    private void handleButtonBerry(ActionEvent event) {
+
+    }
+    
+    @FXML
+    private void handleButtonCarina(ActionEvent event) {
+
+    }
 
     @FXML
     private void handleButtonSave(ActionEvent event) {
-        //todo:convertor
+        VisibilityGraph graph = new VisibilityGraph();
+        List<Polygon> poly = new ArrayList<>();
+        poly.add(polygon);
+        poly.addAll(innerPolygon);
+
+        graph.visibilityGraphAlgorithm(poly);
     }
     
     @FXML

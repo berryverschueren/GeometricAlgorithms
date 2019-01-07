@@ -22,5 +22,8 @@
       <Label layoutX="914.0" layoutY="321.0" text="Inner Polygons " />
       <Label layoutX="923.0" layoutY="57.0" text="Green" />
       <Label layoutX="925.0" layoutY="104.0" text="Red" />
+      <Button fx:id="kaj" layoutX="920.0" layoutY="151.0" mnemonicParsing="false" onAction="#handleButtonKaj" text="kaj" />
+      <Button fx:id="berry" layoutX="920.0" layoutY="176.0" mnemonicParsing="false" onAction="#handleButtonBerry" text="berry" />
+      <Button fx:id="carina" layoutX="920.0" layoutY="201.0" mnemonicParsing="false" onAction="#handleButtonCarina" text="carina" />
     </children>
 </AnchorPane>
