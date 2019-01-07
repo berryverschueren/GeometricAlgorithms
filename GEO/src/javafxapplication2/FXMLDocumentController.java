@@ -5,17 +5,25 @@
  */
 package javafxapplication2;
 
+import geo.dataStructures.Edge;
 import geo.dataStructures.Polygon;
+import geo.dataStructures.TrapezoidalMap;
 import geo.dataStructures.Vertex;
 import geo.dataStructures.VisibilityGraph;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Group;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ChoiceBox;
@@ -25,6 +33,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
+import javafx.scene.transform.Scale;
+import javafx.stage.Stage;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -71,7 +81,56 @@ public class FXMLDocumentController implements Initializable {
     
     @FXML
     private void handleButtonBerry(ActionEvent event) {
+        
+        Group root = new Group();
+        Stage stage = new Stage();
+        stage.setTitle("My New Stage Title");
 
+
+        TrapezoidalMap tm = new TrapezoidalMap();
+        
+        List<Edge> segments = new ArrayList<>();
+        segments.addAll(this.polygon.getEdges());
+        for (int i = 0; i < this.innerPolygon.size(); i++) {
+            segments.addAll(this.innerPolygon.get(i).getEdges());
+        }
+        
+        Collections.shuffle(segments);      
+        tm.construct(segments);
+
+        tm.removeInnerTrapezoids(this.innerPolygon);
+        tm.removeOuterTrapezoids(this.polygon);
+        tm.triangulateTrapezoids();
+
+        Canvas canvas = new Canvas(900, 700);
+        
+        drawShapes(canvas, tm);
+        root.getChildren().add(canvas);
+        stage.setScene(new Scene(root, canvas.getWidth(), canvas.getHeight()));
+        stage.show();
+    }
+
+    private void drawShapes(Canvas canvas, TrapezoidalMap tm) {
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(1);
+        
+        int multiplier = 1;
+        
+        for (int i = 0; i < tm.getTrapezoids().size(); i++) {
+            gc.strokePolygon(new double[] {
+                tm.getTrapezoids().get(i).getV1().getX() * multiplier,
+                tm.getTrapezoids().get(i).getV2().getX() * multiplier,
+                tm.getTrapezoids().get(i).getV3().getX() * multiplier,
+                tm.getTrapezoids().get(i).getV4().getX() * multiplier
+            }, new double[] {
+                tm.getTrapezoids().get(i).getV1().getY() * multiplier,
+                tm.getTrapezoids().get(i).getV2().getY() * multiplier,
+                tm.getTrapezoids().get(i).getV3().getY() * multiplier,
+                tm.getTrapezoids().get(i).getV4().getY() * multiplier
+            }, 4);
+        }
     }
     
     @FXML
