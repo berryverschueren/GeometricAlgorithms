@@ -890,6 +890,27 @@ public class TrapezoidalMap {
         this.trapezoids = outerTrapezoids;
     }
     
+    public void removeOuterTrapezoids(Polygon polygon) {
+        List<Trapezoid> innerTrapezoids = new ArrayList<>();
+        
+        // loop trapezoids
+        for (int i = 0; i < this.trapezoids.size(); i++) {
+            
+            // take halfway points of vertical segments
+            Vertex hp1 = HalfwayPoint(this.trapezoids.get(i).getSpecificEdge(0));
+            Vertex hp2 = HalfwayPoint(this.trapezoids.get(i).getSpecificEdge(2));
+            
+            // tag if one of the halfway points is contained in a polygon
+            if (DoesPolygonContainVertex(polygon, hp1) 
+                    || DoesPolygonContainVertex(polygon, hp2)) {
+                innerTrapezoids.add(this.trapezoids.get(i));
+            }
+        }
+        
+        // overwrite set of trapezoids with legit ones
+        this.trapezoids = innerTrapezoids;
+    }
+    
     public Vertex HalfwayPoint(Edge e) {
         return HalfwayPoint(e.getV1(), e.getV2());
     }
@@ -1093,7 +1114,7 @@ public class TrapezoidalMap {
             return null;
         }
         
-        Vertex intersectionPoint = new Vertex();
+        Vertex intersectionPoint = null;
         
         Vector2D p = new Vector2D(e1.getV1().getX(), e1.getV1().getY());
         Vector2D r = new Vector2D((e1.getV2().getX() - e1.getV1().getX()), (e1.getV2().getY() - e1.getV1().getY()));
