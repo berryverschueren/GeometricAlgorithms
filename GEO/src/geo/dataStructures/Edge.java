@@ -23,6 +23,11 @@ public class Edge extends TrapezoidShape {
         this.v1 = v1;
         this.v2 = v2;
     }
+    
+    public Edge(Vertex v1, Vertex v2) {
+        this.v1 = v1;
+        this.v2 = v2;
+    }
 
     public Vertex getV1() {
         return v1;
@@ -55,6 +60,14 @@ public class Edge extends TrapezoidShape {
             default:
                 return null;
         }
+    }
+    
+    public boolean containsVertex(Vertex vertex){
+        boolean isTrue = true;
+        if(v1==vertex || v2==vertex){
+            isTrue=false;
+        }
+        return isTrue;
     }
     
     public void print() {
