@@ -13,11 +13,11 @@ import geo.dataStructures.PathGuard;
  * @author carina
  */
 public class WriteInputGuardSpecification {
-    String fileName = "temp.txt";
     
-    public WriteInputGuardSpecification(int numOfGuards, List<Guard> guards) {
+    public static void WriteInputGuardSpecification(int numOfGuards, List<Guard> guards) {
         
         try {
+            String fileName = "temp.txt";
             FileWriter fileWriter = new FileWriter(fileName);
 
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
