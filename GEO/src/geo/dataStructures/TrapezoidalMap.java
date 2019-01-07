@@ -855,12 +855,20 @@ public class TrapezoidalMap {
     public void removeInnerTrapezoids(List<Polygon> polygons) {
         List<Trapezoid> outerTrapezoids = new ArrayList<>();
         
+        if (polygons == null) {
+            return;
+        }
+        
+        System.out.println("Remove inner polygons, the following ones may stay:");
+        
         // loop trapezoids
         for (int i = 0; i < this.trapezoids.size(); i++) {
             
             // take halfway points of vertical segments
-            Vertex hp1 = HalfwayPoint(this.trapezoids.get(i).getSpecificEdge(0));
-            Vertex hp2 = HalfwayPoint(this.trapezoids.get(i).getSpecificEdge(2));
+//            Vertex hp1 = HalfwayPoint(this.trapezoids.get(i).getSpecificEdge(0));
+//            Vertex hp2 = HalfwayPoint(this.trapezoids.get(i).getSpecificEdge(2));
+            Vertex hp1 = HalfwayPoint(this.trapezoids.get(i).getSpecificVertex(0), this.trapezoids.get(i).getSpecificVertex(1));
+            Vertex hp2 = HalfwayPoint(this.trapezoids.get(i).getSpecificVertex(2), this.trapezoids.get(i).getSpecificVertex(3));
             
             // variable to remember if tagged
             boolean isContained = false;
@@ -869,8 +877,8 @@ public class TrapezoidalMap {
             for (int j = 0; j < polygons.size(); j++) {
                 
                 // tag if one of the halfway points is contained in a polygon
-                if (DoesPolygonContainVertex(polygons.get(j), hp1) 
-                        || DoesPolygonContainVertex(polygons.get(j), hp2)) {
+                if ((hp1 != null && DoesPolygonContainVertex(polygons.get(j), hp1)) 
+                        || (hp2 != null && DoesPolygonContainVertex(polygons.get(j), hp2))) {
                     isContained = true;
                     
                     // no need to look further
@@ -883,6 +891,8 @@ public class TrapezoidalMap {
                 
                 // legit trapezoid for further processing
                 outerTrapezoids.add(this.trapezoids.get(i));
+                this.trapezoids.get(i).print();
+                System.out.println("-------------------------------------------");
             }
         }
         
@@ -893,16 +903,25 @@ public class TrapezoidalMap {
     public void removeOuterTrapezoids(Polygon polygon) {
         List<Trapezoid> innerTrapezoids = new ArrayList<>();
         
+        if (polygon == null) {
+            return;
+        }
+        
+        System.out.println("Remove outer polygons, the following ones may stay:");
+        
         // loop trapezoids
         for (int i = 0; i < this.trapezoids.size(); i++) {
             
             // take halfway points of vertical segments
-            Vertex hp1 = HalfwayPoint(this.trapezoids.get(i).getSpecificEdge(0));
-            Vertex hp2 = HalfwayPoint(this.trapezoids.get(i).getSpecificEdge(2));
+            Vertex hp1 = HalfwayPoint(this.trapezoids.get(i).getSpecificVertex(0), this.trapezoids.get(i).getSpecificVertex(1));// this.trapezoids.get(i).getSpecificEdge(0));
+            Vertex hp2 = HalfwayPoint(this.trapezoids.get(i).getSpecificVertex(2), this.trapezoids.get(i).getSpecificVertex(3));//this.trapezoids.get(i).getSpecificEdge(2));
+            
             
             // tag if one of the halfway points is contained in a polygon
-            if (DoesPolygonContainVertex(polygon, hp1) 
-                    || DoesPolygonContainVertex(polygon, hp2)) {
+            if ((hp1 != null && DoesPolygonContainVertex(polygon, hp1)) 
+                    && (hp2 != null && DoesPolygonContainVertex(polygon, hp2))) {
+                this.trapezoids.get(i).print();
+                System.out.println("-------------------------------------------");
                 innerTrapezoids.add(this.trapezoids.get(i));
             }
         }
@@ -911,11 +930,74 @@ public class TrapezoidalMap {
         this.trapezoids = innerTrapezoids;
     }
     
+    public void triangulateTrapezoids() {
+        List<Trapezoid> triangles = new ArrayList<>();
+        
+        System.out.println("Triangulate " + this.trapezoids.size() + " trapezoids");
+        
+        for (int i = 0; i < this.trapezoids.size(); i++) {
+            
+            this.trapezoids.get(i).print();
+            
+            
+            if (NotTheSameVertex(this.trapezoids.get(i).getV1(), this.trapezoids.get(i).getV2())
+                    && NotTheSameVertex(this.trapezoids.get(i).getV1(), this.trapezoids.get(i).getV3())
+                    && NotTheSameVertex(this.trapezoids.get(i).getV1(), this.trapezoids.get(i).getV4())
+                    && NotTheSameVertex(this.trapezoids.get(i).getV2(), this.trapezoids.get(i).getV3())
+                    && NotTheSameVertex(this.trapezoids.get(i).getV2(), this.trapezoids.get(i).getV4())
+                    && NotTheSameVertex(this.trapezoids.get(i).getV3(), this.trapezoids.get(i).getV4())) {
+                
+                System.out.println("NOT TRIANGLE");
+                
+                // left bottom triangle
+                Trapezoid t1 = CreateTrapezoidByVertices(this.trapezoids.get(i).getSpecificVertex(0), 
+                        this.trapezoids.get(i).getSpecificVertex(0), this.trapezoids.get(i).getSpecificVertex(1), 
+                        this.trapezoids.get(i).getSpecificVertex(3));
+                t1.setRight(null);
+                t1.setLeft(null);
+                t1.setBottom(null);
+                t1.setTop(null);
+                
+                // right upper triangle
+                Trapezoid t2 = CreateTrapezoidByVertices(this.trapezoids.get(i).getSpecificVertex(1), 
+                        this.trapezoids.get(i).getSpecificVertex(2), this.trapezoids.get(i).getSpecificVertex(2), 
+                        this.trapezoids.get(i).getSpecificVertex(3));
+                t2.setRight(null);
+                t2.setLeft(null);
+                t2.setBottom(null);
+                t2.setTop(null);
+                
+                triangles.add(t1);
+                triangles.add(t2);
+            }
+            else {
+                
+                // trapezoid was already a triangle
+                triangles.add(this.trapezoids.get(i));
+            }
+        }
+        
+        this.trapezoids = triangles;
+    }
+    
+    public boolean NotTheSameVertex(Vertex v1, Vertex v2) {
+        if (!Objects.equals(v1.getX(), v2.getX()) || !Objects.equals(v1.getY(), v2.getY())) {
+            return true;
+        }
+        return false;
+    }
+    
     public Vertex HalfwayPoint(Edge e) {
+        if (e == null || e.getV1() == null || e.getV2() == null) {
+            return null;
+        }
         return HalfwayPoint(e.getV1(), e.getV2());
     }
     
     public Vertex HalfwayPoint(Vertex v1, Vertex v2) {
+        if (v1 == null || v2 == null) {
+            return null;
+        }
         // the midpoint formula
         double x = (v1.getX() + v2.getX()) / 2;
         double y = (v1.getY() + v2.getY()) / 2;
@@ -1093,7 +1175,7 @@ public class TrapezoidalMap {
     
     public boolean DoesPolygonContainVertex(Polygon p, Vertex v) {
         Vertex extreme = new Vertex(10000.0, v.getY(), "Extreme Point");
-        Vertex[] polygon = (Vertex[]) p.getVertices().toArray();
+        Vertex[] polygon = p.getVertices().toArray(new Vertex[p.getVertices().size()]);
         int count = 0, i = 0, n = polygon.length;
         do {
             int next = (i + 1) % n;
