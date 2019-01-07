@@ -18,17 +18,17 @@ import geo.dataStructures.Robber;
  * @author carina
  */
 public class ReadInputRobberSpecification {
-    public int numOfVertices;
-    public double x; //x coordinate
-    public double y; //y coordinate
-    public double timestamp;
-    public double initX;
-    public double initY;
+    public static int numOfVertices;
+    public static double x; //x coordinate
+    public static double y; //y coordinate
+    public static double timestamp;
+    public static double initX;
+    public static double initY;
                 
-    public List<PathRobber> path = new ArrayList<PathRobber>();
-    public Robber robber = new Robber();
+    public static List<PathRobber> path = new ArrayList<PathRobber>();
+    public static Robber robber = new Robber();
     
-    public void ReadInputRobberSpecification(String filename) {
+    public static Robber ReadInputRobberSpecification(String filename) {
         try {
             FileReader reader = new FileReader(filename);
 
@@ -53,12 +53,12 @@ public class ReadInputRobberSpecification {
                 step = new PathRobber(x, y, timestamp);
                 path.add(step);
             }
-            Robber robber = new Robber(initX, initY, path);
+            robber = new Robber(initX, initY, path);
             
             reader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
+        return robber;    
     }
 }

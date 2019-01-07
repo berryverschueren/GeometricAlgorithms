@@ -18,18 +18,18 @@ import geo.dataStructures.Guard;
  * @author carina
  */
 public class ReadInputGuardSpecification {
-    public int numOfGuards;
-    public double x; //x coordinate
-    public double y; //y coordinate
-    public double timestamp;
-    public int observing; // 0 if guard is not observing and 1 if guard is
-    public double initX;
-    public double initY;
+    public static int numOfGuards;
+    public static double x; //x coordinate
+    public static double y; //y coordinate
+    public static double timestamp;
+    public static int observing; // 0 if guard is not observing and 1 if guard is
+    public static double initX;
+    public static double initY;
                 
-    public List<PathGuard> path = new ArrayList<PathGuard>();
-    public List<Guard> guards = new ArrayList<Guard>();
+    public static List<PathGuard> path = new ArrayList<PathGuard>();
+    public static List<Guard> guards = new ArrayList<Guard>();
     
-    public void ReadInputGuardSpecification(String filename) {
+    public static List<Guard> ReadInputGuardSpecification(String filename) {
         try {
             FileReader reader = new FileReader(filename);
 
@@ -43,19 +43,19 @@ public class ReadInputGuardSpecification {
             /** line rest */
             for (int i = 0; i < numOfGuards; i++) {
                 int verticesGuard = input.nextInt();
-                initX = input.nextDouble();
-                initY = input.nextDouble();
-                timestamp = input.nextDouble();
-                observing = input.nextInt();  
-                PathGuard step = new PathGuard(initX, initY, timestamp, observing);
-                path.add(step);
+                //initX = input.nextDouble();
+                //initY = input.nextDouble();
+                //timestamp = input.nextDouble();
+                //observing = input.nextInt();  
+                //PathGuard step = new PathGuard(initX, initY, timestamp, observing);
+                //path.add(step);
                 
-                for (int j = 0; j < verticesGuard - 1; j++) {
+                for (int j = 0; j < verticesGuard; j++) {
                     x = input.nextDouble();
                     y = input.nextDouble();
                     timestamp = input.nextDouble();
                     observing = input.nextInt();
-                    step = new PathGuard(x, y, timestamp, observing);
+                    PathGuard step = new PathGuard(x, y, timestamp, observing);
                     path.add(step);
                 }
                 Guard guard = new Guard(initX, initY, path);
@@ -67,6 +67,6 @@ public class ReadInputGuardSpecification {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
+        return guards;
     }
 }

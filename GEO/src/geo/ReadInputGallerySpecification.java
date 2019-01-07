@@ -41,7 +41,7 @@ public class ReadInputGallerySpecification extends Vertex {
     public static Gallery gallery = new Gallery();
     public static GalleryProblem galleryProblem = new GalleryProblem();
     
-    public static void readInputArtGallerySpecification(String filename) {
+    public static GalleryProblem readInputArtGallerySpecification(String filename) {
         try {
             FileReader reader = new FileReader(filename);
 
@@ -86,7 +86,7 @@ public class ReadInputGallerySpecification extends Vertex {
 
             Vertex firstVertex = new Vertex(x, y, artFlag, exitFlag, "label");
             //System.out.println("first vertex: x=" + x + ", y = " + y);
-            
+            vertices.add(firstVertex);
             Vertex oldVertex = firstVertex;
             
             //rest of vertices
@@ -123,7 +123,7 @@ public class ReadInputGallerySpecification extends Vertex {
 
                 firstVertex = new Vertex(x, y, artFlag, "label");
                 //System.out.println("first vertex hole: x=" + x + ", y = " + y);
-
+                verticesInnerPolygon.add(firstVertex);
                 oldVertex = firstVertex;
 
                 for (int j = 0; j < verticesPerHole[i]-1; j++) {
@@ -153,11 +153,14 @@ public class ReadInputGallerySpecification extends Vertex {
         //result: 
         gallery = new Gallery(numOfExits, numOfArts, outerPolygon, innerPolygons);
         galleryProblem = new GalleryProblem(gallery, numOfGuards, vmaxGuards, globalTime, deltaT); 
+        return galleryProblem;
     }
 
-/**    public static void main(String[] args) {
-        readInputArtGallerySpecification("ArtGallery1.txt");
-        System.out.println("num of vert = " + numOfVertices);
+    public static void main(String[] args) {
+        GalleryProblem gallery = new GalleryProblem();
+        gallery = readInputArtGallerySpecification("ArtGallery1.txt");
+        WriteInputGallerySpecification.WriteInputGallerySpecification(gallery);
+/**     System.out.println("num of vert = " + numOfVertices);
         System.out.println("num of holes = " + numOfHoles);
         System.out.println("num of exits = " + numOfExits);
         System.out.println("num of arts = " + numOfArts);
@@ -166,5 +169,5 @@ public class ReadInputGallerySpecification extends Vertex {
         System.out.println("global time limit T = " + globalTime);
         System.out.println("observation time delta t = " + deltaT);
     }*/
-
+    }
 }

@@ -13,11 +13,11 @@ import geo.dataStructures.PathRobber;
  * @author carina
  */
 public class WriteInputRobberSpecification {
-    String fileName = "temp.txt";
     
-    public WriteInputRobberSpecification(Robber robber) {
+    public static void WriteInputRobberSpecification(Robber robber) {
         
         try {
+            String fileName = "temp.txt";
             FileWriter fileWriter = new FileWriter(fileName);
 
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);

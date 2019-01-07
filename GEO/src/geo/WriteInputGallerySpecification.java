@@ -16,7 +16,6 @@ import geo.dataStructures.Vertex;
  * @author carina
  */
 public class WriteInputGallerySpecification {
-    String fileName = "temp.txt";
     public static int numOfVertices;
     public static int numOfHoles;
     public static int numOfExits;
@@ -32,9 +31,10 @@ public class WriteInputGallerySpecification {
     public static int artFlag; // 1 art; 0 no art
     public static int exitFlag; // 1 exit; 0 no exit
     
-    public WriteInputGallerySpecification(GalleryProblem galleryProblem) {
+    public static void WriteInputGallerySpecification(GalleryProblem galleryProblem) {
         
         try {
+            String fileName = "temp.txt";
             FileWriter fileWriter = new FileWriter(fileName);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
             
@@ -42,8 +42,8 @@ public class WriteInputGallerySpecification {
             Polygon outerPolygon = gallery.getOuterPolygon();
             List<Vertex> verticesOuterPolygon = outerPolygon.getVertices();
             List<Polygon> innerPolygons = gallery.getInnerPolygons();
-            bufferedWriter.write(numOfGuards);
-            bufferedWriter.newLine();
+            //bufferedWriter.write(numOfGuards);
+            //bufferedWriter.newLine();
             
             // line 1
             numOfVertices = verticesOuterPolygon.size();
@@ -56,7 +56,7 @@ public class WriteInputGallerySpecification {
             
             for (Polygon innerPolygon : innerPolygons ) {
                 List<Vertex> verticesHole = innerPolygon.getVertices();
-                System.out.println(verticesHole.size() + ", ");
+                bufferedWriter.write(verticesHole.size() + ", ");
             }
             
             bufferedWriter.newLine();
@@ -82,9 +82,9 @@ public class WriteInputGallerySpecification {
             for (Polygon innerPolygon : innerPolygons) {
                 List<Vertex> verticesHole = innerPolygon.getVertices();
                 for (Vertex verticeHole : verticesHole) {
-                    verticeHole.getX();
-                    verticeHole.getY();
-                    verticeHole.getArtFlag();
+                    x = verticeHole.getX();
+                    y = verticeHole.getY();
+                    artFlag = verticeHole.getArtFlag();
                     bufferedWriter.write(x + ", " + y + ", " + artFlag + ", ");
                     bufferedWriter.newLine();
                 }
