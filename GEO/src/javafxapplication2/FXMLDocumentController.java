@@ -5,11 +5,14 @@
  */
 package javafxapplication2;
 
+import geo.WriteInputGallerySpecification;
 import geo.dataStructures.Edge;
 import geo.dataStructures.Polygon;
 import geo.dataStructures.TrapezoidalMap;
 import geo.dataStructures.Vertex;
 import geo.dataStructures.VisibilityGraph;
+import geo.dataStructures.Gallery;
+import geo.dataStructures.GalleryProblem;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -53,6 +56,12 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private TextField guards;
     @FXML
+    private TextField vMaxGuards;
+    @FXML
+    private TextField globalTime;
+    @FXML
+    private TextField deltaT;
+    @FXML
     private RadioButton art;
     @FXML
     private RadioButton exit;
@@ -60,6 +69,12 @@ public class FXMLDocumentController implements Initializable {
     private GraphicsContext g; 
     private Polygon polygon;
     private List<Polygon> innerPolygon;
+    private int numOfGuards; 
+    private int vMaxG;
+    private int deltaTime;
+    private int globalT;
+    public int countArts = 0;
+    public int countExits = 0;
     //private List<Vertex> artList;
     //private List<Vertex> exitList;
     
@@ -144,6 +159,13 @@ public class FXMLDocumentController implements Initializable {
     
     @FXML
     private void handleButtonCarina(ActionEvent event) {
+        numOfGuards = Integer.parseInt(guards.getText());
+        vMaxG = Integer.parseInt(vMaxGuards.getText());
+        deltaTime = Integer.parseInt(deltaT.getText());
+        globalT = Integer.parseInt(globalTime.getText());
+        Gallery gallery = new Gallery(countExits, countArts, polygon, innerPolygon);
+        GalleryProblem galleryProblem = new GalleryProblem(gallery, numOfGuards, vMaxG, globalT, deltaTime);
+        WriteInputGallerySpecification.WriteInputGallerySpecification(galleryProblem);
         finalEdge();
     }
     
@@ -297,8 +319,8 @@ public class FXMLDocumentController implements Initializable {
                 }
             }
         }
-        
         nearstVertex.setArtFlag(1);
+        countArts++;
     }
 
     private void addExit(int xCoordinate, int yCoordinate) {
@@ -312,8 +334,8 @@ public class FXMLDocumentController implements Initializable {
                 dist = newDistance;
             }
         }
-        
         nearstVertex.setExitFlag(1);
+        countExits++;
     }
     
     private double distance(Vertex vertex1, Vertex vertex2){

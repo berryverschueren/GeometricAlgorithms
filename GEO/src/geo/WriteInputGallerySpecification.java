@@ -51,13 +51,14 @@ public class WriteInputGallerySpecification {
             numOfExits = gallery.getExits();
             numOfArts = gallery.getArtPieces();
             
-            bufferedWriter.write(numOfVertices + ", " + numOfHoles + ", " + numOfExits + ", " + numOfArts + ", ");
+            //bufferedWriter.write(numOfVertices + ", " + numOfHoles + ", " + numOfExits + ", " + numOfArts + ", ");
+            bufferedWriter.write(numOfVertices + ", " + numOfHoles + ", " + numOfExits + ", " + numOfArts);
             bufferedWriter.newLine();
             
             for (Polygon innerPolygon : innerPolygons ) {
                 List<Vertex> verticesHole = innerPolygon.getVertices();
                 bufferedWriter.write(verticesHole.size() + ", ");
-            }
+                }
             
             bufferedWriter.newLine();
             
@@ -67,7 +68,8 @@ public class WriteInputGallerySpecification {
             globalTime = galleryProblem.getGlobalTime();
             deltaT = galleryProblem.getObservationTime();
             
-            bufferedWriter.write(numOfGuards + ", " + vmaxGuards + ", " + globalTime + ", " + deltaT + ", ");
+            //bufferedWriter.write(numOfGuards + ", " + vmaxGuards + ", " + globalTime + ", " + deltaT + ", ");
+            bufferedWriter.write(numOfGuards + ", " + vmaxGuards + ", " + globalTime + ", " + deltaT);
             bufferedWriter.newLine();
             
             for (Vertex vertexOuterPolygon : verticesOuterPolygon) {
@@ -75,7 +77,8 @@ public class WriteInputGallerySpecification {
                 y = vertexOuterPolygon.getY();
                 artFlag = vertexOuterPolygon.getArtFlag();
                 exitFlag = vertexOuterPolygon.getExitFlag();
-                bufferedWriter.write(x + ", " + y + ", " + artFlag + ", " + exitFlag + ", ");
+                //bufferedWriter.write(x + ", " + y + ", " + artFlag + ", " + exitFlag + ", ");
+                bufferedWriter.write(x + ", " + y + ", " + artFlag + ", " + exitFlag);
                 bufferedWriter.newLine();
             }
             
@@ -85,7 +88,8 @@ public class WriteInputGallerySpecification {
                     x = verticeHole.getX();
                     y = verticeHole.getY();
                     artFlag = verticeHole.getArtFlag();
-                    bufferedWriter.write(x + ", " + y + ", " + artFlag + ", ");
+                    //bufferedWriter.write(x + ", " + y + ", " + artFlag + ", ");
+                    bufferedWriter.write(x + ", " + y + ", " + artFlag);
                     bufferedWriter.newLine();
                 }
             }
@@ -97,4 +101,3 @@ public class WriteInputGallerySpecification {
         }
     } 
 }
-
