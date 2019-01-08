@@ -74,6 +74,21 @@ public class VisibilityGraph {
     
     
     
+    private void printSort(List<Vertex> list, Vertex vertex){
+        System.out.println(Math.atan2(0, -2)*(180/Math.PI)+ "math");
+        System.out.println("Vertex="+vertex.getLabel());
+        String sort = ""; 
+        for(Vertex vertex1 : list){
+            sort = sort + vertex1.getLabel()+" , ";
+        }
+        
+        for(Vertex a : list){
+            System.out.println((((Math.atan2(a.getY()-vertex.getY(), a.getX()-vertex.getX())))*(180/Math.PI))+" "+a.getLabel());
+            
+
+        }
+        System.out.println(sort);
+    }
 
     private List<Vertex> visibleVertices(Vertex vertex, List<Polygon> innerpolygon) {
         List<Vertex> visibleVertex = new ArrayList<>();
@@ -83,6 +98,8 @@ public class VisibilityGraph {
 //        Sort the obstacle vertices according to the clockwise angle that the halfline from p to each vertex makes with the positive x-axis. In case of
 //        ties, vertices closer to p should come before vertices farther from p. Let
 //        w1,...,wn be the sorted list.
+
+        printSort(allVertices(innerpolygon), vertex);
         List<Vertex> sortedList = circleSweepSort(vertex, allVertices(innerpolygon));
 //        2. Let ρ be the half-line parallel to the positive x-axis starting at p. Find
 //        the obstacle edges that are properly intersected by ρ, and store them in a
@@ -159,15 +176,26 @@ public class VisibilityGraph {
         
         return visibleVertex;
     }
+    
+    private double angleValue(Vertex a, Vertex b){
+        return Math.atan2(a.getY()-b.getY(), a.getX()-b.getX())*(180/Math.PI);
+    }
 
     private List<Vertex> circleSweepSort(Vertex vertex, List<Vertex> allVertices) {
         List<Vertex> sortedList = allVertices;
         double deg = Math.atan2(-vertex.getY(), -vertex.getX());
-        Collections.sort(sortedList, (a,b) -> 
-                (Math.atan2(a.getY()-vertex.getY(), a.getX()-vertex.getX())) < (Math.atan2(b.getY()-vertex.getY(), b.getX()-vertex.getX()))? -1:
-                (Math.atan2(a.getY()-vertex.getY(), a.getX()-vertex.getX())) == (Math.atan2(b.getY()-vertex.getY(), b.getX()-vertex.getX()))&&
-                Point2D.distance(vertex.getX(), vertex.getY(), a.getX(), a.getY()) < Point2D.distance(vertex.getX(), vertex.getY(), b.getX(), b.getY())?-1:1
+        
+        //angleValue (angle value, offset);
+        Collections.sort(sortedList, (a,b) ->         
+                angleValue(a,vertex) == angleValue(b,vertex)? 
+                    Point2D.distance(vertex.getX(), vertex.getY(), a.getX(), a.getY()) < Point2D.distance(vertex.getX(), vertex.getY(), b.getX(), b.getY())?-1:1:
+                (angleValue(a,vertex) == 0.0)?-1:
+                (angleValue(b,vertex) == 0.0)?1:
+                (angleValue(a,vertex) < 0 && angleValue(b,vertex) < 0)?(angleValue(a,vertex) > angleValue(b,vertex))?-1:1:
+                (angleValue(a,vertex) > 0 && angleValue(b,vertex) > 0)?(angleValue(a,vertex) > angleValue(b,vertex))?-1:1:        
+                (angleValue(a,vertex) < angleValue(b,vertex))?-1:1
         );
+        printSort(sortedList, vertex);
         return sortedList;        
     }
 

@@ -80,145 +80,46 @@ public class FXMLDocumentController implements Initializable {
         List<Polygon> testPolygons = new ArrayList<>();
 //        Polygon poly1 = new Polygon();
 //        poly1.setLabel("polygon1");
-        Vertex v1, v2;
-        Edge e1;
-//        
-//        v1 = new Vertex(10.0, 2.0, "p1");
-//        v2 = new Vertex(24.0, 3.0, "q1");
-//        e1 = new Edge("s1", v1, v2);
-//        poly1.addVertex(v1);
-//        poly1.addVertex(v2);
-//        poly1.addEdge(e1);
-//        
-//        v1 = new Vertex(24.0, 3.0, "p2");
-//        v2 = new Vertex(27.0, 8.0, "q2");
-//        e1 = new Edge("s2", v1, v2);
-//        poly1.addVertex(v1);
-//        poly1.addVertex(v2);
-//        poly1.addEdge(e1);
-//        
-//        v1 = new Vertex(27.0, 8.0, "p3");
-//        v2 = new Vertex(20.0, 20.0, "q3");
-//        e1 = new Edge("s3", v1, v2);
-//        poly1.addVertex(v1);
-//        poly1.addVertex(v2);
-//        poly1.addEdge(e1);
-//        
-//        v1 = new Vertex(20.0, 20.0, "p4");
-//        v2 = new Vertex(23.0, 25.0, "q4");
-//        e1 = new Edge("s4", v1, v2);
-//        poly1.addVertex(v1);
-//        poly1.addVertex(v2);
-//        poly1.addEdge(e1);
-//        
-//        v1 = new Vertex(23.0, 25.0, "p5");
-//        v2 = new Vertex(12.0, 26.0, "q5");
-//        e1 = new Edge("s5", v1, v2);
-//        poly1.addVertex(v1);
-//        poly1.addVertex(v2);
-//        poly1.addEdge(e1);
-//        
-//        v1 = new Vertex(12.0, 26.0, "p6");
-//        v2 = new Vertex(6.0, 19.0, "q6");
-//        e1 = new Edge("s6", v1, v2);
-//        poly1.addVertex(v1);
-//        poly1.addVertex(v2);
-//        poly1.addEdge(e1);
-//        
-//        v1 = new Vertex(6.0, 19.0, "p7");
-//        v2 = new Vertex(11.0, 15.0, "q7");
-//        e1 = new Edge("s7", v1, v2);
-//        poly1.addVertex(v1);
-//        poly1.addVertex(v2);
-//        poly1.addEdge(e1);
-//        
-//        v1 = new Vertex(11.0, 15.0, "p8");
-//        v2 = new Vertex(7.0, 10.0, "q8");
-//        e1 = new Edge("s8", v1, v2);
-//        poly1.addVertex(v1);
-//        poly1.addVertex(v2);
-//        poly1.addEdge(e1);
-//        
-//        v1 = new Vertex(7.0, 10.0, "p9");
-//        v2 = new Vertex(10.0, 2.0, "q9");
-//        e1 = new Edge("s9", v1, v2);
-//        poly1.addVertex(v1);
-//        poly1.addVertex(v2);
-//        poly1.addEdge(e1);
-//        
-//        polygons.add(poly1);
+        Vertex v1, v2, v3;
+        Edge e1,e2,e3;
+
         
         Polygon poly2 = new Polygon();
         poly2.setLabel("polygon2");
         
-        v1 = new Vertex(16.0, 9.0, "p10");
-        v2 = new Vertex(19.0, 6.0, "q10");
-        e1 = new Edge("s10", v1, v2);
+        v1 = new Vertex(1.0, 1.0, "p1");
+        v2 = new Vertex(3.0, 1.0, "p2");
+        v3 = new Vertex(2.0, 2.0, "p3");
+        e1 = new Edge("e1", v1, v2);
+        e2 = new Edge("e2", v2, v3);
+        e3 = new Edge("e3", v3, v1);
         poly2.addVertex(v1);
         poly2.addVertex(v2);
+        poly2.addVertex(v3);
         poly2.addEdge(e1);
-        
-        v1 = new Vertex(19.0, 6.0, "p11");
-        v2 = new Vertex(22.0, 7.0, "q11");
-        e1 = new Edge("s11", v1, v2);
-        poly2.addVertex(v1);
-        poly2.addVertex(v2);
-        poly2.addEdge(e1);
-        
-        v1 = new Vertex(22.0, 7.0, "p12");
-        v2 = new Vertex(21.0, 11.0, "q12");
-        e1 = new Edge("s12", v1, v2);
-        poly2.addVertex(v1);
-        poly2.addVertex(v2);
-        poly2.addEdge(e1);
-        
-        v1 = new Vertex(21.0, 11.0, "p13");
-        v2 = new Vertex(17.0, 12.0, "q13");
-        e1 = new Edge("s13", v1, v2);
-        poly2.addVertex(v1);
-        poly2.addVertex(v2);
-        poly2.addEdge(e1);
-        
-        v1 = new Vertex(17.0, 12.0, "p14");
-        v2 = new Vertex(16.0, 9.0, "q14");
-        e1 = new Edge("s14", v1, v2);
-        poly2.addVertex(v1);
-        poly2.addVertex(v2);
-        poly2.addEdge(e1);
+        poly2.addEdge(e2);
+        poly2.addEdge(e3);
         
         testPolygons.add(poly2);
+        
+        
         
         Polygon poly3 = new Polygon();
         poly3.setLabel("polygon3");
         
-        v1 = new Vertex(15.0, 17.0, "p15");
-        v2 = new Vertex(18.0, 24.0, "q15");
-        e1 = new Edge("s15", v1, v2);
+        v1 = new Vertex(5.0, 1.0, "pp1");
+        v2 = new Vertex(6.0, 4.0, "pp2");
+        v3 = new Vertex(4.0, 2.0, "pp3");
+        e1 = new Edge("ee1", v1, v2);
+        e2 = new Edge("ee2", v2, v3);
+        e3 = new Edge("ee3", v3, v1);
         poly3.addVertex(v1);
         poly3.addVertex(v2);
+        poly3.addVertex(v3);
         poly3.addEdge(e1);
-        
-        v1 = new Vertex(18.0, 24.0, "p16");
-        v2 = new Vertex(14.0, 23.0, "q16");
-        e1 = new Edge("s16", v1, v2);
-        poly3.addVertex(v1);
-        poly3.addVertex(v2);
-        poly3.addEdge(e1);
-        
-        v1 = new Vertex(14.0, 23.0, "p17");
-        v2 = new Vertex(13.0, 21.0, "q17");
-        e1 = new Edge("s17", v1, v2);
-        poly3.addVertex(v1);
-        poly3.addVertex(v2);
-        poly3.addEdge(e1);
-        
-        v1 = new Vertex(13.0, 21.0, "p18");
-        v2 = new Vertex(15.0, 17.0, "q18");
-        e1 = new Edge("s18", v1, v2);
-        poly3.addVertex(v1);
-        poly3.addVertex(v2);
-        poly3.addEdge(e1);
-        
+        poly3.addEdge(e2);
+        poly3.addEdge(e3);
+                
         testPolygons.add(poly3);
         
 
@@ -236,7 +137,7 @@ public class FXMLDocumentController implements Initializable {
         g.setFill(Color.BLACK);
 
         for(Edge edge : poly.getEdges()){
-            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+            g.strokeLine(10*edge.getV1().getX(), 10*edge.getV1().getY(), 10*edge.getV2().getX(), 10*edge.getV2().getY());
         }
     }
     
