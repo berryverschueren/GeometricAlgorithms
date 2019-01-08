@@ -294,18 +294,31 @@ public class FXMLDocumentController implements Initializable {
         
         int multiplier = 1;
         
-        for (int i = 0; i < tm.getTrapezoids().size(); i++) {
+//        for (int i = 0; i < tm.getTrapezoids().size(); i++) {
+//            gc.strokePolygon(new double[] {
+//                tm.getTrapezoids().get(i).getV1().getX() * multiplier,
+//                tm.getTrapezoids().get(i).getV2().getX() * multiplier,
+//                tm.getTrapezoids().get(i).getV3().getX() * multiplier,
+//                tm.getTrapezoids().get(i).getV4().getX() * multiplier
+//            }, new double[] {
+//                tm.getTrapezoids().get(i).getV1().getY() * multiplier,
+//                tm.getTrapezoids().get(i).getV2().getY() * multiplier,
+//                tm.getTrapezoids().get(i).getV3().getY() * multiplier,
+//                tm.getTrapezoids().get(i).getV4().getY() * multiplier
+//            }, 4);
+//        }
+        
+        for (int i = 0; i < tm.getTriangles().size(); i++) {
+            tm.getTriangles().get(i).print();
             gc.strokePolygon(new double[] {
-                tm.getTrapezoids().get(i).getV1().getX() * multiplier,
-                tm.getTrapezoids().get(i).getV2().getX() * multiplier,
-                tm.getTrapezoids().get(i).getV3().getX() * multiplier,
-                tm.getTrapezoids().get(i).getV4().getX() * multiplier
+                tm.getTriangles().get(i).getV1().getX() * multiplier,
+                tm.getTriangles().get(i).getV2().getX() * multiplier,
+                tm.getTriangles().get(i).getV3().getX() * multiplier
             }, new double[] {
-                tm.getTrapezoids().get(i).getV1().getY() * multiplier,
-                tm.getTrapezoids().get(i).getV2().getY() * multiplier,
-                tm.getTrapezoids().get(i).getV3().getY() * multiplier,
-                tm.getTrapezoids().get(i).getV4().getY() * multiplier
-            }, 4);
+                tm.getTriangles().get(i).getV1().getY() * multiplier,
+                tm.getTriangles().get(i).getV2().getY() * multiplier,
+                tm.getTriangles().get(i).getV3().getY() * multiplier
+            }, 3);
         }
     }
     
