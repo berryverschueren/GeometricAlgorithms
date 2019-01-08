@@ -110,6 +110,15 @@ public class Polygon {
     public int getNumberVertices(){
         return vertices.size();
     }
+    
+    public boolean containsX(int x){
+        for(Vertex vertex : vertices){
+            if(vertex.getX()==x){
+                return true;
+            }
+        }
+        return false;
+    }
     //endregion
 
     public boolean contains(Vertex vertex) {

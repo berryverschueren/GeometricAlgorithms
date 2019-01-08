@@ -77,7 +77,7 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void handleButtonKaj(ActionEvent event) {
         finalEdge();
-        int a=1;
+        int a=0;
     }
     
     @FXML
@@ -134,6 +134,14 @@ public class FXMLDocumentController implements Initializable {
         }
     }
     
+    private boolean checkUniqueX(int x){
+        boolean exists = polygon.containsX(x);
+        for(Polygon poly : innerPolygon){
+            exists = poly.containsX(x);
+        }
+        return !exists;
+    }
+    
     @FXML
     private void handleButtonCarina(ActionEvent event) {
         finalEdge();
@@ -182,7 +190,9 @@ public class FXMLDocumentController implements Initializable {
    
     @FXML
     private void handleClickAction(MouseEvent e) {
+        if(checkUniqueX((int)e.getX())){
         setUpDraw(true);
+        
         boolean addArt = art.isSelected();
         boolean addExit = exit.isSelected();
         if(addArt){
@@ -196,7 +206,6 @@ public class FXMLDocumentController implements Initializable {
             if(Poly.POLY == selectedPolygon){
                 g.setFill(Color.BLACK);
                 polygon.joinAndAddNewVertex((int)e.getX(), (int)e.getY());
-
                 g.fillOval((int)e.getX()-5, (int)e.getY()-5, 10, 10);
             }else{
                 g.setFill(Color.WHITE);
@@ -211,6 +220,9 @@ public class FXMLDocumentController implements Initializable {
         }
         finalizeDraw();
         setUpDraw(false);
+        }else{
+            JOptionPane.showMessageDialog(new JFrame(), "Same X!!!!!");
+        }
     }
     
     private void setUpDraw(boolean clear){
