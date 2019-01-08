@@ -91,8 +91,168 @@ public class FXMLDocumentController implements Initializable {
 //    }
     @FXML
     private void handleButtonKaj(ActionEvent event) {
-        finalEdge();
-        int a=0;
+        
+        List<Polygon> testPolygons = new ArrayList<>();
+//        Polygon poly1 = new Polygon();
+//        poly1.setLabel("polygon1");
+        Vertex v1, v2;
+        Edge e1;
+//        
+//        v1 = new Vertex(10.0, 2.0, "p1");
+//        v2 = new Vertex(24.0, 3.0, "q1");
+//        e1 = new Edge("s1", v1, v2);
+//        poly1.addVertex(v1);
+//        poly1.addVertex(v2);
+//        poly1.addEdge(e1);
+//        
+//        v1 = new Vertex(24.0, 3.0, "p2");
+//        v2 = new Vertex(27.0, 8.0, "q2");
+//        e1 = new Edge("s2", v1, v2);
+//        poly1.addVertex(v1);
+//        poly1.addVertex(v2);
+//        poly1.addEdge(e1);
+//        
+//        v1 = new Vertex(27.0, 8.0, "p3");
+//        v2 = new Vertex(20.0, 20.0, "q3");
+//        e1 = new Edge("s3", v1, v2);
+//        poly1.addVertex(v1);
+//        poly1.addVertex(v2);
+//        poly1.addEdge(e1);
+//        
+//        v1 = new Vertex(20.0, 20.0, "p4");
+//        v2 = new Vertex(23.0, 25.0, "q4");
+//        e1 = new Edge("s4", v1, v2);
+//        poly1.addVertex(v1);
+//        poly1.addVertex(v2);
+//        poly1.addEdge(e1);
+//        
+//        v1 = new Vertex(23.0, 25.0, "p5");
+//        v2 = new Vertex(12.0, 26.0, "q5");
+//        e1 = new Edge("s5", v1, v2);
+//        poly1.addVertex(v1);
+//        poly1.addVertex(v2);
+//        poly1.addEdge(e1);
+//        
+//        v1 = new Vertex(12.0, 26.0, "p6");
+//        v2 = new Vertex(6.0, 19.0, "q6");
+//        e1 = new Edge("s6", v1, v2);
+//        poly1.addVertex(v1);
+//        poly1.addVertex(v2);
+//        poly1.addEdge(e1);
+//        
+//        v1 = new Vertex(6.0, 19.0, "p7");
+//        v2 = new Vertex(11.0, 15.0, "q7");
+//        e1 = new Edge("s7", v1, v2);
+//        poly1.addVertex(v1);
+//        poly1.addVertex(v2);
+//        poly1.addEdge(e1);
+//        
+//        v1 = new Vertex(11.0, 15.0, "p8");
+//        v2 = new Vertex(7.0, 10.0, "q8");
+//        e1 = new Edge("s8", v1, v2);
+//        poly1.addVertex(v1);
+//        poly1.addVertex(v2);
+//        poly1.addEdge(e1);
+//        
+//        v1 = new Vertex(7.0, 10.0, "p9");
+//        v2 = new Vertex(10.0, 2.0, "q9");
+//        e1 = new Edge("s9", v1, v2);
+//        poly1.addVertex(v1);
+//        poly1.addVertex(v2);
+//        poly1.addEdge(e1);
+//        
+//        polygons.add(poly1);
+        
+        Polygon poly2 = new Polygon();
+        poly2.setLabel("polygon2");
+        
+        v1 = new Vertex(16.0, 9.0, "p10");
+        v2 = new Vertex(19.0, 6.0, "q10");
+        e1 = new Edge("s10", v1, v2);
+        poly2.addVertex(v1);
+        poly2.addVertex(v2);
+        poly2.addEdge(e1);
+        
+        v1 = new Vertex(19.0, 6.0, "p11");
+        v2 = new Vertex(22.0, 7.0, "q11");
+        e1 = new Edge("s11", v1, v2);
+        poly2.addVertex(v1);
+        poly2.addVertex(v2);
+        poly2.addEdge(e1);
+        
+        v1 = new Vertex(22.0, 7.0, "p12");
+        v2 = new Vertex(21.0, 11.0, "q12");
+        e1 = new Edge("s12", v1, v2);
+        poly2.addVertex(v1);
+        poly2.addVertex(v2);
+        poly2.addEdge(e1);
+        
+        v1 = new Vertex(21.0, 11.0, "p13");
+        v2 = new Vertex(17.0, 12.0, "q13");
+        e1 = new Edge("s13", v1, v2);
+        poly2.addVertex(v1);
+        poly2.addVertex(v2);
+        poly2.addEdge(e1);
+        
+        v1 = new Vertex(17.0, 12.0, "p14");
+        v2 = new Vertex(16.0, 9.0, "q14");
+        e1 = new Edge("s14", v1, v2);
+        poly2.addVertex(v1);
+        poly2.addVertex(v2);
+        poly2.addEdge(e1);
+        
+        testPolygons.add(poly2);
+        
+        Polygon poly3 = new Polygon();
+        poly3.setLabel("polygon3");
+        
+        v1 = new Vertex(15.0, 17.0, "p15");
+        v2 = new Vertex(18.0, 24.0, "q15");
+        e1 = new Edge("s15", v1, v2);
+        poly3.addVertex(v1);
+        poly3.addVertex(v2);
+        poly3.addEdge(e1);
+        
+        v1 = new Vertex(18.0, 24.0, "p16");
+        v2 = new Vertex(14.0, 23.0, "q16");
+        e1 = new Edge("s16", v1, v2);
+        poly3.addVertex(v1);
+        poly3.addVertex(v2);
+        poly3.addEdge(e1);
+        
+        v1 = new Vertex(14.0, 23.0, "p17");
+        v2 = new Vertex(13.0, 21.0, "q17");
+        e1 = new Edge("s17", v1, v2);
+        poly3.addVertex(v1);
+        poly3.addVertex(v2);
+        poly3.addEdge(e1);
+        
+        v1 = new Vertex(13.0, 21.0, "p18");
+        v2 = new Vertex(15.0, 17.0, "q18");
+        e1 = new Edge("s18", v1, v2);
+        poly3.addVertex(v1);
+        poly3.addVertex(v2);
+        poly3.addEdge(e1);
+        
+        testPolygons.add(poly3);
+        
+
+    
+        
+        //finalEdge();
+        VisibilityGraph graph = new VisibilityGraph();
+        //List<Polygon> polys = new ArrayList<>();
+        //polys.add(polygon);
+        //polys.addAll(innerPolygon);
+        Polygon poly = graph.visibilityGraphAlgorithm(testPolygons);
+        
+        g.setFill(Color.WHITE);
+        g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        g.setFill(Color.BLACK);
+
+        for(Edge edge : poly.getEdges()){
+            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+        }
     }
     
     @FXML
@@ -212,7 +372,7 @@ public class FXMLDocumentController implements Initializable {
    
     @FXML
     private void handleClickAction(MouseEvent e) {
-        if(checkUniqueX((int)e.getX())){
+        
         setUpDraw(true);
         
         boolean addArt = art.isSelected();
@@ -224,27 +384,28 @@ public class FXMLDocumentController implements Initializable {
             addExit((int)e.getX(), (int)e.getY());
             
         }else{
+            if(checkUniqueX((int)e.getX())){
             Poly selectedPolygon = (Poly)choice.getSelectionModel().getSelectedItem();
-            if(Poly.POLY == selectedPolygon){
-                g.setFill(Color.BLACK);
-                polygon.joinAndAddNewVertex((int)e.getX(), (int)e.getY());
-                g.fillOval((int)e.getX()-5, (int)e.getY()-5, 10, 10);
+                if(Poly.POLY == selectedPolygon){
+                    g.setFill(Color.BLACK);
+                    polygon.joinAndAddNewVertex((int)e.getX(), (int)e.getY());
+                    g.fillOval((int)e.getX()-5, (int)e.getY()-5, 10, 10);
+                }else{
+                    g.setFill(Color.WHITE);
+                    Polygon innerPoly = innerPolygon.stream().filter(s->s.getLabel()==selectedPolygon.toString()).findAny().orElse(null);
+                    if(innerPoly==null){
+                        innerPoly = new Polygon(selectedPolygon.toString());
+                        innerPolygon.add(innerPoly);
+                    }
+                    innerPoly.joinAndAddNewVertex((int)e.getX(), (int)e.getY());
+                    g.fillOval((int)e.getX()-5, (int)e.getY()-5, 10, 10);
+                }   
             }else{
-                g.setFill(Color.WHITE);
-                Polygon innerPoly = innerPolygon.stream().filter(s->s.getLabel()==selectedPolygon.toString()).findAny().orElse(null);
-                if(innerPoly==null){
-                    innerPoly = new Polygon(selectedPolygon.toString());
-                    innerPolygon.add(innerPoly);
-                }
-                innerPoly.joinAndAddNewVertex((int)e.getX(), (int)e.getY());
-                g.fillOval((int)e.getX()-5, (int)e.getY()-5, 10, 10);
-            }   
+                JOptionPane.showMessageDialog(new JFrame(), "Same X!!!!!");
+            }
         }
         finalizeDraw();
         setUpDraw(false);
-        }else{
-            JOptionPane.showMessageDialog(new JFrame(), "Same X!!!!!");
-        }
     }
     
     private void setUpDraw(boolean clear){
