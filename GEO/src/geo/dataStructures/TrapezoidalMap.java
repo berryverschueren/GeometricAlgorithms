@@ -987,9 +987,9 @@ public class TrapezoidalMap {
             return;
         }
         
-        Vertex cv = this.triangles.get(0).getV1();
-        Vertex nv = this.triangles.get(0).getV2();
-        Vertex ov = this.triangles.get(0).getV3();
+        Vertex ogcv = this.triangles.get(0).getV1();
+        Vertex ognv = this.triangles.get(0).getV2();
+        Vertex ogov = this.triangles.get(0).getV3();
         
         List<Triangle> subTriangles = new ArrayList<>();
         
@@ -997,53 +997,59 @@ public class TrapezoidalMap {
         for (int i = 0; i < this.triangles.size(); i++) {
             
             // find all trapezoids that share the vertex cv
-            if (TheSameVertex(cv, this.triangles.get(i).getV1())
-                    || TheSameVertex(cv, this.triangles.get(i).getV2())
-                    || TheSameVertex(cv, this.triangles.get(i).getV3())) {
+            if (TheSameVertex(ogcv, this.triangles.get(i).getV1())
+                    || TheSameVertex(ogcv, this.triangles.get(i).getV2())
+                    || TheSameVertex(ogcv, this.triangles.get(i).getV3())) {
                 
                 subTriangles.add(this.triangles.get(i));
             }
-                        
-            for (int j = 0; j < subTriangles.size(); j++) {
-                
-                Vertex[] vertices = new Vertex[] { 
-                    subTriangles.get(j).getV1(), subTriangles.get(j).getV2(), subTriangles.get(j).getV3()
-                };
-                
-                int cvIndex = 0;
-                int nvIndex = 0;
-                int ovIndex = 0;
-                
-                for (int k = 0; k < vertices.length; k++) {
-                    if (TheSameVertex(cv, vertices[k])) {
-                        cvIndex = k;
-                        nvIndex = k + 1 % 3;
-                        ovIndex = k + 2 % 3;
-                    }
-                }
-                
-                cv = vertices[cvIndex];
-                nv = vertices[nvIndex];
-                ov = vertices[ovIndex];
-                
-                cv.setColor(5);
-                nv.setColor(3);
-                ov.setColor(0);
-                
-                for (int k = 0; k < subTriangles.size(); k++) {
-                    
-                    if (k != j && TriangleHasEdge(subTriangles.get(k), cv, nv)) {
-                        
-                    }
-                }
-                
-                for (int k = 0; k < subTriangles.size(); k++) {
-                    
-                    if (k != j && TriangleHasEdge(subTriangles.get(k), cv, ov)) {
-                        
-                    }
+
+            Vertex cv, nv, ov;
+
+            if (subTriangles.isEmpty()) {
+                return;
+            }
+
+            Vertex[] vertices = new Vertex[] { 
+                subTriangles.get(0).getV1(), subTriangles.get(0).getV2(), subTriangles.get(0).getV3()
+            };
+
+            int cvIndex = 0;
+            int nvIndex = 0;
+            int ovIndex = 0;
+
+            for (int k = 0; k < vertices.length; k++) {
+                if (TheSameVertex(ogcv, vertices[k])) {
+                    cvIndex = k;
+                    nvIndex = k + 1 % 3;
+                    ovIndex = k + 2 % 3;
                 }
             }
+
+            cv = vertices[cvIndex];
+            nv = vertices[nvIndex];
+            ov = vertices[ovIndex];
+
+            cv.setColor(5);
+            nv.setColor(3);
+            ov.setColor(0);
+
+            for (int j = 1; j < subTriangles.size(); j++) {
+                if (TriangleHasEdge(subTriangles.get(j), cv, nv)) {
+                    
+                    // find sub triangles OV and color 0
+                }
+                if (TriangleHasEdge(subTriangles.get(j), cv, ov)) {
+
+                    // find sub triangles nv and color 3
+                }
+                if (TriangleHasEdge(subTriangles.get(j), nv, ov)) {
+
+                    // find sub triangles cv and color 5
+                }
+            }
+            
+            // TODO give new values (smart) to OG vertices and use for next iteration of the loop
         }
     }
     
