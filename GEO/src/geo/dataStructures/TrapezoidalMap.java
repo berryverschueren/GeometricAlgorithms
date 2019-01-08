@@ -1026,7 +1026,9 @@ public class TrapezoidalMap {
                 nv = vertices[nvIndex];
                 ov = vertices[ovIndex];
                 
-                
+                cv.setColor(5);
+                nv.setColor(3);
+                ov.setColor(0);
                 
                 for (int k = 0; k < subTriangles.size(); k++) {
                     
@@ -1037,7 +1039,9 @@ public class TrapezoidalMap {
                 
                 for (int k = 0; k < subTriangles.size(); k++) {
                     
-                    
+                    if (k != j && TriangleHasEdge(subTriangles.get(k), cv, ov)) {
+                        
+                    }
                 }
             }
         }

@@ -13,12 +13,8 @@ public class Triangle extends TrapezoidShape {
     // Coordinates
     private Vertex v1, v2, v3;
     private Edge e1, e2, e3;
-    private int c1, c2, c3;
     
     public Triangle() {
-        this.c1 = 0;
-        this.c2 = 0;
-        this.c3 = 0;
     }
 
     public Triangle(String label, Vertex v1, Vertex v2, Vertex v3, Edge e1, Edge e2, Edge e3) {
@@ -29,33 +25,6 @@ public class Triangle extends TrapezoidShape {
         this.e1 = e1;
         this.e2 = e2;
         this.e3 = e3;
-        this.c1 = 0;
-        this.c2 = 0;
-        this.c3 = 0;
-    }
-
-    public void setC1(int c1) {
-        this.c1 = c1;
-    }
-
-    public void setC2(int c2) {
-        this.c2 = c2;
-    }
-
-    public void setC3(int c3) {
-        this.c3 = c3;
-    }
-
-    public int getC1() {
-        return c1;
-    }
-
-    public int getC2() {
-        return c2;
-    }
-
-    public int getC3() {
-        return c3;
     }
 
     public Vertex getV1() {
