@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
@@ -8,7 +12,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane id="AnchorPane" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="javafxapplication2.FXMLDocumentController">
+<AnchorPane id="AnchorPane" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="javafxapplication2.FXMLDocumentController">
     <children>
         <Button fx:id="Save" layoutX="913.0" layoutY="661.0" onAction="#handleButtonSave" prefHeight="25.0" prefWidth="80.0" text="Save!" />
         <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
@@ -25,5 +29,11 @@
       <Button fx:id="kaj" layoutX="920.0" layoutY="151.0" mnemonicParsing="false" onAction="#handleButtonKaj" text="kaj" />
       <Button fx:id="berry" layoutX="920.0" layoutY="176.0" mnemonicParsing="false" onAction="#handleButtonBerry" text="berry" />
       <Button fx:id="carina" layoutX="920.0" layoutY="201.0" mnemonicParsing="false" onAction="#handleButtonCarina" text="carina" />
+      <TextField fx:id="vMaxGuards" layoutX="911.0" layoutY="574.0" prefHeight="39.0" prefWidth="80.0" text="1" />
+      <Label layoutX="911.0" layoutY="559.0" text="vMaxGuards" />
+      <TextField fx:id="deltaT" layoutX="911.0" layoutY="520.0" prefHeight="39.0" prefWidth="80.0" />
+      <TextField fx:id="globalTime" layoutX="911.0" layoutY="462.0" prefHeight="39.0" prefWidth="80.0" />
+      <Label layoutX="911.0" layoutY="442.0" text="globalTime" />
+      <Label layoutX="913.0" layoutY="501.0" text="deltaT" />
     </children>
 </AnchorPane>
