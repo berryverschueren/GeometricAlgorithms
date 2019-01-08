@@ -71,6 +71,9 @@ public class VisibilityGraph {
     }
     
     
+    
+    
+    
 
     private List<Vertex> visibleVertices(Vertex vertex, List<Polygon> innerpolygon) {
         List<Vertex> visibleVertex = new ArrayList<>();
@@ -106,14 +109,46 @@ public class VisibilityGraph {
             boolean visible = visible(i, sortedList, vertex, innerpolygon, tree, minIVisibility);
             if(visible){
                 minIVisibility = true;
+                visibleVertex.add(sortedList.get(i));
             }else{
                 minIVisibility = false;
             }
             //find edges of vertex
             Vertex vertexI = sortedList.get(i);
+            Polygon polygon = null;
+            for(Polygon poly : innerpolygon){
+                if(poly.getVertices().contains(vertexI)){
+                    polygon = poly;
+                    break;
+                }
+            }
+            List<Edge> edges = new ArrayList<>();
+            for(Edge edge : polygon.getEdges()){
+                if(edge.containsVertex(vertexI)){
+                    edges.add(edge);
+                }   
+            }
+            
+            List<Edge> toAdd = new ArrayList<>();
+            List<Edge> toDelete = new ArrayList<>();
+            for(Edge edge : edges){
+                if(tree.containsValue(edge)){
+                    toDelete.add(edge);
+                }else{
+                    toAdd.add(edge);
+                }
+            }
             //remove edges in tree
-            removeEdges(vertexI, innerpolygon, tree);
+            double prevKey = 0.0;
+            if(toDelete.isEmpty()){
+                prevKey = removeEdges(toDelete, tree); 
+            }
             //add edges in tree
+            if(toAdd.isEmpty()){
+                tree = addEdges(toAdd, tree, prevKey, vertex);
+            }
+
+   
         }
 //        4. for i ← 1 to n
 //        5. do if VISIBLE(wi) then Add wi to W.
@@ -126,7 +161,7 @@ public class VisibilityGraph {
     }
 
     private List<Vertex> circleSweepSort(Vertex vertex, List<Vertex> allVertices) {
-        List<Vertex> sortedList = new ArrayList<>();
+        List<Vertex> sortedList = allVertices;
         double deg = Math.atan2(-vertex.getY(), -vertex.getX());
         Collections.sort(sortedList, (a,b) -> 
                 (Math.atan2(a.getY()-vertex.getY(), a.getX()-vertex.getX())) < (Math.atan2(b.getY()-vertex.getY(), b.getX()-vertex.getX()))? -1:
@@ -144,26 +179,40 @@ public class VisibilityGraph {
         return edges;
     }
     
-    private void removeEdges(Vertex vertexI, List<Polygon> polygons, TreeMap<Double, Edge> tree) {
-        Polygon polygon = null;
-        for(Polygon poly : polygons){
-            if(poly.getVertices().contains(vertexI)){
-                polygon = poly;
-                break;
+    private TreeMap<Double, Edge> addEdges(List<Edge> edges, TreeMap<Double, Edge> tree, Double preKey, Vertex vertex){
+        if(preKey != 0.0){
+            tree.put(preKey, edges.get(0));
+            return tree;
+        }
+        List<Edge> treeEdges = new ArrayList<>(tree.values());
+        tree = new TreeMap<>();
+        //two new added update all distances
+        for(Edge edge : treeEdges){
+            Vertex intersection = mapFunction.GetIntersectionPointOfSegments(new Edge("",vertex, new Vertex(vertex.getX()+1000000,vertex.getY(),"")), edge);
+//            Point intersection = lineLineIntersection(  new Point(vertex.getX(), vertex.getY()), 
+//                                                        new Point(vertex.getX().floatValue()+1000000, vertex.getY().floatValue()),  
+//                                                        new Point(edge.getV1().getX(), edge.getV1().getY()), 
+//                                                        new Point(edge.getV2().getX(), edge.getV2().getY())
+//            );
+            if(intersection!=null){
+                double distance = Point2D.distance(vertex.getX(), vertex.getY(), intersection.getX(), intersection.getY());
+                tree.put(distance, edge);
             }
         }
-        List<Edge> edges = new ArrayList<>();
-        for(Edge edge : polygon.getEdges()){
-            if(edge.containsVertex(vertexI)){
-                edges.add(edge);
-            }   
-        }
-        
+        return tree;
+    }
+    
+    private Double removeEdges(List<Edge> edges, TreeMap<Double, Edge> tree) {
+        Double edgeKey=0.0;
         for(Edge edge : edges){
-            if(tree.containsValue(edge)){
-                //tree.re
+            for(Entry<Double, Edge> entry : tree.entrySet()){
+                if(entry.getValue()==edge){
+                    edgeKey = entry.getKey();
+                }
             }
+            tree.remove(edgeKey);
         }
+        return edgeKey;
     }
     //GetIntersectionPointOfSegments posible
 //    private Point lineLineIntersection(Point A, Point B, Point C, Point D) 
