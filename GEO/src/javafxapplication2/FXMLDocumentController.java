@@ -168,7 +168,7 @@ public class FXMLDocumentController implements Initializable {
 //        g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 //        g.setFill(Color.BLACK);
 //
-g.setStroke(Color.WHITE);
+        g.setStroke(Color.WHITE);
 
         for(Edge edge : poly.getEdges()){
             g.strokeLine(100*edge.getV1().getX(), 100*edge.getV1().getY(), 100*edge.getV2().getX(), 100*edge.getV2().getY());
