@@ -194,8 +194,9 @@ public class FXMLDocumentController implements Initializable {
 
         tm.removeInnerTrapezoids(this.innerPolygon);
         tm.removeOuterTrapezoids(this.polygon);
-        tm.triangulateTrapezoids();
-        tm.colorTriangles();
+        //tm.triangulateTrapezoids();
+        //tm.colorTriangles();
+        tm.computePossiblePaths();
 
         Canvas canvas = new Canvas(900, 700);
         
@@ -213,55 +214,63 @@ public class FXMLDocumentController implements Initializable {
         
         int multiplier = 1;
         
-//        for (int i = 0; i < tm.getTrapezoids().size(); i++) {
-//            gc.strokePolygon(new double[] {
-//                tm.getTrapezoids().get(i).getV1().getX() * multiplier,
-//                tm.getTrapezoids().get(i).getV2().getX() * multiplier,
-//                tm.getTrapezoids().get(i).getV3().getX() * multiplier,
-//                tm.getTrapezoids().get(i).getV4().getX() * multiplier
-//            }, new double[] {
-//                tm.getTrapezoids().get(i).getV1().getY() * multiplier,
-//                tm.getTrapezoids().get(i).getV2().getY() * multiplier,
-//                tm.getTrapezoids().get(i).getV3().getY() * multiplier,
-//                tm.getTrapezoids().get(i).getV4().getY() * multiplier
-//            }, 4);
-//        }
-        
-        for (int i = 0; i < tm.getTriangles().size(); i++) {
-            tm.getTriangles().get(i).print();
+        for (int i = 0; i < tm.getTrapezoids().size(); i++) {
             gc.strokePolygon(new double[] {
-                tm.getTriangles().get(i).getV1().getX() * multiplier,
-                tm.getTriangles().get(i).getV2().getX() * multiplier,
-                tm.getTriangles().get(i).getV3().getX() * multiplier
+                tm.getTrapezoids().get(i).getV1().getX() * multiplier,
+                tm.getTrapezoids().get(i).getV2().getX() * multiplier,
+                tm.getTrapezoids().get(i).getV3().getX() * multiplier,
+                tm.getTrapezoids().get(i).getV4().getX() * multiplier
             }, new double[] {
-                tm.getTriangles().get(i).getV1().getY() * multiplier,
-                tm.getTriangles().get(i).getV2().getY() * multiplier,
-                tm.getTriangles().get(i).getV3().getY() * multiplier
-            }, 3);
+                tm.getTrapezoids().get(i).getV1().getY() * multiplier,
+                tm.getTrapezoids().get(i).getV2().getY() * multiplier,
+                tm.getTrapezoids().get(i).getV3().getY() * multiplier,
+                tm.getTrapezoids().get(i).getV4().getY() * multiplier
+            }, 4);
         }
         
-        for (int i = 0; i < tm.getTriangles().size(); i++) {
-            Vertex v = tm.getTriangles().get(i).getV1();
-            gc.setFill(v.getColor() == 1 ? Color.RED : 
-                    (v.getColor() == 2 ? Color.GREEN : 
-                            (v.getColor() == 3 ? Color.BLUE : Color.BLACK)));
-            gc.fillOval(v.getX() - 5, v.getY() - 5, 10, 10);
-            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
-            
-            v = tm.getTriangles().get(i).getV2();
-            gc.setFill(v.getColor() == 1 ? Color.RED : 
-                    (v.getColor() == 2 ? Color.GREEN : 
-                            (v.getColor() == 3 ? Color.BLUE : Color.BLACK)));
-            gc.fillOval(v.getX() - 5, v.getY() - 5, 10, 10);
-            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
-            
-            v = tm.getTriangles().get(i).getV3();
-            gc.setFill(v.getColor() == 1 ? Color.RED : 
-                    (v.getColor() == 2 ? Color.GREEN : 
-                            (v.getColor() == 3 ? Color.BLUE : Color.BLACK)));
-            gc.fillOval(v.getX() - 5, v.getY() - 5, 10, 10);
-            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+        for (int i = 0; i < tm.getPossiblePathEdges().size(); i++) {
+            Edge e = tm.getPossiblePathEdges().get(i);
+            Vertex v1 = e.getV1();
+            Vertex v2 = e.getV2();
+            gc.setStroke(Color.RED);
+            gc.strokeLine(v1.getX(), v1.getY(), v2.getX(), v2.getY());
         }
+        
+//        for (int i = 0; i < tm.getTriangles().size(); i++) {
+//            tm.getTriangles().get(i).print();
+//            gc.strokePolygon(new double[] {
+//                tm.getTriangles().get(i).getV1().getX() * multiplier,
+//                tm.getTriangles().get(i).getV2().getX() * multiplier,
+//                tm.getTriangles().get(i).getV3().getX() * multiplier
+//            }, new double[] {
+//                tm.getTriangles().get(i).getV1().getY() * multiplier,
+//                tm.getTriangles().get(i).getV2().getY() * multiplier,
+//                tm.getTriangles().get(i).getV3().getY() * multiplier
+//            }, 3);
+//        }
+//        
+//        for (int i = 0; i < tm.getTriangles().size(); i++) {
+//            Vertex v = tm.getTriangles().get(i).getV1();
+//            gc.setFill(v.getColor() == 1 ? Color.RED : 
+//                    (v.getColor() == 2 ? Color.GREEN : 
+//                            (v.getColor() == 3 ? Color.BLUE : Color.BLACK)));
+//            gc.fillOval(v.getX() - 5, v.getY() - 5, 10, 10);
+//            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+//            
+//            v = tm.getTriangles().get(i).getV2();
+//            gc.setFill(v.getColor() == 1 ? Color.RED : 
+//                    (v.getColor() == 2 ? Color.GREEN : 
+//                            (v.getColor() == 3 ? Color.BLUE : Color.BLACK)));
+//            gc.fillOval(v.getX() - 5, v.getY() - 5, 10, 10);
+//            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+//            
+//            v = tm.getTriangles().get(i).getV3();
+//            gc.setFill(v.getColor() == 1 ? Color.RED : 
+//                    (v.getColor() == 2 ? Color.GREEN : 
+//                            (v.getColor() == 3 ? Color.BLUE : Color.BLACK)));
+//            gc.fillOval(v.getX() - 5, v.getY() - 5, 10, 10);
+//            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+//        }
     }
     
     private boolean checkUniqueX(int x){

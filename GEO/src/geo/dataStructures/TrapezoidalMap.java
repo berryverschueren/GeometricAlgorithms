@@ -18,6 +18,7 @@ import math.geom2d.Vector2D;
 public class TrapezoidalMap {
     private List<Triangle> triangles;
     private List<Trapezoid> trapezoids;
+    private List<Edge> possiblePathEdges;
     private TrapezoidShape tree;
     private int trapezoidCounter;
 
@@ -931,6 +932,164 @@ public class TrapezoidalMap {
         this.trapezoids = innerTrapezoids;
     }
     
+    public void computePossiblePaths() {
+        List<Vertex> possibleSideVertices = new ArrayList<>();
+        
+        for (int i = 0; i < this.trapezoids.size(); i++) {
+            
+            // not triangle trapezoid
+            if (NotTheSameVertex(this.trapezoids.get(i).getV1(), this.trapezoids.get(i).getV2())
+                    && NotTheSameVertex(this.trapezoids.get(i).getV1(), this.trapezoids.get(i).getV3())
+                    && NotTheSameVertex(this.trapezoids.get(i).getV1(), this.trapezoids.get(i).getV4())
+                    && NotTheSameVertex(this.trapezoids.get(i).getV2(), this.trapezoids.get(i).getV3())
+                    && NotTheSameVertex(this.trapezoids.get(i).getV2(), this.trapezoids.get(i).getV4())
+                    && NotTheSameVertex(this.trapezoids.get(i).getV3(), this.trapezoids.get(i).getV4())) {
+                
+                // take halfway points of vertical segments
+                Vertex hp1 = HalfwayPoint(this.trapezoids.get(i).getSpecificVertex(0), this.trapezoids.get(i).getSpecificVertex(1));
+                Vertex hp2 = HalfwayPoint(this.trapezoids.get(i).getSpecificVertex(2), this.trapezoids.get(i).getSpecificVertex(3));
+                
+                // add hp1 if not already in list
+                boolean contains = false;
+                for (int j = 0; j < possibleSideVertices.size(); j++) {
+                    
+                    if (TheSameVertex(possibleSideVertices.get(j), hp1)) {
+                        contains = true;
+                        break;
+                    }
+                }
+                
+                if (!contains) {
+                    possibleSideVertices.add(hp1);
+                }
+                
+                // add hp2 if not already in list
+                contains = false;
+                for (int j = 0; j < possibleSideVertices.size(); j++) {
+                    
+                    if (TheSameVertex(possibleSideVertices.get(j), hp2)) {
+                        contains = true;
+                        break;
+                    }
+                }
+                
+                if (!contains) {
+                    possibleSideVertices.add(hp2);
+                }           
+            }
+            // triangle trapezoid
+            else {                
+                if (!TheSameVertex(this.trapezoids.get(i).getSpecificVertex(0), this.trapezoids.get(i).getSpecificVertex(1))) {
+                    Vertex hp1 = HalfwayPoint(this.trapezoids.get(i).getSpecificVertex(0), this.trapezoids.get(i).getSpecificVertex(1));
+                    boolean contains = false;
+                    for (int j = 0; j < possibleSideVertices.size(); j++) {
+                        if (TheSameVertex(possibleSideVertices.get(j), hp1)) {
+                            contains = true;
+                            break;
+                        }
+                    }
+                    if (!contains) {
+                        possibleSideVertices.add(hp1);
+                    }
+                }                
+                if (!TheSameVertex(this.trapezoids.get(i).getSpecificVertex(2), this.trapezoids.get(i).getSpecificVertex(3))) {
+                    Vertex hp2 = HalfwayPoint(this.trapezoids.get(i).getSpecificVertex(2), this.trapezoids.get(i).getSpecificVertex(3));
+                    boolean contains = false;
+                    for (int j = 0; j < possibleSideVertices.size(); j++) {
+                        if (TheSameVertex(possibleSideVertices.get(j), hp2)) {
+                            contains = true;
+                            break;
+                        }
+                    }
+                    if (!contains) {
+                        possibleSideVertices.add(hp2);
+                    } 
+                }
+            }
+        }
+        
+        this.possiblePathEdges = new ArrayList<>();
+        
+        // connect center to side vertices
+        for (int i = 0; i < this.trapezoids.size(); i++) {
+            
+            if (NotTheSameVertex(this.trapezoids.get(i).getV1(), this.trapezoids.get(i).getV2())
+                    && NotTheSameVertex(this.trapezoids.get(i).getV1(), this.trapezoids.get(i).getV3())
+                    && NotTheSameVertex(this.trapezoids.get(i).getV1(), this.trapezoids.get(i).getV4())
+                    && NotTheSameVertex(this.trapezoids.get(i).getV2(), this.trapezoids.get(i).getV3())
+                    && NotTheSameVertex(this.trapezoids.get(i).getV2(), this.trapezoids.get(i).getV4())
+                    && NotTheSameVertex(this.trapezoids.get(i).getV3(), this.trapezoids.get(i).getV4())) {
+                
+                // take halfway points of vertical segments
+                Vertex hp1 = HalfwayPoint(this.trapezoids.get(i).getSpecificVertex(0), this.trapezoids.get(i).getSpecificVertex(1));
+                Vertex hp2 = HalfwayPoint(this.trapezoids.get(i).getSpecificVertex(2), this.trapezoids.get(i).getSpecificVertex(3));
+                
+                // take halfway point of the halfway points
+                Vertex hp3 = HalfwayPoint(hp1, hp2);
+                
+                // left edge of trapezoid
+                Edge leftEdge = this.trapezoids.get(i).getSpecificEdge(0);
+                // right edge of trapezoid
+                Edge rightEdge = this.trapezoids.get(i).getSpecificEdge(2);
+                                
+                // loop all possible side vertices
+                for (int j = 0; j < possibleSideVertices.size(); j++) {
+                    
+                    // lies on left edge
+                    if (OnSegment(leftEdge.getV1(), possibleSideVertices.get(j), leftEdge.getV2())) {
+                        
+                        //link it by an edge
+                        Edge e = new Edge("", hp3, possibleSideVertices.get(j));
+                                                
+                        // add edge to list
+                        this.possiblePathEdges.add(e);
+                    }
+                    // lies on right edge
+                    else if (OnSegment(rightEdge.getV1(), possibleSideVertices.get(j), rightEdge.getV2())) {
+                        
+                        //link it by an edge
+                        Edge e = new Edge("", hp3, possibleSideVertices.get(j));
+                        
+                        // add edge to list
+                        this.possiblePathEdges.add(e);
+                    }
+                }
+            }
+            else { 
+                Vertex hp1, hp2;  
+                if (!TheSameVertex(this.trapezoids.get(i).getSpecificVertex(0), this.trapezoids.get(i).getSpecificVertex(1))) {
+                    hp1 = HalfwayPoint(this.trapezoids.get(i).getSpecificVertex(0), this.trapezoids.get(i).getSpecificVertex(1));
+                }                
+                else {
+                    hp1 = this.trapezoids.get(i).getSpecificVertex(0);
+                }             
+                if (!TheSameVertex(this.trapezoids.get(i).getSpecificVertex(2), this.trapezoids.get(i).getSpecificVertex(3))) {
+                    hp2 = HalfwayPoint(this.trapezoids.get(i).getSpecificVertex(2), this.trapezoids.get(i).getSpecificVertex(3));
+                }                
+                else {
+                    hp2 = this.trapezoids.get(i).getSpecificVertex(3);
+                }                
+                Vertex hp3 = HalfwayPoint(hp1, hp2);
+                for (int j = 0; j < possibleSideVertices.size(); j++) {                    
+                    if (!TheSameVertex(this.trapezoids.get(i).getSpecificVertex(0), this.trapezoids.get(i).getSpecificVertex(1))) {
+                        Edge leftEdge = this.trapezoids.get(i).getSpecificEdge(0);
+                        if (OnSegment(leftEdge.getV1(), possibleSideVertices.get(j), leftEdge.getV2())) {
+                            Edge e = new Edge("", hp3, possibleSideVertices.get(j));
+                            this.possiblePathEdges.add(e);
+                        }
+                    }
+                    if (!TheSameVertex(this.trapezoids.get(i).getSpecificVertex(2), this.trapezoids.get(i).getSpecificVertex(3))) {
+                        Edge rightEdge = this.trapezoids.get(i).getSpecificEdge(2);
+                         if (OnSegment(rightEdge.getV1(), possibleSideVertices.get(j), rightEdge.getV2())) {
+                            Edge e = new Edge("", hp3, possibleSideVertices.get(j));
+                            this.possiblePathEdges.add(e);
+                        }
+                    }
+                }            
+            }
+        }
+    }
+    
     public void triangulateTrapezoids() {
         List<Triangle> triangles = new ArrayList<>();
         
@@ -1726,4 +1885,9 @@ public class TrapezoidalMap {
     public List<Triangle> getTriangles() {
         return triangles;
     }
+
+    public List<Edge> getPossiblePathEdges() {
+        return possiblePathEdges;
+    }
+
 }
