@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class ReadInputGallerySpecification extends Vertex {
+public class ReadInputGallerySpecification {
     
     /** Variables */
     public static int numOfVertices;
@@ -156,10 +156,10 @@ public class ReadInputGallerySpecification extends Vertex {
         return galleryProblem;
     }
 
-    public static void main(String[] args) {
-        GalleryProblem gallery = new GalleryProblem();
-        gallery = readInputArtGallerySpecification("ArtGallery1.txt");
-        WriteInputGallerySpecification.WriteInputGallerySpecification(gallery);
+//    public static void main(String[] args) {
+//        GalleryProblem gallery = new GalleryProblem();
+//        gallery = readInputArtGallerySpecification("ArtGallery1.txt");
+//        WriteInputGallerySpecification.WriteInputGallerySpecification(gallery);
 /**     System.out.println("num of vert = " + numOfVertices);
         System.out.println("num of holes = " + numOfHoles);
         System.out.println("num of exits = " + numOfExits);
@@ -169,5 +169,5 @@ public class ReadInputGallerySpecification extends Vertex {
         System.out.println("global time limit T = " + globalTime);
         System.out.println("observation time delta t = " + deltaT);
     }*/
-    }
+//    }
 }

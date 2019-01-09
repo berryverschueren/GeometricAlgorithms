@@ -6,6 +6,7 @@
 package javafxapplication2;
 
 import geo.WriteInputGallerySpecification;
+import geo.ReadInputGallerySpecification;
 import geo.dataStructures.Edge;
 import geo.dataStructures.Polygon;
 import geo.dataStructures.TrapezoidalMap;
@@ -75,6 +76,7 @@ public class FXMLDocumentController implements Initializable {
     private int globalT;
     public int countArts = 0;
     public int countExits = 0;
+    public final int count = 0;
     //private List<Vertex> artList;
     //private List<Vertex> exitList;
     
@@ -326,8 +328,17 @@ public class FXMLDocumentController implements Initializable {
         Gallery gallery = new Gallery(countExits, countArts, polygon, innerPolygon);
         GalleryProblem galleryProblem = new GalleryProblem(gallery, numOfGuards, vMaxG, globalT, deltaTime);
         WriteInputGallerySpecification.WriteInputGallerySpecification(galleryProblem);
-        finalEdge();
+        //finalEdge();
     }
+    @FXML
+    private void handleButtonInputRead(ActionEvent event) {
+        String filename = "ArtGalleryV1.txt";
+        GalleryProblem galleryProblem = new GalleryProblem();
+        galleryProblem = ReadInputGallerySpecification.readInputArtGallerySpecification(filename);
+        //DRAW galleryProblem
+        //finalEdge();
+    }
+    
     
     private void finalEdge(){
         List<Vertex> vertices = polygon.getVertices();
@@ -363,12 +374,14 @@ public class FXMLDocumentController implements Initializable {
     
     @FXML
     private void handleButtonClear(ActionEvent event){
+        countArts = count;
+        countExits = count;
         g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         polygon = new Polygon();
         innerPolygon = new ArrayList<>();
         //artList = new Arra
         choice.getSelectionModel().selectFirst();
-    }
+        }
    
     @FXML
     private void handleClickAction(MouseEvent e) {

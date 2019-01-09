@@ -35,5 +35,6 @@
       <TextField fx:id="globalTime" layoutX="911.0" layoutY="462.0" prefHeight="39.0" prefWidth="80.0" />
       <Label layoutX="911.0" layoutY="442.0" text="globalTime" />
       <Label layoutX="913.0" layoutY="501.0" text="deltaT" />
+      <Button fx:id="readInput" layoutX="922.0" layoutY="240.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="99.0" text="ReadInput" />
     </children>
 </AnchorPane>
