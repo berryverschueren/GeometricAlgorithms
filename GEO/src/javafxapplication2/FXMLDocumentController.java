@@ -246,12 +246,12 @@ public class FXMLDocumentController implements Initializable {
     }
     @FXML
     private void handleButtonInputRead(ActionEvent event) {
-        String filename = "ArtGalleryV1.txt";
+        
+        String filename = "ArtGalleryV3.txt";
         GalleryProblem galleryProblem = new GalleryProblem();
         galleryProblem = ReadInputGallerySpecification.readInputArtGallerySpecification(filename);
         Gallery gallery = galleryProblem.getGallery();
         polygon = gallery.getOuterPolygon();
-        //List<Vertex> verticesOuterPolygon = outerPolygon.getVertices();
         innerPolygon = gallery.getInnerPolygons();
             
         setUpDraw(true);
