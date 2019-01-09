@@ -249,6 +249,13 @@ public class FXMLDocumentController implements Initializable {
         String filename = "ArtGalleryV1.txt";
         GalleryProblem galleryProblem = new GalleryProblem();
         galleryProblem = ReadInputGallerySpecification.readInputArtGallerySpecification(filename);
+        Gallery gallery = galleryProblem.getGallery();
+        polygon = gallery.getOuterPolygon();
+        //List<Vertex> verticesOuterPolygon = outerPolygon.getVertices();
+        innerPolygon = gallery.getInnerPolygons();
+            
+        setUpDraw(true);
+        finalizeDraw();
         //DRAW galleryProblem
         //finalEdge();
     }
