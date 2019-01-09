@@ -140,7 +140,22 @@ public class FXMLDocumentController implements Initializable {
         testPolygons.add(poly3);
         
 
-    
+        //innerPolygon = testPolygons;
+        for(Polygon poly : testPolygons){
+            Polygon p = new Polygon();
+            for(Vertex vertex : poly.getVertices()){
+                Vertex v = new Vertex(vertex.getX()*100, vertex.getY()*100, "");
+                p.addVertex(v);
+            }
+            innerPolygon.add(p);
+        }
+        polygon.addVertex(new Vertex(0.0,0.0,""));
+        polygon.addVertex(new Vertex(700.0,0.0,""));
+        polygon.addVertex(new Vertex(700.0,700.0,""));
+        polygon.addVertex(new Vertex(0.0,700.0,""));
+        
+        setUpDraw(true);
+                
         
         //finalEdge();
         VisibilityGraph graph = new VisibilityGraph();
@@ -149,13 +164,13 @@ public class FXMLDocumentController implements Initializable {
         //polys.addAll(innerPolygon);
         Polygon poly = graph.visibilityGraphAlgorithm(testPolygons);
         
-        g.setFill(Color.WHITE);
-        g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        g.setFill(Color.BLACK);
-
-        for(Edge edge : poly.getEdges()){
-            g.strokeLine(10*edge.getV1().getX(), 10*edge.getV1().getY(), 10*edge.getV2().getX(), 10*edge.getV2().getY());
-        }
+//        g.setFill(Color.WHITE);
+//        g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+//        g.setFill(Color.BLACK);
+//
+//        for(Edge edge : poly.getEdges()){
+//            g.strokeLine(10*edge.getV1().getX(), 10*edge.getV1().getY(), 10*edge.getV2().getX(), 10*edge.getV2().getY());
+//        }
     }
     
     @FXML
@@ -255,6 +270,7 @@ public class FXMLDocumentController implements Initializable {
         innerPolygon = gallery.getInnerPolygons();
             
         setUpDraw(true);
+        
         finalizeDraw();
         //DRAW galleryProblem
         //finalEdge();
