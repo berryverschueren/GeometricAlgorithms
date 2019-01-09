@@ -102,7 +102,7 @@ public class FXMLDocumentController implements Initializable {
 
         
         Polygon poly2 = new Polygon();
-        poly2.setLabel("polygon2");
+        poly2.setLabel("polygon1");
         
         v1 = new Vertex(1.0, 1.0, "p1");
         v2 = new Vertex(3.0, 1.0, "p2");
@@ -122,7 +122,7 @@ public class FXMLDocumentController implements Initializable {
         
         
         Polygon poly3 = new Polygon();
-        poly3.setLabel("polygon3");
+        poly3.setLabel("polygon2");
         
         v1 = new Vertex(5.0, 1.0, "pp1");
         v2 = new Vertex(6.0, 4.0, "pp2");
@@ -155,7 +155,7 @@ public class FXMLDocumentController implements Initializable {
         polygon.addVertex(new Vertex(0.0,700.0,""));
         
         setUpDraw(true);
-                
+        finalizeDraw();        
         
         //finalEdge();
         VisibilityGraph graph = new VisibilityGraph();
@@ -164,13 +164,15 @@ public class FXMLDocumentController implements Initializable {
         //polys.addAll(innerPolygon);
         Polygon poly = graph.visibilityGraphAlgorithm(testPolygons);
         
-//        g.setFill(Color.WHITE);
+        g.setFill(Color.WHITE);
 //        g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 //        g.setFill(Color.BLACK);
 //
-//        for(Edge edge : poly.getEdges()){
-//            g.strokeLine(10*edge.getV1().getX(), 10*edge.getV1().getY(), 10*edge.getV2().getX(), 10*edge.getV2().getY());
-//        }
+g.setStroke(Color.WHITE);
+
+        for(Edge edge : poly.getEdges()){
+            g.strokeLine(100*edge.getV1().getX(), 100*edge.getV1().getY(), 100*edge.getV2().getX(), 100*edge.getV2().getY());
+        }
     }
     
     @FXML

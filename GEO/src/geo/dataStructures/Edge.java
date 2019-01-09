@@ -63,11 +63,10 @@ public class Edge extends TrapezoidShape {
     }
     
     public boolean containsVertex(Vertex vertex){
-        boolean isTrue = true;
         if(v1==vertex || v2==vertex){
-            isTrue=false;
+            return true;
         }
-        return isTrue;
+        return false;
     }
     
     public void print() {
