@@ -71,9 +71,9 @@ public class FXMLDocumentController implements Initializable {
     private Polygon polygon;
     private List<Polygon> innerPolygon;
     private int numOfGuards; 
-    private int vMaxG;
-    private int deltaTime;
-    private int globalT;
+    private double vMaxG;
+    private double deltaTime;
+    private double globalT;
     public int countArts = 0;
     public int countExits = 0;
     public final int count = 0;
@@ -253,11 +253,15 @@ public class FXMLDocumentController implements Initializable {
         Gallery gallery = galleryProblem.getGallery();
         polygon = gallery.getOuterPolygon();
         innerPolygon = gallery.getInnerPolygons();
-            
+        
+        guards.setText(String.valueOf(galleryProblem.getGuards()));
+        vMaxGuards.setText(String.valueOf(galleryProblem.getSpeed()));
+        deltaT.setText(String.valueOf(galleryProblem.getObservationTime()));
+        globalTime.setText(String.valueOf(galleryProblem.getGlobalTime()));
+        
         setUpDraw(true);
         finalizeDraw();
-        //DRAW galleryProblem
-        //finalEdge();
+        
     }
     
     
