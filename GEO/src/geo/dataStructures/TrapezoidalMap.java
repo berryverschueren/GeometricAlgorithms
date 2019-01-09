@@ -16,6 +16,7 @@ import math.geom2d.Vector2D;
  * @author Berry
  */
 public class TrapezoidalMap {
+    private List<Triangle> triangles;
     private List<Trapezoid> trapezoids;
     private TrapezoidShape tree;
     private int trapezoidCounter;
@@ -931,14 +932,13 @@ public class TrapezoidalMap {
     }
     
     public void triangulateTrapezoids() {
-        List<Trapezoid> triangles = new ArrayList<>();
+        List<Triangle> triangles = new ArrayList<>();
         
         System.out.println("Triangulate " + this.trapezoids.size() + " trapezoids");
         
         for (int i = 0; i < this.trapezoids.size(); i++) {
             
-            this.trapezoids.get(i).print();
-            
+            this.trapezoids.get(i).print();            
             
             if (NotTheSameVertex(this.trapezoids.get(i).getV1(), this.trapezoids.get(i).getV2())
                     && NotTheSameVertex(this.trapezoids.get(i).getV1(), this.trapezoids.get(i).getV3())
@@ -967,23 +967,142 @@ public class TrapezoidalMap {
                 t2.setBottom(null);
                 t2.setTop(null);
                 
-                triangles.add(t1);
-                triangles.add(t2);
+                triangles.add(TrapezoidToTriangle(t1));
+                triangles.add(TrapezoidToTriangle(t2));
             }
             else {
                 
                 // trapezoid was already a triangle
-                triangles.add(this.trapezoids.get(i));
+                triangles.add(TrapezoidToTriangle(this.trapezoids.get(i)));
             }
         }
         
-        this.trapezoids = triangles;
+        this.triangles = triangles;
+    }
+    
+    public void colorTriangles() {
+        System.out.println("Color " + this.triangles.size() + " triangles");
+        
+        if (this.triangles == null || this.triangles.isEmpty()) {
+            return;
+        }
+        
+        Vertex ogcv = this.triangles.get(0).getV1();
+        Vertex ognv = this.triangles.get(0).getV2();
+        Vertex ogov = this.triangles.get(0).getV3();
+        
+        List<Triangle> subTriangles = new ArrayList<>();
+        
+        // loop all triangles
+        for (int i = 0; i < this.triangles.size(); i++) {
+            
+            // find all trapezoids that share the vertex cv
+            if (TheSameVertex(ogcv, this.triangles.get(i).getV1())
+                    || TheSameVertex(ogcv, this.triangles.get(i).getV2())
+                    || TheSameVertex(ogcv, this.triangles.get(i).getV3())) {
+                
+                subTriangles.add(this.triangles.get(i));
+            }
+
+            Vertex cv, nv, ov;
+
+            if (subTriangles.isEmpty()) {
+                return;
+            }
+
+            Vertex[] vertices = new Vertex[] { 
+                subTriangles.get(0).getV1(), subTriangles.get(0).getV2(), subTriangles.get(0).getV3()
+            };
+
+            int cvIndex = 0;
+            int nvIndex = 0;
+            int ovIndex = 0;
+
+            for (int k = 0; k < vertices.length; k++) {
+                if (TheSameVertex(ogcv, vertices[k])) {
+                    cvIndex = k;
+                    nvIndex = k + 1 % 3;
+                    ovIndex = k + 2 % 3;
+                }
+            }
+
+            cv = vertices[cvIndex];
+            nv = vertices[nvIndex];
+            ov = vertices[ovIndex];
+
+            cv.setColor(5);
+            nv.setColor(3);
+            ov.setColor(0);
+
+            for (int j = 1; j < subTriangles.size(); j++) {
+                if (TriangleHasEdge(subTriangles.get(j), cv, nv)) {
+                    
+                    // find sub triangles OV and color 0
+                }
+                if (TriangleHasEdge(subTriangles.get(j), cv, ov)) {
+
+                    // find sub triangles nv and color 3
+                }
+                if (TriangleHasEdge(subTriangles.get(j), nv, ov)) {
+
+                    // find sub triangles cv and color 5
+                }
+            }
+            
+            // TODO give new values (smart) to OG vertices and use for next iteration of the loop
+        }
     }
     
     public boolean NotTheSameVertex(Vertex v1, Vertex v2) {
         if (!Objects.equals(v1.getX(), v2.getX()) || !Objects.equals(v1.getY(), v2.getY())) {
             return true;
         }
+        return false;
+    }
+    
+    public boolean TheSameVertex(Vertex v1, Vertex v2) {
+        if (Objects.equals(v1.getX(), v2.getX()) && Objects.equals(v1.getY(), v2.getY())) {
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean TrianglesShareEdge(Triangle t1, Triangle t2) {
+        int sameVerticesCount = 0;
+        
+        if (TheSameVertex(t1.getV1(), t2.getV1()) || TheSameVertex(t1.getV1(), t2.getV2())
+                || TheSameVertex(t1.getV1(), t2.getV3())) {
+            sameVerticesCount++;
+        }
+        
+        if (TheSameVertex(t1.getV2(), t2.getV1()) || TheSameVertex(t1.getV2(), t2.getV2())
+                || TheSameVertex(t1.getV2(), t2.getV3())) {
+            sameVerticesCount++;
+        }
+        
+        if (TheSameVertex(t1.getV3(), t2.getV1()) || TheSameVertex(t1.getV3(), t2.getV2())
+                || TheSameVertex(t1.getV3(), t2.getV3())) {
+            sameVerticesCount++;
+        }
+        
+        return sameVerticesCount == 2;
+    }
+    
+    public boolean TriangleHasEdge(Triangle t, Edge e) {
+        return TriangleHasEdge(t, e.getV1(), e.getV2());
+    }
+    
+    public boolean TriangleHasEdge(Triangle t, Vertex v1, Vertex v2) {
+        if (TheSameVertex(v1, v2)) {
+            return false;
+        }
+        
+        if ((TheSameVertex(t.getV1(), v1) || TheSameVertex(t.getV2(), v1) 
+                || TheSameVertex(t.getV3(), v1)) && (TheSameVertex(t.getV1(), v2) 
+                || TheSameVertex(t.getV2(), v2) || TheSameVertex(t.getV3(), v2))) {
+            return true;
+        }
+        
         return false;
     }
     
@@ -1016,6 +1135,53 @@ public class TrapezoidalMap {
         t.setE4(new Edge("e4", t.getV4(), t.getV1()));
         t.setLabel(CreateTrapezoidLabel());
         return t;
+    }
+    
+    public Triangle CreateTriangleByVertices(Vertex v1, Vertex v2, Vertex v3) {
+        Triangle t = new Triangle();
+        t.setV1(v1);
+        t.setV2(v2);
+        t.setV3(v3);
+        t.setE1(new Edge("e1", t.getV1(), t.getV2()));
+        t.setE2(new Edge("e2", t.getV2(), t.getV3()));
+        t.setE3(new Edge("e3", t.getV3(), t.getV1()));
+        t.setLabel(CreateTrapezoidLabel());
+        return t;
+    }
+    
+    public Triangle TrapezoidToTriangle(Trapezoid t) {
+        Vertex[] triangleVertices = new Vertex[3];
+        Vertex[] trapezoidVertices = new Vertex[] {
+            t.getV1(), t.getV2(), t.getV3(), t.getV4()
+        };
+        
+        for (int i = 0; i < trapezoidVertices.length; i++) {
+            boolean found = false;
+            for (int j = 0; j < trapezoidVertices.length; j++) {
+                if (i != j && TheSameVertex(trapezoidVertices[i], trapezoidVertices[j])) {
+                    triangleVertices[0] = trapezoidVertices[i];
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                break;
+            }
+        }
+        
+        int index = 1;
+        
+        for (int i = 0; i < trapezoidVertices.length; i++) {
+            if (index == 3) {
+                break;
+            }
+            if (NotTheSameVertex(trapezoidVertices[i], triangleVertices[0])) {
+                triangleVertices[index] = trapezoidVertices[i];
+                index++;
+            }
+        }
+        
+        return CreateTriangleByVertices(triangleVertices[0], triangleVertices[1], triangleVertices[2]);
     }
     
     public Trapezoid FinishTrapezoidWithVertices(Trapezoid t) {
@@ -1231,5 +1397,9 @@ public class TrapezoidalMap {
 
     public List<Trapezoid> getTrapezoids() {
         return trapezoids;
+    }
+
+    public List<Triangle> getTriangles() {
+        return triangles;
     }
 }
