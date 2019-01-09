@@ -239,6 +239,29 @@ public class FXMLDocumentController implements Initializable {
                 tm.getTriangles().get(i).getV3().getY() * multiplier
             }, 3);
         }
+        
+        for (int i = 0; i < tm.getTriangles().size(); i++) {
+            Vertex v = tm.getTriangles().get(i).getV1();
+            gc.setFill(v.getColor() == 1 ? Color.RED : 
+                    (v.getColor() == 2 ? Color.GREEN : 
+                            (v.getColor() == 3 ? Color.BLUE : Color.BLACK)));
+            gc.fillOval(v.getX() - 5, v.getY() - 5, 10, 10);
+            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+            
+            v = tm.getTriangles().get(i).getV2();
+            gc.setFill(v.getColor() == 1 ? Color.RED : 
+                    (v.getColor() == 2 ? Color.GREEN : 
+                            (v.getColor() == 3 ? Color.BLUE : Color.BLACK)));
+            gc.fillOval(v.getX() - 5, v.getY() - 5, 10, 10);
+            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+            
+            v = tm.getTriangles().get(i).getV3();
+            gc.setFill(v.getColor() == 1 ? Color.RED : 
+                    (v.getColor() == 2 ? Color.GREEN : 
+                            (v.getColor() == 3 ? Color.BLUE : Color.BLACK)));
+            gc.fillOval(v.getX() - 5, v.getY() - 5, 10, 10);
+            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+        }
     }
     
     private boolean checkUniqueX(int x){
