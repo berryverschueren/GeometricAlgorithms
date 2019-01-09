@@ -14,6 +14,7 @@ import geo.dataStructures.Vertex;
 import geo.dataStructures.VisibilityGraph;
 import geo.dataStructures.Gallery;
 import geo.dataStructures.GalleryProblem;
+import geo.dataStructures.dummyVis;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -157,18 +158,13 @@ public class FXMLDocumentController implements Initializable {
         setUpDraw(true);
         finalizeDraw();        
         
-        //finalEdge();
+
         VisibilityGraph graph = new VisibilityGraph();
-        //List<Polygon> polys = new ArrayList<>();
-        //polys.add(polygon);
-        //polys.addAll(innerPolygon);
+
         Polygon poly = graph.visibilityGraphAlgorithm(testPolygons);
         
-        g.setFill(Color.WHITE);
-//        g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-//        g.setFill(Color.BLACK);
-//
-        g.setStroke(Color.WHITE);
+
+        g.setStroke(Color.AQUA);
 
         for(Edge edge : poly.getEdges()){
             g.strokeLine(100*edge.getV1().getX(), 100*edge.getV1().getY(), 100*edge.getV2().getX(), 100*edge.getV2().getY());
@@ -329,12 +325,16 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private void handleButtonSave(ActionEvent event) {
-        VisibilityGraph graph = new VisibilityGraph();
-        List<Polygon> poly = new ArrayList<>();
-        poly.add(polygon);
-        poly.addAll(innerPolygon);
+        finalEdge();
+        Polygon p = polygon;
+        List<Polygon> ps = innerPolygon;
+        ps.add(p);
+        Polygon vis = new dummyVis().visibiliyGraph(ps);
+        g.setStroke(Color.AQUA);
 
-        graph.visibilityGraphAlgorithm(poly);
+        for(Edge edge : vis.getEdges()){
+            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+        }
     }
     
     @FXML

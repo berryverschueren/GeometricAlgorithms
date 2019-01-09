@@ -124,4 +124,12 @@ public class Polygon {
     public boolean contains(Vertex vertex) {
         return vertices.contains(vertex);
     }
+
+    void addVertices(List<Vertex> vertices) {
+        this.vertices.addAll(vertices);
+    }
+
+    void addEdges(List<Edge> edges) {
+        this.edges.addAll(edges);
+    }
 }

@@ -28,6 +28,8 @@ public class VisibilityGraph {
     private Polygon visibilityGraph;
     private List<Polygon> innerpolygon;
     private TrapezoidalMap mapFunction;
+    
+    
 
     public VisibilityGraph() {
         innerpolygon = new ArrayList<>();
@@ -49,7 +51,10 @@ public class VisibilityGraph {
         return visibilityGraph;       
     }
     
+    private List<Vertex> nextVertices = new ArrayList<>();
+    
     private List<Vertex> visibleVertices(Vertex vertex, List<Polygon> innerpolygon) {
+        System.out.println("Testing Vertex: " + vertex.getLabel());
         List<Vertex> visibleVertex = new ArrayList<>();
         
 
@@ -60,6 +65,7 @@ public class VisibilityGraph {
 
         //printSort(allVertices(innerpolygon), vertex);
         List<Vertex> sortedList = circleSweepSort(vertex, allVertices(innerpolygon));
+        
 //        2. Let ρ be the half-line parallel to the positive x-axis starting at p. Find
 //        the obstacle edges that are properly intersected by ρ, and store them in a
 //        balanced search tree T in the order in which they are intersected by ρ.
@@ -76,18 +82,19 @@ public class VisibilityGraph {
 //            );
             if(intersection!=null){
                 double distance = Point2D.distance(vertex.getX(), vertex.getY(), intersection.getX(), intersection.getY());
-                if(tree.containsKey(distance)){
-                    List<Edge> e = tree.get(distance);
-                    e.add(edge);
-                    
-                    tree.put(distance, e);
-                }else{
-                    List<Edge> e = new ArrayList<>();
-                    e.add(edge);
-                        
-                    tree.put(distance, e);
+                if(distance != 0.0){
+                    if(tree.containsKey(distance)){
+                        List<Edge> e = tree.get(distance);
+                        e.add(edge);
+
+                        tree.put(distance, e);
+                    }else{
+                        List<Edge> e = new ArrayList<>();
+                        e.add(edge);
+
+                        tree.put(distance, e);
+                    }
                 }
-                
                 
             }
         }
@@ -99,8 +106,9 @@ public class VisibilityGraph {
         //balanced search tree
         boolean minIVisibility = false;
         System.out.println("For Vertex: "+vertex.getLabel());
-        for (int i = 0; i < sortedList.size()-1 ; i++) {
+        for (int i = 1; i <= sortedList.size()-1 ; i++) {
             Vertex currentVertex = sortedList.get(i);
+            
             boolean visible = visible(i, sortedList, vertex, innerpolygon, tree, minIVisibility);
             if(visible){
                 System.out.println("Vertex: "+currentVertex.getLabel()+" is Visible");
@@ -125,20 +133,28 @@ public class VisibilityGraph {
                     edges.add(edge);
                 }   
             }
-            
+            ///////////////nextVertices
             List<Edge> toAdd = new ArrayList<>();
             List<Edge> toDelete = new ArrayList<>();
             for(Edge edge : edges){
-                boolean isInTree = false;
-                for(Entry<Double, List<Edge>> entry : tree.entrySet()){
-                    if(entry.getValue().contains(edge)){
-                        isInTree = true;
+                boolean notNext = true;
+                for(Vertex v : nextVertices){
+                    if(edge.containsVertex(v)){
+                        notNext = false;
                     }
                 }
-                if(isInTree){
-                    toDelete.add(edge);
-                }else{
-                    toAdd.add(edge);
+                if(notNext){
+                    boolean isInTree = false;
+                    for(Entry<Double, List<Edge>> entry : tree.entrySet()){
+                        if(entry.getValue().contains(edge)){
+                            isInTree = true;
+                        }
+                    }
+                    if(isInTree){
+                        toDelete.add(edge);
+                    }else{
+                        toAdd.add(edge);
+                    }
                 }
             }
             //remove edges in tree
@@ -153,6 +169,13 @@ public class VisibilityGraph {
 
             if(!toDelete.isEmpty()){
                 removeEdges(toDelete, tree); 
+            }
+            System.out.println("");
+            for (Entry<Double, List<Edge>> entry : tree.entrySet()) {
+                
+                for(Edge edge : entry.getValue()){
+                    System.out.println("Key: " + entry.getKey() + ". Value: " + edge.getLabel());
+                }
             }
         }
 //        4. for i ← 1 to n
@@ -191,7 +214,7 @@ public class VisibilityGraph {
             return false;
             //3. else if i = 1 or wi−1 is not on the segment pwi  
         }  
-        if(i==0){
+        if(i==1){
             
             //4. then Search in T for the edge e in the leftmost leaf.
             Edge edge = null;
@@ -199,7 +222,17 @@ public class VisibilityGraph {
             if(entry != null) {
                 edge = entry.getValue().get(0);
                 //pwi intersects e
-                if(mapFunction.GetIntersectionPointOfSegments(edge, P)!=null){
+                boolean doesIntersect = false;
+                Vertex inter = mapFunction.GetIntersectionPointOfSegments(edge, P);
+                // note: maybe parrallel
+                if(inter != null){
+                    if(edge.hasSameCoordinates(inter)){
+                        doesIntersect = true;
+                    }else{
+                        doesIntersect = false;
+                    }
+                }
+                if(doesIntersect){
                     return false;
                 }else{
                     return true;
@@ -213,8 +246,20 @@ public class VisibilityGraph {
             Entry<Double, List<Edge>> entry = tree.firstEntry();//.pollFirstEntry();
             if(entry != null) {
                 edge = entry.getValue().get(0);
+                
+                boolean doesIntersect = false;
+                Vertex inter = mapFunction.GetIntersectionPointOfSegments(edge, P);
+                // note: maybe parrallel
+                if(inter != null){
+                    if(edge.hasSameCoordinates(inter)){
+                        doesIntersect = true;
+                    }else{
+                        doesIntersect = false;
+                    }
+                }
+                if(doesIntersect){
                 //pwi intersects e
-                if(mapFunction.GetIntersectionPointOfSegments(edge, P)!=null){
+                //if(mapFunction.GetIntersectionPointOfSegments(edge, P)!=null){
                     return false;
                 }else{
                     return true;
@@ -227,7 +272,7 @@ public class VisibilityGraph {
             if(!minIVisibility){
                 return false;
             }else{
-                Edge edge = new Edge(vertex, sortedList.get(1-i));
+                Edge edge = new Edge(vertex, sortedList.get(i-1));
                 boolean anyEdgeIntersects = searchIntersectingEdge(tree, edge);
                //Search in T for an edge e that intersects wi−1wi.
                //if e exists
@@ -314,6 +359,15 @@ public class VisibilityGraph {
                 (angleValue(a,vertex) < angleValue(b,vertex))?-1:1
         );
         printSort(sortedList, vertex);
+        String s = ""; 
+        for(Vertex v : sortedList){
+            double angle = angleValue(v, vertex);
+            if(angle<0){
+                nextVertices.add(v);
+                s = s+", "+v.getLabel();
+            }
+        }
+        System.out.println(s);
         return sortedList;        
     }
 
@@ -358,16 +412,18 @@ public class VisibilityGraph {
 //            );
             if(intersection!=null){
                 double distance = Point2D.distance(vertex.getX(), vertex.getY(), intersection.getX(), intersection.getY());
-                if(tree.containsKey(distance)){
-                    List<Edge> e = tree.get(distance);
-                    e.add(edge);
-                    
-                    tree.put(distance, e);
-                }else{
-                    List<Edge> e = new ArrayList<>();
-                    e.add(edge);
-                        
-                    tree.put(distance, e);
+                if(distance != 0.0){
+                    if(tree.containsKey(distance)){
+                        List<Edge> e = tree.get(distance);
+                        e.add(edge);
+
+                        tree.put(distance, e);
+                    }else{
+                        List<Edge> e = new ArrayList<>();
+                        e.add(edge);
+
+                        tree.put(distance, e);
+                    }
                 }
                 //tree.put(distance, edge);
             }

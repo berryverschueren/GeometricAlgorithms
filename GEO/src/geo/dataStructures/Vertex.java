@@ -80,4 +80,11 @@ public class Vertex extends TrapezoidShape {
         this.artFlag = artFlag;
     }
     
+    public boolean onSameCoordinates(Vertex vertex){
+        boolean onSame = false;
+        if(vertex.x==x && vertex.y==y){
+            onSame = true;
+        }
+        return onSame;
+    }
 }
