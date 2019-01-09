@@ -981,75 +981,245 @@ public class TrapezoidalMap {
     }
     
     public void colorTriangles() {
-        System.out.println("Color " + this.triangles.size() + " triangles");
+        System.out.println("Coloring " + this.triangles.size() + " triangles");
         
         if (this.triangles == null || this.triangles.isEmpty()) {
             return;
         }
         
-        Vertex ogcv = this.triangles.get(0).getV1();
-        Vertex ognv = this.triangles.get(0).getV2();
-        Vertex ogov = this.triangles.get(0).getV3();
+        Vertex ogcv;
         
         List<Triangle> subTriangles = new ArrayList<>();
+        List<Vertex> testQueue = new ArrayList<>();
+        testQueue.add(this.triangles.get(0).getV1());
+        boolean isFirst = true;
         
-        // loop all triangles
-        for (int i = 0; i < this.triangles.size(); i++) {
+        // untill no more points left to test
+        while (!testQueue.isEmpty()) {
             
-            // find all trapezoids that share the vertex cv
-            if (TheSameVertex(ogcv, this.triangles.get(i).getV1())
-                    || TheSameVertex(ogcv, this.triangles.get(i).getV2())
-                    || TheSameVertex(ogcv, this.triangles.get(i).getV3())) {
+            // take first in queue as ogcv
+            ogcv = testQueue.get(0);
+            
+            System.out.println("Testing for vertex: (" + ogcv.getX() + ", " + ogcv.getY() + ")  --  color: " + ogcv.getColor());
+            System.out.println("Matching triangles: ");
+            
+            // loop all triangles
+            for (int i = 0; i < this.triangles.size(); i++) {
                 
-                subTriangles.add(this.triangles.get(i));
+                // find all trapezoids that share the vertex ogcv
+                if (TheSameVertex(ogcv, this.triangles.get(i).getV1())
+                        && !(this.triangles.get(i).getV2().getColor() != 0
+                        && this.triangles.get(i).getV3().getColor() != 0)
+                        && (this.triangles.get(i).getV2().getColor() == 0
+                        || this.triangles.get(i).getV3().getColor() == 0)) {
+                    subTriangles.add(this.triangles.get(i));
+                    this.triangles.get(i).print();
+                }
+                else if (TheSameVertex(ogcv, this.triangles.get(i).getV2())
+                        && !(this.triangles.get(i).getV1().getColor() != 0
+                        && this.triangles.get(i).getV3().getColor() != 0)
+                        && (this.triangles.get(i).getV1().getColor() == 0
+                        || this.triangles.get(i).getV3().getColor() == 0)) {
+                    subTriangles.add(this.triangles.get(i));
+                    this.triangles.get(i).print();
+                }
+                else if (TheSameVertex(ogcv, this.triangles.get(i).getV3())
+                        && !(this.triangles.get(i).getV2().getColor() != 0
+                        && this.triangles.get(i).getV1().getColor() != 0)
+                        && (this.triangles.get(i).getV2().getColor() == 0
+                        || this.triangles.get(i).getV1().getColor() == 0)) {
+                    subTriangles.add(this.triangles.get(i));
+                    this.triangles.get(i).print();
+                }
             }
-
-            Vertex cv, nv, ov;
-
+            
+            // if no sub triangles found go next
             if (subTriangles.isEmpty()) {
-                return;
+                System.out.println("No matches found, go next");
+                testQueue.remove(ogcv);
+                continue;
             }
 
+            // take 3 vertices of first sub triangle
+            Vertex cv = null, nv = null, ov = null; 
             Vertex[] vertices = new Vertex[] { 
                 subTriangles.get(0).getV1(), subTriangles.get(0).getV2(), subTriangles.get(0).getV3()
             };
-
-            int cvIndex = 0;
-            int nvIndex = 0;
-            int ovIndex = 0;
-
-            for (int k = 0; k < vertices.length; k++) {
-                if (TheSameVertex(ogcv, vertices[k])) {
-                    cvIndex = k;
-                    nvIndex = k + 1 % 3;
-                    ovIndex = k + 2 % 3;
+            
+            // first time just assign 3 colors
+            if (isFirst) {
+                System.out.println("Is first time, applying colors");
+                isFirst = false;
+                
+                // find which vertex is the ogcv, nv and ov
+                int cvIndex = 0, nvIndex = 0, ovIndex = 0;
+                for (int k = 0; k < vertices.length; k++) {
+                    if (TheSameVertex(ogcv, vertices[k])) {
+                        cvIndex = k;
+                        nvIndex = k + 1 % 3;
+                        ovIndex = k + 2 % 3;
+                    }
                 }
-            }
+                
+                // remove ogcv from queue
+                testQueue.remove(ogcv);
 
-            cv = vertices[cvIndex];
-            nv = vertices[nvIndex];
-            ov = vertices[ovIndex];
+                // store in variables with matching names
+                cv = vertices[cvIndex];
+                nv = vertices[nvIndex];
+                ov = vertices[ovIndex];
 
-            cv.setColor(5);
-            nv.setColor(3);
-            ov.setColor(0);
-
-            for (int j = 1; j < subTriangles.size(); j++) {
-                if (TriangleHasEdge(subTriangles.get(j), cv, nv)) {
-                    
-                    // find sub triangles OV and color 0
+                // apply coloring
+                cv.setColor(1);
+                nv.setColor(2);
+                ov.setColor(3);
+                
+                if (subTriangles.size()== 1) {
+                    System.out.println("No other subtriangles found");
+                    System.out.println("Added nv to queue");
+                    System.out.println("Added ov to queue");
+                    testQueue.add(nv);
+                    testQueue.add(ov);
+                    continue;
                 }
-                if (TriangleHasEdge(subTriangles.get(j), cv, ov)) {
-
-                    // find sub triangles nv and color 3
+            } 
+            // if not the first time, find variables according to color
+            else {
+                System.out.println("Not first time, matching vertices");
+                for (int i = 0; i < vertices.length; i++) {
+                    switch (vertices[i].getColor()) {
+                        case 1:
+                            cv = vertices[i];
+                            break;
+                        case 2:
+                            nv = vertices[i];
+                            break;
+                        case 3:
+                            ov = vertices[i];
+                            break;
+                        default:
+                            break;
+                    }
                 }
-                if (TriangleHasEdge(subTriangles.get(j), nv, ov)) {
-
-                    // find sub triangles cv and color 5
+                for (int i = 0; i < vertices.length; i++) {
+                    if (vertices[i].getColor() == 0) {
+                        if (cv == null) {
+                            cv = vertices[i];
+                        }
+                        else if (nv == null) {
+                            nv = vertices[i];
+                        }
+                        else if (ov == null) {
+                            ov = vertices[i];
+                        }
+                    }
                 }
             }
             
-            // TODO give new values (smart) to OG vertices and use for next iteration of the loop
+            if (cv != null) {    
+                System.out.println("cv: (" + cv.getX() + ", " + cv.getY() + ")");
+            }
+            if (nv != null) {    
+                System.out.println("nv: (" + nv.getX() + ", " + nv.getY() + ")");
+            }
+            if (ov != null) {    
+                System.out.println("ov: (" + ov.getX() + ", " + ov.getY() + ")");
+            }
+
+            System.out.println("Looping other subtriangles (" + (subTriangles.size() - 1) + ")");
+            
+            // for all other sub triangles
+            for (int j = 1; j < subTriangles.size(); j++) {
+                
+                subTriangles.get(j).print();
+                
+                // variables to add to queue
+                Vertex newov = null, newnv = null, newcv = null;
+                
+                // if it shares the edge cv-nv then
+                if (cv != null && nv != null && TriangleHasEdge(subTriangles.get(j), cv, nv)) {
+
+                    // find sub triangles ov
+                    if (NotTheSameVertex(subTriangles.get(j).getV1(), cv) && 
+                            NotTheSameVertex(subTriangles.get(j).getV1(), nv)) {
+                        newov = subTriangles.get(j).getV1();
+                    }
+                    else if (NotTheSameVertex(subTriangles.get(j).getV2(), cv) && 
+                            NotTheSameVertex(subTriangles.get(j).getV2(), nv)) {
+                        newov = subTriangles.get(j).getV2();
+                    }
+                    else if (NotTheSameVertex(subTriangles.get(j).getV3(), cv) && 
+                            NotTheSameVertex(subTriangles.get(j).getV3(), nv)) {
+                        newov = subTriangles.get(j).getV3();
+                    }
+                    
+                    
+                    // color vertex 3
+                    if (newov != null && newov.getColor() != 3) {
+                        System.out.println("Found newov: (" + newov.getX() + ", " + newov.getY() + ")");
+                        newov.setColor(3);
+                    }
+                }
+                // if it shares the edge cv-ov then
+                else if (cv != null && ov != null && TriangleHasEdge(subTriangles.get(j), cv, ov)) {
+                    
+                    // find sub triangles nv
+                    if (NotTheSameVertex(subTriangles.get(j).getV1(), cv) && 
+                            NotTheSameVertex(subTriangles.get(j).getV1(), ov)) {
+                        newnv = subTriangles.get(j).getV1();
+                    }
+                    else if (NotTheSameVertex(subTriangles.get(j).getV2(), cv) && 
+                            NotTheSameVertex(subTriangles.get(j).getV2(), ov)) {
+                        newnv = subTriangles.get(j).getV2();
+                    }
+                    else if (NotTheSameVertex(subTriangles.get(j).getV3(), cv) && 
+                            NotTheSameVertex(subTriangles.get(j).getV3(), ov)) {
+                        newnv = subTriangles.get(j).getV3();
+                    }
+
+                    // color vertex 2
+                    if (newnv != null && newnv.getColor() != 2) {
+                        System.out.println("Found newnv: (" + newnv.getX() + ", " + newnv.getY() + ")");
+                        newnv.setColor(2);
+                    }
+                }
+                else if (ov != null && nv != null && TriangleHasEdge(subTriangles.get(j), nv, ov)) {
+
+                    // find sub triangles cv
+                    if (NotTheSameVertex(subTriangles.get(j).getV1(), ov) && 
+                            NotTheSameVertex(subTriangles.get(j).getV1(), nv)) {
+                        newcv = subTriangles.get(j).getV1();
+                    }
+                    else if (NotTheSameVertex(subTriangles.get(j).getV2(), ov) && 
+                            NotTheSameVertex(subTriangles.get(j).getV2(), nv)) {
+                        newcv = subTriangles.get(j).getV2();
+                    }
+                    else if (NotTheSameVertex(subTriangles.get(j).getV3(), ov) && 
+                            NotTheSameVertex(subTriangles.get(j).getV3(), nv)) {
+                        newcv = subTriangles.get(j).getV3();
+                    }
+
+                    // color vertex 1
+                    if (newcv != null && newcv.getColor() != 1) {
+                        System.out.println("Found newcv: (" + newcv.getX() + ", " + newcv.getY() + ")");
+                        newcv.setColor(1);
+                    }
+                }
+                
+                // add found new vertices to the queue
+                if (newov != null) {
+                    System.out.println("Added newov to queue");
+                    testQueue.add(newov);
+                }
+                if (newnv != null) {
+                    System.out.println("Added newnv to queue");
+                    testQueue.add(newnv);
+                }
+                if (newcv != null) {
+                    System.out.println("Added newcv to queue");
+                    testQueue.add(newcv);
+                }
+            }
         }
     }
     

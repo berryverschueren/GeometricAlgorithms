@@ -277,6 +277,7 @@ public class FXMLDocumentController implements Initializable {
         tm.removeInnerTrapezoids(this.innerPolygon);
         tm.removeOuterTrapezoids(this.polygon);
         tm.triangulateTrapezoids();
+        tm.colorTriangles();
 
         Canvas canvas = new Canvas(900, 700);
         
