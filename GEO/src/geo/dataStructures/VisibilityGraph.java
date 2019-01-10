@@ -76,7 +76,7 @@ public class VisibilityGraph {
         for(Edge edge : allEdges(innerpolygon)){
             System.out.println("testing: "+ edge.getLabel());
             Edge startEdge = new Edge("",vertex, new Vertex(vertex.getX()+1000000,vertex.getY(),""));
-            Vertex intersection = mapFunction.GetIntersectionPointOfSegments(startEdge, edge);
+            Vertex intersection = mapFunction.getIntersectionPointOfSegments(startEdge, edge);
 //            Point intersection = lineLineIntersection(  new Point(vertex.getX(), vertex.getY()), 
 //                                                        new Point(vertex.getX().floatValue()+1000000, vertex.getY().floatValue()),  
 //                                                        new Point(edge.getV1().getX(), edge.getV1().getY()), 
@@ -84,8 +84,8 @@ public class VisibilityGraph {
 //            );
             boolean isParrallel = false;
             if(intersection == null){
-                int col = mapFunction.Orientation(startEdge.getV1(), startEdge.getV2(), edge.getV1());
-                col = col + mapFunction.Orientation(startEdge.getV1(), startEdge.getV2(), edge.getV2());
+                int col = mapFunction.orientation(startEdge.getV1(), startEdge.getV2(), edge.getV1());
+                col = col + mapFunction.orientation(startEdge.getV1(), startEdge.getV2(), edge.getV2());
                 if(col == 0){
                     double distanceV1 = Point2D.distance(vertex.getX(), vertex.getY(),edge.getV1().getX(), edge.getV1().getY());
                     double distanceV2 = Point2D.distance(vertex.getX(), vertex.getY(),edge.getV2().getX(), edge.getV2().getY());
@@ -219,7 +219,7 @@ public class VisibilityGraph {
             if(polygon.contains(vertex)){
                 for(Edge edge : polygon.getEdges()){
                     if(!edge.containsVertex(vertex)){
-                        Vertex intersection = mapFunction.GetIntersectionPointOfSegments(P, edge);
+                        Vertex intersection = mapFunction.getIntersectionPointOfSegments(P, edge);
                         if(intersection!=null){
                             intersectsPolygon=true;
                             break outerloop;
@@ -242,7 +242,7 @@ public class VisibilityGraph {
                 edge = entry.getValue().get(0);
                 //pwi intersects e
                 boolean doesIntersect = false;
-                Vertex inter = mapFunction.GetIntersectionPointOfSegments(edge, P);
+                Vertex inter = mapFunction.getIntersectionPointOfSegments(edge, P);
                 // note: maybe parrallel
                 if(inter != null){
                     if(edge.hasSameCoordinates(inter)){
@@ -259,7 +259,7 @@ public class VisibilityGraph {
             }else{
                 return true;
             }
-        }else if(!mapFunction.OnSegment(p, sortedList.get(i-1), vertex)){
+        }else if(!mapFunction.onSegment(p, sortedList.get(i-1), vertex)){
             //4. then Search in T for the edge e in the leftmost leaf.
             Edge edge = null;
             Entry<Double, List<Edge>> entry = tree.firstEntry();//.pollFirstEntry();
@@ -267,7 +267,7 @@ public class VisibilityGraph {
                 edge = entry.getValue().get(0);
                 
                 boolean doesIntersect = false;
-                Vertex inter = mapFunction.GetIntersectionPointOfSegments(edge, P);
+                Vertex inter = mapFunction.getIntersectionPointOfSegments(edge, P);
                 // note: maybe parrallel
                 if(inter != null){
                     if(edge.hasSameCoordinates(inter)){
@@ -423,7 +423,7 @@ public class VisibilityGraph {
         //two new added update all distances
         Edge halfLine =  new Edge("",vertex, currentVertex);
         for(Edge edge : treeEdges){
-            Vertex intersection = mapFunction.GetIntersectionPointOfSegments(halfLine, edge);
+            Vertex intersection = mapFunction.getIntersectionPointOfSegments(halfLine, edge);
 //            Point intersection = lineLineIntersection(  new Point(vertex.getX(), vertex.getY()), 
 //                                                        new Point(vertex.getX().floatValue()+1000000, vertex.getY().floatValue()),  
 //                                                        new Point(edge.getV1().getX(), edge.getV1().getY()), 
@@ -509,7 +509,7 @@ public class VisibilityGraph {
         boolean foundIntersection = false;
         for(Entry<Double, List<Edge>> entry : tree.entrySet()) {
             for(Edge e : entry.getValue()){
-                if(mapFunction.GetIntersectionPointOfSegments(edge, e)!=null){
+                if(mapFunction.getIntersectionPointOfSegments(edge, e)!=null){
                     return true;
                 }
             }           

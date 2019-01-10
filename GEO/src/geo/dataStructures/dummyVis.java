@@ -25,7 +25,7 @@ public class dummyVis {
         boolean noCrossing = true;
         for(Edge edge : edges){
                 if(!edge.containsVertex(newEdge.getV1()) && !edge.containsVertex(newEdge.getV2()) ){
-                    Vertex inter = mapFunction.GetIntersectionPointOfSegments(edge, newEdge);
+                    Vertex inter = mapFunction.getIntersectionPointOfSegments(edge, newEdge);
                     if(inter != null){
                         noCrossing = false;
                     }
