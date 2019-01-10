@@ -279,6 +279,17 @@ public class FXMLDocumentController implements Initializable {
                 tm.getTrapezoids().get(i).getV3().getY() * multiplier,
                 tm.getTrapezoids().get(i).getV4().getY() * multiplier
             }, 4);
+//            Vertex v = tm.getTrapezoids().get(i).getV1();
+//            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+//            
+//            v = tm.getTrapezoids().get(i).getV2();
+//            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+//            
+//            v = tm.getTrapezoids().get(i).getV3();
+//            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+//            
+//            v = tm.getTrapezoids().get(i).getV4();
+//            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
         }
         
         for (int i = 0; i < tm.getPossiblePathEdges().size(); i++) {

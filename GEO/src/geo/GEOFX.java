@@ -38,7 +38,7 @@ public class GEOFX extends Application {
         
         List<Edge> segments = testSet4();
         //List<Edge> segments = testSet3();
-        //Collections.shuffle(segments);      
+        Collections.shuffle(segments);      
         
         //List<Polygon> polygons = testSetPoly1();
         
@@ -52,7 +52,7 @@ public class GEOFX extends Application {
         
         primaryStage.setTitle("Drawing Operations Test");
         Group root = new Group();
-        Canvas canvas = new Canvas(900, 900);
+        Canvas canvas = new Canvas(900, 700);
 
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent t) -> {
             if (sliceCount >= segments.size()) {
@@ -69,15 +69,15 @@ public class GEOFX extends Application {
             tm.construct(segments.subList(0, sliceCount));
             drawShapes(canvas, tm);  
         });
-        
-        Scale scale = new Scale();
-        scale.setX(1);
-        scale.setY(-1);
-
-        scale.pivotYProperty().bind(Bindings.createDoubleBinding(() -> 
-            canvas.getBoundsInLocal().getMinY() + canvas.getBoundsInLocal().getHeight() /2, 
-            canvas.boundsInLocalProperty()));
-        canvas.getTransforms().add(scale);
+//        
+//        Scale scale = new Scale();
+//        scale.setX(1);
+//        scale.setY(-1);
+//
+//        scale.pivotYProperty().bind(Bindings.createDoubleBinding(() -> 
+//            canvas.getBoundsInLocal().getMinY() + canvas.getBoundsInLocal().getHeight() /2, 
+//            canvas.boundsInLocalProperty()));
+//        canvas.getTransforms().add(scale);
         drawShapes(canvas, tm);
         root.getChildren().add(canvas);
         primaryStage.setScene(new Scene(root, canvas.getWidth() * 2, canvas.getHeight() * 2));
@@ -111,6 +111,17 @@ public class GEOFX extends Application {
                 tm.getTrapezoids().get(i).getV3().getY() * multiplier,
                 tm.getTrapezoids().get(i).getV4().getY() * multiplier
             }, 4);
+            Vertex v = tm.getTrapezoids().get(i).getV1();
+            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+            
+            v = tm.getTrapezoids().get(i).getV2();
+            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+            
+            v = tm.getTrapezoids().get(i).getV3();
+            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+            
+            v = tm.getTrapezoids().get(i).getV4();
+            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
         }
     }
     
@@ -307,14 +318,11 @@ public class GEOFX extends Application {
     
     private List<Edge> testSet4() {
 
-    //Trapezoid t24: ((250.0, 49.0), (250.0, 250.0), (450.0, 200.0), (450.0, 49.0))
-    //polygon(2.50|.49 2.50|2.50 4.51|2.00 4.50|.49)
-    //point(6.00|.50 "P")
-    //point(3.50|2.00 "Q")
-
         List<Edge> segments = new ArrayList<>();
-        segments.add(new Edge("s2", new Vertex(250.0, 250.0,"p2"), new Vertex(450.0,200.0,"q2")));          
-        segments.add(new Edge("s1", new Vertex(600.0,50.0,"p1"), new Vertex(350.0,200.0,"q1")));          
+        segments.add(new Edge("s1", new Vertex(348.0, 329.0,"p1"), new Vertex(446.0,362.0,"q1")));          
+        segments.add(new Edge("s2", new Vertex(303.0, 169.0,"p2"), new Vertex(385.0,231.0,"q2")));          
+        segments.add(new Edge("s3", new Vertex(289.0, 314.0,"p3"), new Vertex(342.0,252.0,"q3")));          
+        segments.add(new Edge("s4", new Vertex(376.0, 435.0,"p4"), new Vertex(306.0,411.0,"q4")));          
         return segments;
     }
 }
