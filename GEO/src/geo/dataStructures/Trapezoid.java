@@ -194,6 +194,11 @@ public class Trapezoid extends TrapezoidShape {
         vertices.add(this.v2);
         vertices.add(this.v3);
         vertices.add(this.v4);
+        for (int i = 0; i < vertices.size(); i++) {
+            if (vertices.get(i) == null || vertices.get(i).getX() == null) {
+                System.out.println("NULL");
+            }
+        }
         switch (point) {
             case 0:
                 firstx = Double.MAX_VALUE; 

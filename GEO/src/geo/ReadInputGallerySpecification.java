@@ -40,6 +40,10 @@ public class ReadInputGallerySpecification {
     public static List<Vertex> vertices = new ArrayList();
     public static Gallery gallery = new Gallery();
     public static GalleryProblem galleryProblem = new GalleryProblem();
+    public static List<Double> distinctX = new ArrayList<>();
+    public static Double xUpper = 0.05;
+    public static List<Double> distinctY = new ArrayList<>();
+    public static Double yUpper = 0.05;
     
     public static GalleryProblem readInputArtGallerySpecification(String filename) {
         try {
@@ -84,6 +88,9 @@ public class ReadInputGallerySpecification {
             artFlag = input.nextInt();
             exitFlag = input.nextInt();
 
+            distinctX.add(x);
+            distinctY.add(y);
+            
             Vertex firstVertex = new Vertex(x, y, artFlag, exitFlag, "label");
             //System.out.println("first vertex: x=" + x + ", y = " + y);
             vertices.add(firstVertex);
@@ -95,10 +102,44 @@ public class ReadInputGallerySpecification {
                 y = input.nextDouble();
                 artFlag = input.nextInt();
                 exitFlag = input.nextInt();
+                
+                // CREATE DISTINCT X'S
+                boolean contained = false;
+                for (int i = 0; i < distinctX.size(); i++) {
+                    if (distinctX.get(i) == x) {
+                        contained = true;
+                        break;
+                    }
+                }
+                if (!contained) {
+                    distinctX.add(x);
+                } else {
+                    x = x +xUpper;
+                    xUpper = xUpper + 0.05;
+                    distinctX.add(x);
+                }
+                
+                // CREATE DISTINCT Y'S
+                contained = false;
+                for (int i = 0; i < distinctY.size(); i++) {
+                    if (distinctY.get(i) == y) {
+                        contained = true;
+                        break;
+                    }
+                }
+                if (!contained) {
+                    distinctY.add(y);
+                } else {
+                    y = y +yUpper;
+                    yUpper = yUpper + 0.05;
+                    distinctY.add(y);
+                }
+                
                 //System.out.println("current vertex: x=" + x + ", y = " + y);
                 //System.out.println("previous vertex: x = " + oldVertex.getX() + " y = " + oldVertex.getY());
                 Vertex vertex = new Vertex(x, y, artFlag, exitFlag, "label");
                 Edge edge = new Edge("label", oldVertex, vertex);
+                
                 
                 vertices.add(vertex);
                 edges.add(edge);
@@ -146,6 +187,9 @@ public class ReadInputGallerySpecification {
                 innerPolygons.add(innerPolygon);
             }
             reader.close();
+            System.out.println("DISTINCT X'S = " + distinctX.size());
+            System.out.println("DISTINCT Y'S = " + distinctY.size());
+            System.out.println("VERTICES COUNT = " + numOfVertices);
         } catch (IOException e) {
             e.printStackTrace();
         }

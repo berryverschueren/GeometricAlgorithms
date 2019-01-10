@@ -227,11 +227,10 @@ public class FXMLDocumentController implements Initializable {
     
     @FXML
     private void handleButtonBerry(ActionEvent event) {
-        finalEdge();
+        //finalEdge();
         Group root = new Group();
         Stage stage = new Stage();
         stage.setTitle("My New Stage Title");
-
 
         TrapezoidalMap tm = new TrapezoidalMap();
         
@@ -241,13 +240,11 @@ public class FXMLDocumentController implements Initializable {
             segments.addAll(this.innerPolygon.get(i).getEdges());
         }
         
-        Collections.shuffle(segments);      
+        //Collections.shuffle(segments);      
         tm.construct(segments);
 
         tm.removeInnerTrapezoids(this.innerPolygon);
         tm.removeOuterTrapezoids(this.polygon);
-        //tm.triangulateTrapezoids();
-        //tm.colorTriangles();
         tm.computePossiblePaths();
 
         Canvas canvas = new Canvas(900, 700);
@@ -278,14 +275,27 @@ public class FXMLDocumentController implements Initializable {
                 tm.getTrapezoids().get(i).getV3().getY() * multiplier,
                 tm.getTrapezoids().get(i).getV4().getY() * multiplier
             }, 4);
+//            Vertex v = tm.getTrapezoids().get(i).getV1();
+//            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+//            
+//            v = tm.getTrapezoids().get(i).getV2();
+//            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+//            
+//            v = tm.getTrapezoids().get(i).getV3();
+//            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+//            
+//            v = tm.getTrapezoids().get(i).getV4();
+//            gc.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
         }
         
-        for (int i = 0; i < tm.getPossiblePathEdges().size(); i++) {
-            Edge e = tm.getPossiblePathEdges().get(i);
-            Vertex v1 = e.getV1();
-            Vertex v2 = e.getV2();
-            gc.setStroke(Color.RED);
-            gc.strokeLine(v1.getX(), v1.getY(), v2.getX(), v2.getY());
+        if (tm.getPossiblePathEdges() != null) {
+            for (int i = 0; i < tm.getPossiblePathEdges().size(); i++) {
+                Edge e = tm.getPossiblePathEdges().get(i);
+                Vertex v1 = e.getV1();
+                Vertex v2 = e.getV2();
+                gc.setStroke(Color.RED);
+                gc.strokeLine(v1.getX(), v1.getY(), v2.getX(), v2.getY());
+            }
         }
         
 //        for (int i = 0; i < tm.getTriangles().size(); i++) {
