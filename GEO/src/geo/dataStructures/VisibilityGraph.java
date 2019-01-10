@@ -74,15 +74,34 @@ public class VisibilityGraph {
         //todo: goes wrong when polygon has values larger than a miljoen 
         //expensive but no other easy solution
         for(Edge edge : allEdges(innerpolygon)){
-            Vertex intersection = mapFunction.GetIntersectionPointOfSegments(new Edge("",vertex, new Vertex(vertex.getX()+1000000,vertex.getY(),"")), edge);
+            System.out.println("testing: "+ edge.getLabel());
+            Edge startEdge = new Edge("",vertex, new Vertex(vertex.getX()+1000000,vertex.getY(),""));
+            Vertex intersection = mapFunction.GetIntersectionPointOfSegments(startEdge, edge);
 //            Point intersection = lineLineIntersection(  new Point(vertex.getX(), vertex.getY()), 
 //                                                        new Point(vertex.getX().floatValue()+1000000, vertex.getY().floatValue()),  
 //                                                        new Point(edge.getV1().getX(), edge.getV1().getY()), 
 //                                                        new Point(edge.getV2().getX(), edge.getV2().getY())
 //            );
+            boolean isParrallel = false;
+            if(intersection == null){
+                int col = mapFunction.Orientation(startEdge.getV1(), startEdge.getV2(), edge.getV1());
+                col = col + mapFunction.Orientation(startEdge.getV1(), startEdge.getV2(), edge.getV2());
+                if(col == 0){
+                    double distanceV1 = Point2D.distance(vertex.getX(), vertex.getY(),edge.getV1().getX(), edge.getV1().getY());
+                    double distanceV2 = Point2D.distance(vertex.getX(), vertex.getY(),edge.getV2().getX(), edge.getV2().getY());
+                    if(distanceV1<distanceV2){
+                        intersection = edge.getV1();
+                    }else{
+                        intersection = edge.getV2();
+                    }
+                    isParrallel = true;
+                }
+            }
+            
             if(intersection!=null){
                 double distance = Point2D.distance(vertex.getX(), vertex.getY(), intersection.getX(), intersection.getY());
-                if(distance != 0.0){
+                if(distance == 0.0 && !isParrallel){
+                }else{
                     if(tree.containsKey(distance)){
                         List<Edge> e = tree.get(distance);
                         e.add(edge);
@@ -227,9 +246,9 @@ public class VisibilityGraph {
                 // note: maybe parrallel
                 if(inter != null){
                     if(edge.hasSameCoordinates(inter)){
-                        doesIntersect = true;
-                    }else{
                         doesIntersect = false;
+                    }else{
+                        doesIntersect = true;
                     }
                 }
                 if(doesIntersect){
@@ -252,9 +271,9 @@ public class VisibilityGraph {
                 // note: maybe parrallel
                 if(inter != null){
                     if(edge.hasSameCoordinates(inter)){
-                        doesIntersect = true;
-                    }else{
                         doesIntersect = false;
+                    }else{
+                        doesIntersect = true;
                     }
                 }
                 if(doesIntersect){
@@ -399,7 +418,7 @@ public class VisibilityGraph {
             treeEdges.addAll(entry.getValue());
         }
         
-        
+        treeEdges.addAll(edges);
         tree = new TreeMap<>();
         //two new added update all distances
         Edge halfLine =  new Edge("",vertex, currentVertex);
