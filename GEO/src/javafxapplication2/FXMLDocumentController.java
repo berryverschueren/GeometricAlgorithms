@@ -325,16 +325,7 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private void handleButtonSave(ActionEvent event) {
-        finalEdge();
-        Polygon p = polygon;
-        List<Polygon> ps = innerPolygon;
-        ps.add(p);
-        Polygon vis = new dummyVis().visibiliyGraph(ps);
-        g.setStroke(Color.AQUA);
 
-        for(Edge edge : vis.getEdges()){
-            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
-        }
     }
     
     @FXML
