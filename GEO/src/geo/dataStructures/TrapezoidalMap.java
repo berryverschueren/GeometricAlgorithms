@@ -551,7 +551,12 @@ public class TrapezoidalMap {
                         t1.setLeft(t.getLeft());
                         t1.setBottom(t.getBottom());
                         t1.setTop(t1.getSpecificEdge(1));
-                                               
+                                 
+                        if (ct == null || ct.getV1() == null || ct.getV2() == null
+                                || t.getSpecificVertex(2) == null || s.getSpecificVertex(1) == null) {
+                            System.out.println("null");
+                        }
+                        
                         // trapezoid above segment ends
                         Trapezoid t2 = CreateTrapezoidByVertices(ct.getV1(), ct.getV2(), t.getSpecificVertex(2), s.getSpecificVertex(1));
                         t2.setLeft(ct.getLeft());
@@ -583,6 +588,11 @@ public class TrapezoidalMap {
                         t1.setLeft(t.getLeft());
                         t1.setBottom(t1.getSpecificEdge(3));
                         t1.setTop(t.getTop());                      
+                                
+                        if (ct == null || ct.getV1() == null || ct.getV2() == null
+                                || s.getSpecificVertex(1) == null || t.getSpecificVertex(3) == null) {
+                            System.out.println("null");
+                        }
                         
                         // trapezoid below segment ends
                         Trapezoid t2 = CreateTrapezoidByVertices(ct.getV1(), ct.getV2(), s.getSpecificVertex(1), t.getSpecificVertex(3));
@@ -688,7 +698,12 @@ public class TrapezoidalMap {
                         t2.setLeft(s.getSpecificVertex(1));
                         t2.setBottom(t2.getSpecificEdge(3));
                         t2.setTop(t2.getSpecificEdge(1));
-                                               
+                                                       
+                        if (ct == null || ct.getV1() == null || ct.getV2() == null
+                                || s.getSpecificVertex(1) == null || v3 == null) {
+                            System.out.println("null");
+                        }
+                        
                         // trapezoid below segment ends
                         Trapezoid t3 = CreateTrapezoidByVertices(ct.getV1(), ct.getV2(), s.getSpecificVertex(1), v3);
                         t3.setLeft(ct.getLeft());
@@ -1871,7 +1886,15 @@ public class TrapezoidalMap {
         
         if (r.cross(s) != 0 && 0 <= t && t <= 1 && 0 <= u && u <= 1) {
             Vector2D intersectionVector = p.plus((r.times(t)));
-            intersectionPoint = new Vertex(intersectionVector.x(), intersectionVector.y(), "");
+            int intersectionVectorXInt = (int)intersectionVector.x();
+            double intersectionVectorXDouble = intersectionVector.x();
+            double newX = (intersectionVectorXDouble - ((double)intersectionVectorXInt));
+            if (newX <= 0.0000000000006){
+                intersectionPoint = new Vertex((double)intersectionVectorXInt, intersectionVector.y(), "");
+            }
+            else {
+                intersectionPoint = new Vertex(intersectionVector.x(), intersectionVector.y(), "");
+            }
             return intersectionPoint;
         }
         

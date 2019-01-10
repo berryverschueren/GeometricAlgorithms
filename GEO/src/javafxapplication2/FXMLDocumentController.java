@@ -298,9 +298,11 @@ public class FXMLDocumentController implements Initializable {
     }
     @FXML
     private void handleButtonInputRead(ActionEvent event) {
-        
+        String workingDir = System.getProperty("user.dir");
+//            String dataDir = workingDir.substring(0, workingDir.length() - 13) + "set1_data\\set1_data\\";
         Stage stage = (Stage) this.readInput.getScene().getWindow();
         FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(workingDir));
         fileChooser.setTitle("Open Folder");
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
