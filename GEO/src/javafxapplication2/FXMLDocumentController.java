@@ -14,6 +14,7 @@ import geo.dataStructures.Vertex;
 import geo.dataStructures.VisibilityGraph;
 import geo.dataStructures.Gallery;
 import geo.dataStructures.GalleryProblem;
+import geo.dataStructures.Graph;
 import geo.dataStructures.dummyVis;
 import java.io.File;
 import java.io.IOException;
@@ -176,12 +177,50 @@ public class FXMLDocumentController implements Initializable {
 //            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
 //        }
         finalEdge();
+        int edgeCounter = 0;
+        int vertexCounter = 0;
+        
+        
         Polygon p = polygon;
+        p.setLabel("Polygon");
+        for(Edge edge : p.getEdges()){
+            edge.setLabel(p.getLabel()+" : "+edgeCounter+"  ");
+            edgeCounter++;
+        }
+        for(Vertex vertex : p.getVertices()){
+            vertex.setLabel(p.getLabel()+" : "+vertexCounter+"  ");
+            vertexCounter++;
+        }
+        
         List<Polygon> ps = innerPolygon;
+        int pcount = 0;
+        for(Polygon poly : ps){
+            poly.setLabel("inner Polygon"+pcount);
+            edgeCounter = 0;
+            vertexCounter = 0;
+            for(Edge edge : poly.getEdges()){
+                edge.setLabel(poly.getLabel()+" : "+edgeCounter+"  ");
+                edgeCounter++;
+            }
+            for(Vertex vertex : poly.getVertices()){
+                vertex.setLabel(poly.getLabel()+" : "+vertexCounter+"  ");
+                vertexCounter++;
+            }
+            pcount++;
+        }
+        
+        System.out.println("");
+        System.out.println("");
+        //System.out.println(ps.get(0).getVertices().get(0).getLabel());
+        
         ps.add(p);
         Polygon vis = new dummyVis().visibiliyGraph(ps);
         g.setStroke(Color.AQUA);
+        
 
+        new Graph().dijkstraStart(vis.getEdges(), vis.getVertices().get(0), vis.getVertices().get(vis.getVertices().size()-1));
+       
+        
         for(Edge edge : vis.getEdges()){
             g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
         }
@@ -374,6 +413,8 @@ public class FXMLDocumentController implements Initializable {
         g.setStroke(Color.BLACK);
         }
    
+
+    
     @FXML
     private void handleClickAction(MouseEvent e) {
         

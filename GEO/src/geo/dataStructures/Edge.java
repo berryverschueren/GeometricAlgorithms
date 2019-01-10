@@ -72,6 +72,7 @@ public class Edge extends TrapezoidShape {
     public void print() {
         System.out.println("Edge " + this.getLabel() + ": ((" + this.v1.getX() + ", " + this.v1.getY() + "), (" + this.v2.getX() + ", " + this.v2.getY() + "))");
     }
+   
     
     public boolean hasSameCoordinates(Vertex vertex){
         boolean onSame = false;
