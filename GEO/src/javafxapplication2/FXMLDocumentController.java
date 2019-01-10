@@ -15,6 +15,7 @@ import geo.dataStructures.VisibilityGraph;
 import geo.dataStructures.Gallery;
 import geo.dataStructures.GalleryProblem;
 import geo.dataStructures.dummyVis;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -39,6 +41,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
 import javafx.scene.transform.Scale;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -67,6 +71,8 @@ public class FXMLDocumentController implements Initializable {
     private RadioButton art;
     @FXML
     private RadioButton exit;
+    @FXML
+    private Button readInput;
     
     private GraphicsContext g; 
     private Polygon polygon;
@@ -293,22 +299,27 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void handleButtonInputRead(ActionEvent event) {
         
-        String filename = "ArtGalleryV3.txt";
-        GalleryProblem galleryProblem = new GalleryProblem();
-        galleryProblem = ReadInputGallerySpecification.readInputArtGallerySpecification(filename);
-        Gallery gallery = galleryProblem.getGallery();
-        polygon = gallery.getOuterPolygon();
-        innerPolygon = gallery.getInnerPolygons();
-        
-        guards.setText(String.valueOf(galleryProblem.getGuards()));
-        vMaxGuards.setText(String.valueOf(galleryProblem.getSpeed()));
-        deltaT.setText(String.valueOf(galleryProblem.getObservationTime()));
-        globalTime.setText(String.valueOf(galleryProblem.getGlobalTime()));
-        
-        setUpDraw(true);
-        
-        finalizeDraw();
-         
+
+        Stage stage = (Stage) this.readInput.getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Folder");
+        File file = fileChooser.showOpenDialog(stage);
+        if (file != null) {
+            String filename = file.getName(); //"ArtGalleryV3.txt";
+            GalleryProblem galleryProblem = new GalleryProblem();
+            galleryProblem = ReadInputGallerySpecification.readInputArtGallerySpecification(filename);
+            Gallery gallery = galleryProblem.getGallery();
+            polygon = gallery.getOuterPolygon();
+            innerPolygon = gallery.getInnerPolygons();
+            guards.setText(String.valueOf(galleryProblem.getGuards()));
+            vMaxGuards.setText(String.valueOf(galleryProblem.getSpeed()));
+            deltaT.setText(String.valueOf(galleryProblem.getObservationTime()));
+            globalTime.setText(String.valueOf(galleryProblem.getGlobalTime()));
+            setUpDraw(true);
+            finalizeDraw();   
+            setUpDraw(false);
+        }
+
     }
     
     

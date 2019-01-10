@@ -26,7 +26,7 @@ public class ReadInputGuardSpecification {
     public static double initX;
     public static double initY;
                 
-    public static List<PathGuard> path = new ArrayList<PathGuard>();
+    //public static List<PathGuard> path = new ArrayList<PathGuard>();
     public static List<Guard> guards = new ArrayList<Guard>();
     
     public static List<Guard> ReadInputGuardSpecification(String filename) {
@@ -43,6 +43,7 @@ public class ReadInputGuardSpecification {
             /** line rest */
             for (int i = 0; i < numOfGuards; i++) {
                 int verticesGuard = input.nextInt();
+                List<PathGuard> path = new ArrayList<PathGuard>();
                 //initX = input.nextDouble();
                 //initY = input.nextDouble();
                 //timestamp = input.nextDouble();
@@ -69,4 +70,10 @@ public class ReadInputGuardSpecification {
         }
         return guards;
     }
+    //    public static void main(String[] args) {
+    //    List<Guard> guards = new ArrayList<Guard>();
+    //    guards = ReadInputGuardSpecification("Guard1.txt");
+    //    WriteInputGuardSpecification.WriteInputGuardSpecification(guards);
+    //}
+
 }
