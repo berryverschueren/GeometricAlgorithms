@@ -306,17 +306,15 @@ public class GEOFX extends Application {
     }
     
     private List<Edge> testSet4() {
-//        Trapezoid R: ((149.0, 48.0), (149.0, 647.0), (766.0, 647.0), (766.0, 48.0))
-//Edge label: ((378.0, 153.0), (424.0, 156.0))
-//label contained in R
-//Trapezoid t1: ((378.0, 153.0), (378.0, 647.0), (424.0, 647.0), (424.0, 156.0))
-//Trapezoid t2: ((378.0, 48.0), (378.0, 153.0), (424.0, 156.0), (424.00000000000006, 48.0))
-//Trapezoid t3: ((149.0, 48.0), (149.0, 647.0), (378.0, 647.0), (378.0, 48.0))
-//Trapezoid t4: ((424.00000000000006, 48.0), (424.0, 647.0), (766.0, 647.0), (766.0, 48.0))
+
+    //Trapezoid t24: ((250.0, 49.0), (250.0, 250.0), (450.0, 200.0), (450.0, 49.0))
+    //polygon(2.50|.49 2.50|2.50 4.51|2.00 4.50|.49)
+    //point(6.00|.50 "P")
+    //point(3.50|2.00 "Q")
 
         List<Edge> segments = new ArrayList<>();
-        segments.add(new Edge("s1", new Vertex(378.0,153.0,"p1"), new Vertex(424.0,156.0,"q1")));          
-        segments.add(new Edge("s2", new Vertex(150.0,49.0,"p2"), new Vertex(765.0,646.0,"q2")));          
+        segments.add(new Edge("s2", new Vertex(250.0, 250.0,"p2"), new Vertex(450.0,200.0,"q2")));          
+        segments.add(new Edge("s1", new Vertex(600.0,50.0,"p1"), new Vertex(350.0,200.0,"q1")));          
         return segments;
     }
 }

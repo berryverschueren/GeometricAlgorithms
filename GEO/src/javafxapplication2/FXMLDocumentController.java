@@ -189,7 +189,7 @@ public class FXMLDocumentController implements Initializable {
     
     @FXML
     private void handleButtonBerry(ActionEvent event) {
-        finalEdge();
+        //finalEdge();
         Group root = new Group();
         Stage stage = new Stage();
         stage.setTitle("My New Stage Title");
