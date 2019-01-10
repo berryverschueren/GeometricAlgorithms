@@ -159,20 +159,30 @@ public class FXMLDocumentController implements Initializable {
 //        polygon.addVertex(new Vertex(0.0,0.0,""));
 //        polygon.addVertex(new Vertex(700.0,0.0,""));
 //        polygon.addVertex(new Vertex(700.0,700.0,""));
-//        polygon.addVertex(new Vertex(0.0,700.0,""));
+////        polygon.addVertex(new Vertex(0.0,700.0,""));
+//        finalEdge();
+//        setUpDraw(true);
+//        finalizeDraw();        
+//        
+//
+//        VisibilityGraph graph = new VisibilityGraph();
+//
+//        Polygon poly = graph.visibilityGraphAlgorithm(innerPolygon);
+//        
+//
+//        g.setStroke(Color.AQUA);
+//
+//        for(Edge edge : poly.getEdges()){
+//            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+//        }
         finalEdge();
-        setUpDraw(true);
-        finalizeDraw();        
-        
-
-        VisibilityGraph graph = new VisibilityGraph();
-
-        Polygon poly = graph.visibilityGraphAlgorithm(innerPolygon);
-        
-
+        Polygon p = polygon;
+        List<Polygon> ps = innerPolygon;
+        ps.add(p);
+        Polygon vis = new dummyVis().visibiliyGraph(ps);
         g.setStroke(Color.AQUA);
 
-        for(Edge edge : poly.getEdges()){
+        for(Edge edge : vis.getEdges()){
             g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
         }
     }
