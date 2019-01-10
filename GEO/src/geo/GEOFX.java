@@ -65,7 +65,7 @@ public class GEOFX extends Application {
             }
             System.out.println("--------------------------------------------------");
             System.out.println("--------------------------------------------------");
-            tm.ResetTrapezoidLabels();
+            tm.resetTrapezoidLabels();
             tm.construct(segments.subList(0, sliceCount));
             drawShapes(canvas, tm);  
         });
