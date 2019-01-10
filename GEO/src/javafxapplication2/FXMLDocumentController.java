@@ -184,11 +184,11 @@ public class FXMLDocumentController implements Initializable {
         Polygon p = polygon;
         p.setLabel("Polygon");
         for(Edge edge : p.getEdges()){
-            edge.setLabel(p.getLabel()+" : "+edgeCounter+"  ");
+            edge.setLabel(p.getLabel()+" : Edge."+edgeCounter+"  ");
             edgeCounter++;
         }
         for(Vertex vertex : p.getVertices()){
-            vertex.setLabel(p.getLabel()+" : "+vertexCounter+"  ");
+            vertex.setLabel(p.getLabel()+" : Vertex."+vertexCounter+"  ");
             vertexCounter++;
         }
         
@@ -199,11 +199,11 @@ public class FXMLDocumentController implements Initializable {
             edgeCounter = 0;
             vertexCounter = 0;
             for(Edge edge : poly.getEdges()){
-                edge.setLabel(poly.getLabel()+" : "+edgeCounter+"  ");
+                edge.setLabel(poly.getLabel()+" : Edge."+edgeCounter+"  ");
                 edgeCounter++;
             }
             for(Vertex vertex : poly.getVertices()){
-                vertex.setLabel(poly.getLabel()+" : "+vertexCounter+"  ");
+                vertex.setLabel(poly.getLabel()+" : Vertex."+vertexCounter+"  ");
                 vertexCounter++;
             }
             pcount++;
@@ -218,10 +218,9 @@ public class FXMLDocumentController implements Initializable {
         g.setStroke(Color.AQUA);
         
 
-        new Graph().dijkstraStart(vis.getEdges(), vis.getVertices().get(0), vis.getVertices().get(vis.getVertices().size()-1));
-       
+        List<Edge> path = new Graph().dijkstraStart(vis.getEdges(), vis.getVertices().get(0), vis.getVertices().get(vis.getVertices().size()-1), vis.getVertices());
         
-        for(Edge edge : vis.getEdges()){
+        for(Edge edge : path){
             g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
         }
     }

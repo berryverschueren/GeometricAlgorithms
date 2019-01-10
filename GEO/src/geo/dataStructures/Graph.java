@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import java.util.Iterator;
@@ -114,7 +115,7 @@ public class Graph {
 	 * recursive routine to print shortest path to destNode after a shortest
 	 * path algorithm has run.
 	 */
-	public void printPath(String destName) {
+	public VertexDijkstra printPath(String destName) {
 		VertexDijkstra w = vertexMap.get(destName);
 		if (w == null)
 			throw new NoSuchElementException("Destination vertex not found");
@@ -125,6 +126,7 @@ public class Graph {
 			printPath(w);
 			System.out.println();
 		}
+                return w;
 	}
 
 	/**
@@ -244,12 +246,12 @@ public class Graph {
 	/**
 	 * Process a request; return false if end of file.
 	 */
-	public static boolean processRequest(String startName, String destName, Graph g) {
+	public VertexDijkstra processRequest(String startName, String destName, Graph g) {
 //		String startName = null;
 //		String destName = null;
 
                 g.dijkstra(startName);
-		g.printPath(destName);
+		return g.printPath(destName);
                 //g.printPath(destName);
 
 //		try {
@@ -276,7 +278,7 @@ public class Graph {
 //		} catch (GraphException e) {
 //			System.err.println(e);
 //		}
-		return true;
+//		return true;
 	}
 
 	/**
@@ -285,34 +287,9 @@ public class Graph {
 	 * two vertices and runs the shortest path algorithm. The data file is a
 	 * sequence of lines of the format source destination.
 	 */
-	public void dijkstraStart(List<Edge> edges, Vertex start, Vertex end ) {
+	public List<Edge> dijkstraStart(List<Edge> edges, Vertex start, Vertex end, List<Vertex> vertices ) {
 		Graph g = new Graph();
-//		try {
-//			FileReader fin = new FileReader(args[0]);
-//			// FileReader fin = new FileReader('DijGraphTest1.txt');
-//			BufferedReader graphFile = new BufferedReader(fin);
-//
-//			// Read the edges and insert
-//			String line;
-//			while ((line = graphFile.readLine()) != null) {
-//				StringTokenizer st = new StringTokenizer(line);
-//
-//				try {
-//					if (st.countTokens() != 3) {
-//						System.err.println("Skipping ill-formatted line " + line);
-//						continue;
-//					}
-//					String source = st.nextToken();
-//					String dest = st.nextToken();
-//					int cost = Integer.parseInt(st.nextToken());
-//					g.addEdgeDijkstra(source, dest, cost);
-//				} catch (NumberFormatException e) {
-//					System.err.println("Skipping ill-formatted line " + line);
-//				}
-//			}
-//		} catch (IOException e) {
-//			System.err.println(e);
-//		}
+
                 
                 for(Edge edge : edges){
                     double cost = Point2D.distance(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
@@ -324,7 +301,30 @@ public class Graph {
 		System.out.println("end:"+ end.getLabel());
 
 		//BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-		processRequest(start.getLabel(),end.getLabel(), g);
+		VertexDijkstra w = processRequest(start.getLabel(),end.getLabel(), g);
+                
+                //VertexDijkstra w = vertexMap.get(end.getLabel());
+                List<Vertex> vertexPath = new ArrayList<>();
+                while(true){
+                    if(w == null){
+                        break;
+                    }
+                    Vertex v=null;
+                    for(Vertex vertex : vertices){
+                        if(vertex.getLabel().equals(w.name)){
+                            v = vertex;
+                        }
+                    }
+                    
+                    vertexPath.add(v);
+                    
+                    w = w.prev;
+                }
+                List<Edge> edgePath = new ArrayList<>();
+                for (int i = 0; i < vertexPath.size()-2; i++) {
+                    edgePath.add(new Edge("",vertexPath.get(i), vertexPath.get(i+1)));
+                }
+                return edgePath;
 			
 	}
 }
