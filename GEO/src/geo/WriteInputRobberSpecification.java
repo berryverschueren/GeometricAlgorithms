@@ -25,7 +25,7 @@ public class WriteInputRobberSpecification {
             List<PathRobber> path = new ArrayList<PathRobber>();
             path = robber.getPath();
             int lengthPath = path.size();
-            bufferedWriter.write(lengthPath);
+            bufferedWriter.write(lengthPath + ", ");
             bufferedWriter.newLine();
                
             for (PathRobber pathRobber : path) {

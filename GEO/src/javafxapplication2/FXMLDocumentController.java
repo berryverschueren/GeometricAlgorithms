@@ -316,6 +316,7 @@ public class FXMLDocumentController implements Initializable {
             globalTime.setText(String.valueOf(galleryProblem.getGlobalTime()));
             setUpDraw(true);
             finalizeDraw();   
+            setUpDraw(false);
         }
     }
     
