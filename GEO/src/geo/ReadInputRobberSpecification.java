@@ -61,4 +61,10 @@ public class ReadInputRobberSpecification {
         }
         return robber;    
     }
+    //    public static void main(String[] args) {
+    //    Robber robber = new Robber();
+    //    robber = ReadInputRobberSpecification("Robber1.txt");
+    //    WriteInputRobberSpecification.WriteInputRobberSpecification(robber);
+    //}
+
 }

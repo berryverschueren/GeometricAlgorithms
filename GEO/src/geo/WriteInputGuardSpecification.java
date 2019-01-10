@@ -14,21 +14,22 @@ import geo.dataStructures.PathGuard;
  */
 public class WriteInputGuardSpecification {
     
-    public static void WriteInputGuardSpecification(int numOfGuards, List<Guard> guards) {
+    public static void WriteInputGuardSpecification(List<Guard> guards) {
         
         try {
             String fileName = "temp.txt";
             FileWriter fileWriter = new FileWriter(fileName);
 
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            bufferedWriter.write(numOfGuards);
+            int numOfGuards = guards.size();
+            bufferedWriter.write(numOfGuards + ", ");
             bufferedWriter.newLine();
             
             for (Guard guard : guards) {
                 List<PathGuard> path = new ArrayList<PathGuard>();
                 path = guard.getPath();
                 int lengthPath = path.size();
-                bufferedWriter.write(lengthPath);
+                bufferedWriter.write(lengthPath + ", ");
                 bufferedWriter.newLine();
                 
                 for (PathGuard pathGuard : path) {

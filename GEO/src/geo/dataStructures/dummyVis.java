@@ -21,18 +21,24 @@ public class dummyVis {
     }
     
     private boolean mayAdd(Edge newEdge, List<Edge> edges){
+        //System.out.println("newEdge v1:"+newEdge.getV1() +"v2:" +newEdge.getV2());
         boolean noCrossing = true;
         for(Edge edge : edges){
-
-                Vertex inter = mapFunction.GetIntersectionPointOfSegments(edge, newEdge);
-                // note: maybe parrallel
-                if(inter != null){
-                    if(edge.hasSameCoordinates(inter) || newEdge.hasSameCoordinates(inter) ){
-
-                    }else{
-                        noCrossing = true;
+                if(!edge.containsVertex(newEdge.getV1()) && !edge.containsVertex(newEdge.getV2()) ){
+                    Vertex inter = mapFunction.GetIntersectionPointOfSegments(edge, newEdge);
+                    if(inter != null){
+                        noCrossing = false;
                     }
                 }
+                
+                // note: maybe parrallel
+//                if(inter != null){
+//                    if(edge.hasSameCoordinates(inter) || newEdge.hasSameCoordinates(inter) ){
+////
+//                    }else{
+//                        noCrossing = false;
+//                    }
+//                }
         }
 
         return noCrossing;
@@ -44,8 +50,8 @@ public class dummyVis {
         for(Vertex vertex1 : allVertices(polygons)){
             for(Vertex vertex2 : allVertices(polygons)){
                 Edge newEdge = new Edge("", vertex1,vertex2);
-                if(mayAdd(newEdge, allEdges(polygons))){
-                    if(noSelfEdge(newEdge, polygons)){
+                if(noSelfEdge(newEdge, polygons)){
+                    if(mayAdd(newEdge, allEdges(polygons))){
                         allPoly.addEdge(newEdge);
                     }
                 }
