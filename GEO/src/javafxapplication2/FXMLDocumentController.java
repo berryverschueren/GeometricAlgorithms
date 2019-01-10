@@ -369,6 +369,8 @@ public class FXMLDocumentController implements Initializable {
         innerPolygon = new ArrayList<>();
         //artList = new Arra
         choice.getSelectionModel().selectFirst();
+        g.setFill(Color.BLACK);
+        g.setStroke(Color.BLACK);
         }
    
     @FXML
