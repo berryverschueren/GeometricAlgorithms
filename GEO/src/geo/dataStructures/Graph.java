@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
+import math.geom2d.Point2D;
 
 //import weiss.nonstandard.PairingHeap;
 
@@ -243,37 +244,38 @@ public class Graph {
 	/**
 	 * Process a request; return false if end of file.
 	 */
-	public static boolean processRequest(BufferedReader in, Graph g) {
-		String startName = null;
-		String destName = null;
-		String alg = null;
+	public static boolean processRequest(String startName, String destName, Graph g) {
+//		String startName = null;
+//		String destName = null;
 
-		try {
-			System.out.print("Enter start node:");
-			if ((startName = in.readLine()) == null)
-				return false;
-			System.out.print("Enter destination node:");
-			if ((destName = in.readLine()) == null)
-				return false;
-			System.out.print(" Enter algorithm (u, d, n, a ): ");
-			if ((alg = in.readLine()) == null)
-				return false;
+                g.dijkstra(startName);
+		g.printPath(destName);
+                //g.printPath(destName);
 
-			if (alg.equals("u"))
-				g.unweighted(startName);
-			else if (alg.equals("d")) {
-				g.dijkstra(startName);
-				g.printPath(destName);
+//		try {
+//			System.out.print("Enter start node:");
+//			if ((startName = in.readLine()) == null)
+//				return false;
+//			System.out.print("Enter destination node:");
+//			if ((destName = in.readLine()) == null)
+//				return false;
+//			System.out.print(" Enter algorithm (u, d, n, a ): ");
+//			if ((alg = in.readLine()) == null)
+//				return false;
+
+//			if (alg.equals("u"))
+//				g.unweighted(startName);
+//			else if (alg.equals("d")) {
+				
 				// g.dijkstra2( startName );
-			} 
-			g.printPath(destName);
-		} catch (IOException e) {
-			System.err.println(e);
-		} catch (NoSuchElementException e) {
-			System.err.println(e);
-		} catch (GraphException e) {
-			System.err.println(e);
-		}
+//			} 
+//		} catch (IOException e) {
+//			System.err.println(e);
+//		} catch (NoSuchElementException e) {
+//			System.err.println(e);
+//		} catch (GraphException e) {
+//			System.err.println(e);
+//		}
 		return true;
 	}
 
@@ -283,40 +285,46 @@ public class Graph {
 	 * two vertices and runs the shortest path algorithm. The data file is a
 	 * sequence of lines of the format source destination.
 	 */
-	public static void main(String[] args) {
+	public void dijkstraStart(List<Edge> edges, Vertex start, Vertex end ) {
 		Graph g = new Graph();
-		try {
-			FileReader fin = new FileReader(args[0]);
-			// FileReader fin = new FileReader('DijGraphTest1.txt');
-			BufferedReader graphFile = new BufferedReader(fin);
+//		try {
+//			FileReader fin = new FileReader(args[0]);
+//			// FileReader fin = new FileReader('DijGraphTest1.txt');
+//			BufferedReader graphFile = new BufferedReader(fin);
+//
+//			// Read the edges and insert
+//			String line;
+//			while ((line = graphFile.readLine()) != null) {
+//				StringTokenizer st = new StringTokenizer(line);
+//
+//				try {
+//					if (st.countTokens() != 3) {
+//						System.err.println("Skipping ill-formatted line " + line);
+//						continue;
+//					}
+//					String source = st.nextToken();
+//					String dest = st.nextToken();
+//					int cost = Integer.parseInt(st.nextToken());
+//					g.addEdgeDijkstra(source, dest, cost);
+//				} catch (NumberFormatException e) {
+//					System.err.println("Skipping ill-formatted line " + line);
+//				}
+//			}
+//		} catch (IOException e) {
+//			System.err.println(e);
+//		}
+                
+                for(Edge edge : edges){
+                    double cost = Point2D.distance(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+                    g.addEdgeDijkstra(edge.getV1().getLabel(), edge.getV2().getLabel(), cost);
+                }
+                
 
-			// Read the edges and insert
-			String line;
-			while ((line = graphFile.readLine()) != null) {
-				StringTokenizer st = new StringTokenizer(line);
+		System.out.println("Start:"+ start.getLabel());
+		System.out.println("end:"+ end.getLabel());
 
-				try {
-					if (st.countTokens() != 3) {
-						System.err.println("Skipping ill-formatted line " + line);
-						continue;
-					}
-					String source = st.nextToken();
-					String dest = st.nextToken();
-					int cost = Integer.parseInt(st.nextToken());
-					g.addEdgeDijkstra(source, dest, cost);
-				} catch (NumberFormatException e) {
-					System.err.println("Skipping ill-formatted line " + line);
-				}
-			}
-		} catch (IOException e) {
-			System.err.println(e);
-		}
-
-		System.out.println("File read...");
-		System.out.println(g.vertexMap.size() + " vertices");
-
-		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-		while (processRequest(in, g))
-			;
+		//BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		processRequest(start.getLabel(),end.getLabel(), g);
+			
 	}
 }

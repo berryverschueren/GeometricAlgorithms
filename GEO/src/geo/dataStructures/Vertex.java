@@ -87,4 +87,8 @@ public class Vertex extends TrapezoidShape {
         }
         return onSame;
     }
+    
+    public String toText(){
+        return this.getX() + "," + this.getY();
+    }
 }
