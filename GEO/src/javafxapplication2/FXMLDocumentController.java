@@ -94,6 +94,8 @@ public class FXMLDocumentController implements Initializable {
     public final int count = 0;
     public int observing; 
     public Polygon visibilityGraph;
+    
+    private dummyVis vis;
     //private List<Vertex> artList;
     //private List<Vertex> exitList;
     
@@ -155,7 +157,7 @@ public class FXMLDocumentController implements Initializable {
         
 
 //        List<Edge> path = new Graph().dijkstraStart(vis.getEdges(), vis.getVertices().get(0), vis.getVertices().get(vis.getVertices().size()-1), vis.getVertices());
-//        
+        
         for(Edge edge : visibilityGraph.getEdges()){
             g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
         }
@@ -163,14 +165,26 @@ public class FXMLDocumentController implements Initializable {
         a.add(visibilityGraph.getVertices().get(0));
         visibilityGraph.getVertices().get(0).setArtFlag(1);
         a.add(visibilityGraph.getVertices().get(visibilityGraph.getVertices().size()-1));
-        visibilityGraph.getVertices().get(visibilityGraph.getVertices().size()-1).setExitFlag(1);
-        List<Vertex> v = findPath(a);
+        visibilityGraph.getVertices().get(visibilityGraph.getVertices().size()-1).setArtFlag(1);
+        a.add(visibilityGraph.getVertices().get(4));
+        visibilityGraph.getVertices().get(4).setArtFlag(1);
         
-        g.setStroke(Color.RED);
-        for (int i = 0; i < v.size()-1; i++) {
-            g.strokeLine(v.get(i).getX(), v.get(i).getY(), v.get(i+1).getX(), v.get(i+1).getY());
-        }
+        List<Vertex> v = findPath(a);
         setUpDraw(false);
+        g.setStroke(Color.RED);
+//        for (int i = 0; i < v.size()-1; i++) {
+//            g.strokeLine(v.get(i).getX(), v.get(i).getY(), v.get(i+1).getX(), v.get(i+1).getY());
+//        }
+        
+    }
+    
+    public void calculateVisibilityGraph(){
+        finalEdge();
+        List<Polygon> polys = new ArrayList<>();
+        polys.add(polygon);
+        polys.addAll(innerPolygon);
+        vis = new dummyVis();
+        visibilityGraph = vis.visibiliyGraph(polys);
     }
     
     public List<Vertex> findPath(List<Vertex> vertices){
@@ -213,7 +227,10 @@ public class FXMLDocumentController implements Initializable {
         String workingDir = "file:\\\\\\" + System.getProperty("user.dir");        
         Image guardImage = new Image(workingDir + "\\guard.png", 40, 40, false, false);
 
-        List<Guard> guards = new ArrayList<>();
+        calculateVisibilityGraph();
+        List<Vertex> interestingVertices = null;
+        List<Vertex> verticesForGuardPath = findPath(interestingVertices);
+        List<Guard> guards = makeGuardList(verticesForGuardPath);
         
         final long startNanoTime = System.nanoTime();
         
