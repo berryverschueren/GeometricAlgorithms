@@ -7,6 +7,8 @@ package javafxapplication2;
 
 import geo.WriteInputGallerySpecification;
 import geo.ReadInputGallerySpecification;
+import geo.ReadInputGuardSpecification;
+import geo.WriteInputGuardSpecification;
 import geo.dataStructures.Edge;
 import geo.dataStructures.Polygon;
 import geo.dataStructures.TrapezoidalMap;
@@ -521,6 +523,28 @@ public class FXMLDocumentController implements Initializable {
             }
         return observing;
     }
+    
+    private void writeGuardFile(List<Guard> guards) {
+        WriteInputGuardSpecification.WriteInputGuardSpecification(guards);
+    }
+    
+    private void readGuardFile() {
+        String workingDir = System.getProperty("user.dir");
+//            String dataDir = workingDir.substring(0, workingDir.length() - 13) + "set1_data\\set1_data\\";
+        Stage stage = (Stage) this.readInput.getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(workingDir));
+        fileChooser.setTitle("Open Folder");
+        File file = fileChooser.showOpenDialog(stage);
+        if (file != null) {
+            String filename = file.getName(); //"ArtGalleryV3.txt";
+            List<Guard> guards = new ArrayList();
+            guards = ReadInputGuardSpecification.ReadInputGuardSpecification(filename);
+        }
+        
+        
+    }
+    
     @FXML
     private void finalEdgeButton(ActionEvent event){
         if(polygon.getEdges().size() != polygon.getVertices().size()){
