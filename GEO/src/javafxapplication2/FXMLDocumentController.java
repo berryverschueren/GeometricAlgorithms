@@ -7,6 +7,8 @@ package javafxapplication2;
 
 import geo.WriteInputGallerySpecification;
 import geo.ReadInputGallerySpecification;
+import geo.ReadInputGuardSpecification;
+import geo.WriteInputGuardSpecification;
 import geo.dataStructures.Edge;
 import geo.dataStructures.Polygon;
 import geo.dataStructures.TrapezoidalMap;
@@ -183,7 +185,7 @@ public class FXMLDocumentController implements Initializable {
     public List<Vertex> findPath(List<Vertex> vertices){
         List<Vertex> path = new ArrayList<>();
         if(!vertices.isEmpty()){
-            if(vertices.size()>2){
+            if(vertices.size()>=2){
                 for (int i = 0; i < vertices.size()-1; i++) {
                      path.addAll(new Graph().dijkstraStart(visibilityGraph.getEdges(), vertices.get(i), vertices.get(i+1), visibilityGraph.getVertices()));
                 }         
@@ -205,22 +207,32 @@ public class FXMLDocumentController implements Initializable {
         root.getChildren().add(canvas);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        TrapezoidalMap tm = new TrapezoidalMap();
-        List<Edge> segments = new ArrayList<>();
-        segments.addAll(this.polygon.getEdges());
-        for (int i = 0; i < this.innerPolygon.size(); i++) {
-            segments.addAll(this.innerPolygon.get(i).getEdges());
-        }
-        
-        tm.construct(segments);
-        tm.removeInnerTrapezoids(this.innerPolygon);
-        tm.removeOuterTrapezoids(this.polygon);
-        tm.computePossiblePaths();
+//        TrapezoidalMap tm = new TrapezoidalMap();
+//        List<Edge> segments = new ArrayList<>();
+//        segments.addAll(this.polygon.getEdges());
+//        for (int i = 0; i < this.innerPolygon.size(); i++) {
+//            segments.addAll(this.innerPolygon.get(i).getEdges());
+//        }
+//        
+//        tm.construct(segments);
+//        tm.removeInnerTrapezoids(this.innerPolygon);
+//        tm.removeOuterTrapezoids(this.polygon);
+//        tm.computePossiblePaths();
         
         String workingDir = "file:\\\\\\" + System.getProperty("user.dir");        
         Image guardImage = new Image(workingDir + "\\guard.png", 40, 40, false, false);
 
-        List<Vertex> interestingVertices = new ArrayList<>();
+        calculateVisibilityGraph();
+        List<Vertex> interestingVertices = new ArrayList<>(); // vis.getBestExitGuards();
+        
+        List<Vertex> verts = this.polygon.getVertices();
+        
+        for (int i = 0; i < verts.size(); i++) {
+            if (verts.get(i).getExitFlag() == 1) {
+                interestingVertices.add(verts.get(i));
+            }
+        }
+        
         List<Vertex> verticesForGuardPath = findPath(interestingVertices);
         List<Guard> guards = makeGuardList(verticesForGuardPath);
         
@@ -232,7 +244,7 @@ public class FXMLDocumentController implements Initializable {
             public void handle(long currentNanoTime)
             {
                 double t = (currentNanoTime - startNanoTime) / 1000000000.0; 
-                drawPath(gc, canvas, tm, guards, t, guardImage);
+                drawPath(gc, canvas, guards, t, guardImage);
             }
         }.start();
         
@@ -258,28 +270,33 @@ public class FXMLDocumentController implements Initializable {
         }
     }
     
-    private void drawPath(GraphicsContext gc, Canvas canvas, TrapezoidalMap tm, List<Guard> guards, double t, Image guardImage) {
+    private void drawPath(GraphicsContext gc, Canvas canvas, List<Guard> guards, double t, Image guardImage) {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        gc.setStroke(Color.BLACK);
-        gc.setLineWidth(1);
-        for (int i = 0; i < tm.getTrapezoids().size(); i++) {
-            Trapezoid tz = tm.getTrapezoids().get(i);
-            gc.strokePolygon(new double[] { tz.getV1().getX(), tz.getV2().getX(), tz.getV3().getX(), tz.getV4().getX() }, 
-                    new double[] { tz.getV1().getY(), tz.getV2().getY(), tz.getV3().getY(), tz.getV4().getY() }, 4);
-        }
+        finalizeDraw(gc);
+        setUpDraw(gc, false);
         gc.setStroke(Color.RED);
         gc.setLineWidth(2);
+        
         for (int i = 0; i < guards.size(); i++) {
             List<PathGuard> pg = guards.get(i).getPath();
             for (int j = 0; j < pg.size(); j++) {
-                int next = (i + 1) % pg.size();
-                gc.strokeLine(pg.get(i).getX(), pg.get(i).getY(), pg.get(next).getX(), pg.get(next).getY());
-                double maxTime = pg.get(pg.size() - 1).getTimestamp();
-                double loopedTime = t % maxTime;
-                PathGuard[] duo = getPathGuardForTime(loopedTime, pg);
-                double[] point = getInterpolatedPoint(duo[0], duo[1], loopedTime);
-                gc.drawImage(guardImage, point[0], point[1]);
+                int next = (j + 1) % pg.size();
+                gc.strokeLine(pg.get(j).getX(), pg.get(j).getY(), pg.get(next).getX(), pg.get(next).getY());
             }
+        }
+        
+        for (int i = 0; i < guards.size(); i++) {
+            List<PathGuard> pg = guards.get(i).getPath();
+            double maxTime = 0.0;
+            for (int j = 0; j < pg.size(); j++) {
+                if (pg.get(j).getTimestamp() > maxTime) {
+                    maxTime = pg.get(j).getTimestamp();
+                }
+            }
+            double loopedTime = t % maxTime;
+            PathGuard[] duo = getPathGuardForTime(loopedTime, pg);
+            double[] point = getInterpolatedPoint(duo[0], duo[1], loopedTime);
+            gc.drawImage(guardImage, point[0], point[1]);
         }
     }
     
@@ -305,8 +322,8 @@ public class FXMLDocumentController implements Initializable {
         double travelTime = v2.getTimestamp() - v1.getTimestamp() - (v1.getObserving() == 1 ? this.deltaTime : 0);
         double stepSize = d / travelTime;
         double n = stepSize * (v1.getObserving() == 1 ? (t - this.deltaTime) : t);
-        point[0] = x1 + (((n < 0 ? 0 : n) / d) * (x2 - x1));
-        point[1] = y1 + (((n < 0 ? 0 : n) / d) * (y2 - y1));
+        point[0] = x1 + (((n < 0 ? 0 : n) / d) * (Math.abs(x2 - x1)));
+        point[1] = y1 + (((n < 0 ? 0 : n) / d) * (Math.abs(y2 - y1)));
         return point;
     }
 
@@ -429,6 +446,12 @@ public class FXMLDocumentController implements Initializable {
             vMaxGuards.setText(String.valueOf(galleryProblem.getSpeed()));
             deltaT.setText(String.valueOf(galleryProblem.getObservationTime()));
             globalTime.setText(String.valueOf(galleryProblem.getGlobalTime()));
+            
+            numOfGuards = galleryProblem.getGuards();
+            vMaxG = galleryProblem.getSpeed();
+            deltaTime = galleryProblem.getObservationTime();
+            globalT = galleryProblem.getGlobalTime();
+            
             setUpDraw(true);
             finalizeDraw();   
             setUpDraw(false);
@@ -495,6 +518,28 @@ public class FXMLDocumentController implements Initializable {
             }
         return observing;
     }
+    
+    private void writeGuardFile(List<Guard> guards) {
+        WriteInputGuardSpecification.WriteInputGuardSpecification(guards);
+    }
+    
+    private void readGuardFile() {
+        String workingDir = System.getProperty("user.dir");
+//            String dataDir = workingDir.substring(0, workingDir.length() - 13) + "set1_data\\set1_data\\";
+        Stage stage = (Stage) this.readInput.getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(workingDir));
+        fileChooser.setTitle("Open Folder");
+        File file = fileChooser.showOpenDialog(stage);
+        if (file != null) {
+            String filename = file.getName(); //"ArtGalleryV3.txt";
+            List<Guard> guards = new ArrayList();
+            guards = ReadInputGuardSpecification.ReadInputGuardSpecification(filename);
+        }
+        
+        
+    }
+    
     @FXML
     private void finalEdgeButton(ActionEvent event){
         if(polygon.getEdges().size() != polygon.getVertices().size()){
@@ -622,6 +667,35 @@ public class FXMLDocumentController implements Initializable {
             }
         }
     }
+    private void setUpDraw(GraphicsContext g, boolean clear){
+        if(clear){
+            g.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+            g.setFill(Color.WHITE);
+            g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        }
+        //polygon
+        for(Vertex vertex:polygon.getVertices()){
+            if(vertex.getArtFlag()==1){
+                    g.setFill(Color.GREEN);
+                } else if(vertex.getExitFlag()==1){
+                    g.setFill(Color.RED);
+                } else{
+                    g.setFill(Color.BLACK);
+                }
+            g.fillOval(vertex.getX()-5, vertex.getY()-5, 10, 10);
+        }
+        //inner
+        for(Polygon innerPolygon:innerPolygon){
+            for(Vertex vertex:innerPolygon.getVertices()){
+                if(vertex.getArtFlag()==1){
+                    g.setFill(Color.GREEN);
+                }else{
+                    g.setFill(Color.WHITE);
+                }
+                g.fillOval(vertex.getX()-5, vertex.getY()-5, 10, 10);
+            }
+        }
+    }
     
     private void finalizeDraw(){
         g.setFill(Color.BLACK);
@@ -629,6 +703,24 @@ public class FXMLDocumentController implements Initializable {
         g.setFill(Color.WHITE);
         for(Polygon innerPolygon:innerPolygon){
             g.fillPolygon(innerPolygon.getXs(), innerPolygon.getYs(), innerPolygon.getNumberVertices());
+        }
+    }
+    
+    private void finalizeDraw(GraphicsContext g){
+        g.setFill(Color.BLACK);
+        g.fillPolygon(polygon.getXs(), polygon.getYs(), polygon.getNumberVertices());
+        g.setStroke(Color.RED);
+        for (int i = 0; i < polygon.getVertices().size(); i++) {
+            Vertex v = polygon.getVertices().get(i);
+            g.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+        }
+        g.setFill(Color.WHITE);
+        for(Polygon innerPolygon:innerPolygon){
+            g.fillPolygon(innerPolygon.getXs(), innerPolygon.getYs(), innerPolygon.getNumberVertices());
+            for (int i = 0; i < innerPolygon.getVertices().size(); i++) {
+                Vertex v = innerPolygon.getVertices().get(i);
+                g.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+            }
         }
     }
     
