@@ -536,7 +536,7 @@ public class FXMLDocumentController implements Initializable {
     }
     
     private int observingGuard(Vertex vertex) {
-        if (vertex.getArtFlag()== 1) {
+        if (vertex.getArtFlag()== 1 || vertex.getExitFlag() == 1) {
                 observing = 1;
             } else {
                 observing = 0; 
