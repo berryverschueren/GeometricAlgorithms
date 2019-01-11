@@ -222,7 +222,9 @@ public class FXMLDocumentController implements Initializable {
         String workingDir = "file:\\\\\\" + System.getProperty("user.dir");        
         Image guardImage = new Image(workingDir + "\\guard.png", 40, 40, false, false);
 
-        List<Guard> guards = new ArrayList<>();
+        List<Vertex> interestingVertices = new ArrayList<>();
+        List<Vertex> verticesForGuardPath = findPath(interestingVertices);
+        List<Guard> guards = makeGuardList(verticesForGuardPath);
         
         final long startNanoTime = System.nanoTime();
         
@@ -301,12 +303,12 @@ public class FXMLDocumentController implements Initializable {
         double[] point = new double[2];
         double x1 = v1.getX(), y1 = v1.getY();
         double x2 = v2.getX(), y2 = v2.getY();
-        double d = Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
-        double travelTime = v2.getTimestamp() - v1.getTimestamp();
+        double d = Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));        
+        double travelTime = v2.getTimestamp() - v1.getTimestamp() - (v1.getObserving() == 1 ? this.deltaTime : 0);
         double stepSize = d / travelTime;
-        double n = stepSize * t;
-        point[0] = x1 + ((n / d) * (x2 - x1));
-        point[1] = y1 + ((n / d) * (y2 - y1));
+        double n = stepSize * (v1.getObserving() == 1 ? (t - this.deltaTime) : t);
+        point[0] = x1 + (((n < 0 ? 0 : n) / d) * (x2 - x1));
+        point[1] = y1 + (((n < 0 ? 0 : n) / d) * (y2 - y1));
         return point;
     }
 
@@ -436,13 +438,27 @@ public class FXMLDocumentController implements Initializable {
 
     }
     
-    private Guard makePathGuard(List<Vertex> verticesPathGuard) {
+    private List<Guard> makeGuardList(List<Vertex> verticesPathGuards) {
+        List<Guard> guards = new ArrayList();
+        int plus = verticesPathGuards.size() / numOfGuards; 
+        int currentIndex = 0;
+        for (int i = 0; i < numOfGuards; i++ ) {
+            Guard guard = new Guard();
+            guard = makePathGuard(verticesPathGuards, currentIndex);
+            guards.add(guard);
+            currentIndex = currentIndex + plus;
+            }
+        return guards;
+    }
+    
+    private Guard makePathGuard(List<Vertex> verticesPathGuard, int index) {
         double x; 
         double y; 
         double tCurrent;
         List<PathGuard> path = new ArrayList<>();
         
-        Vertex firstVertex = verticesPathGuard.get(0);
+        int firstIndex = index % verticesPathGuard.size();
+        Vertex firstVertex = verticesPathGuard.get(firstIndex);
         double initX = firstVertex.getX();
         double initY = firstVertex.getY();
         double initT = 0; 
@@ -453,8 +469,8 @@ public class FXMLDocumentController implements Initializable {
         double tPrevious = initT; 
         Vertex vertexPrevious = firstVertex;
                   
-        for (int i = 1; i < verticesPathGuard.size()+1; i++) {
-            Vertex vertexTemp = verticesPathGuard.get(i);
+        for (int i = 1; i < verticesPathGuard.size(); i++) {
+            Vertex vertexTemp = verticesPathGuard.get(i + (index % verticesPathGuard.size()));
             x = vertexTemp.getX();
             y = vertexTemp.getY();
             observing = observingGuard(vertexTemp);
