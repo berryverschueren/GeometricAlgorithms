@@ -25,12 +25,13 @@
       <Button fx:id="kaj" layoutX="920.0" layoutY="151.0" mnemonicParsing="false" onAction="#handleButtonKaj" text="kaj" />
       <Button fx:id="berry" layoutX="920.0" layoutY="176.0" mnemonicParsing="false" onAction="#handleButtonBerry" text="berry" />
       <Button fx:id="carina" layoutX="920.0" layoutY="201.0" mnemonicParsing="false" onAction="#handleButtonCarina" text="carina" />
-      <TextField fx:id="vMaxGuards" layoutX="911.0" layoutY="574.0" prefHeight="39.0" prefWidth="80.0" text="1" />
-      <Label layoutX="911.0" layoutY="559.0" text="vMaxGuards" />
-      <TextField fx:id="deltaT" layoutX="911.0" layoutY="520.0" prefHeight="39.0" prefWidth="80.0" />
-      <TextField fx:id="globalTime" layoutX="911.0" layoutY="462.0" prefHeight="39.0" prefWidth="80.0" />
-      <Label layoutX="911.0" layoutY="442.0" text="globalTime" />
-      <Label layoutX="913.0" layoutY="501.0" text="deltaT" />
-      <Button fx:id="readInput" layoutX="922.0" layoutY="240.0" mnemonicParsing="false" onAction="#handleButtonInputRead" prefHeight="39.0" prefWidth="99.0" text="ReadInput" />
+      <TextField fx:id="vMaxGuards" layoutX="911.0" layoutY="588.0" prefHeight="25.0" prefWidth="80.0" text="1" />
+      <Label layoutX="911.0" layoutY="571.0" text="vMaxGuards" />
+      <TextField fx:id="deltaT" layoutX="911.0" layoutY="546.0" prefHeight="25.0" prefWidth="80.0" text="0" />
+      <TextField fx:id="globalTime" layoutX="911.0" layoutY="504.0" prefHeight="25.0" prefWidth="80.0" text="0" />
+      <Label layoutX="913.0" layoutY="487.0" text="globalTime" />
+      <Label layoutX="909.0" layoutY="529.0" text="deltaT" />
+      <Button fx:id="readInput" layoutX="915.0" layoutY="282.0" mnemonicParsing="false" onAction="#handleButtonInputRead" prefHeight="39.0" prefWidth="80.0" text="ReadInput" />
+      <Button layoutX="910.0" layoutY="462.0" mnemonicParsing="false" onAction="#finalEdgeButton" text="Final Edge" />
     </children>
 </AnchorPane>
