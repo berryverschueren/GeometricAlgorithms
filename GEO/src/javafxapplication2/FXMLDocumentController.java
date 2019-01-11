@@ -141,26 +141,49 @@ public class FXMLDocumentController implements Initializable {
             }
         }
         
-        shortestPath = findPath(interestingVertices);
+//<<<<<<< HEAD
+//        shortestPath = findPath(interestingVertices);
+//        
+////        List<Vertex> path = new ArrayList<>();
+////        interestingVertices.add(interestingVertices.get(0));
+////        for (int i = 0; i < interestingVertices.size()-1; i++) {
+////            List<Vertex> currentPath = new ArrayList<>();
+////            currentPath = findSinglePath(interestingVertices.get(i), interestingVertices.get(i+1));
+////            currentPath.remove(0);
+////            if(!path.isEmpty()&&!currentPath.isEmpty()){
+////                //currentPath = findSinglePath(interestingVertices.get(i), interestingVertices.get(i+1));
+////                //currentPath.remove(0);
+////                List<Vertex> inter = findSinglePath(path.get(path.size()-1), currentPath.get(0));
+////                inter.remove(0);
+////                shortestPath.addAll(inter);
+////            }
+////            path = currentPath;
+////            //path.remove(0);
+////            shortestPath.addAll(path);
+////            
+////        }
+//=======
         
-//        List<Vertex> path = new ArrayList<>();
-//        interestingVertices.add(interestingVertices.get(0));
-//        for (int i = 0; i < interestingVertices.size()-1; i++) {
-//            List<Vertex> currentPath = new ArrayList<>();
-//            currentPath = findSinglePath(interestingVertices.get(i), interestingVertices.get(i+1));
-//            currentPath.remove(0);
-//            if(!path.isEmpty()&&!currentPath.isEmpty()){
-//                //currentPath = findSinglePath(interestingVertices.get(i), interestingVertices.get(i+1));
-//                //currentPath.remove(0);
-//                List<Vertex> inter = findSinglePath(path.get(path.size()-1), currentPath.get(0));
-//                inter.remove(0);
-//                shortestPath.addAll(inter);
-//            }
-//            path = currentPath;
-//            //path.remove(0);
-//            shortestPath.addAll(path);
-//            
-//        }
+        
+        List<Vertex> path = new ArrayList<>();
+        interestingVertices.add(interestingVertices.get(0));
+        for (int i = 0; i < interestingVertices.size()-1; i++) {
+            List<Vertex> currentPath = new ArrayList<>();
+            currentPath = findSinglePath(interestingVertices.get(i), interestingVertices.get(i+1));
+            currentPath.remove(0);
+            if(!path.isEmpty() && !currentPath.isEmpty()){
+                //currentPath = findSinglePath(interestingVertices.get(i), interestingVertices.get(i+1));
+                //currentPath.remove(0);
+                List<Vertex> inter = findSinglePath(path.get(path.size()-1), currentPath.get(0));
+                inter.remove(0);
+                shortestPath.addAll(inter);
+            }
+            path = currentPath;
+            //path.remove(0);
+            shortestPath.addAll(path);
+            
+        }
+//>>>>>>> b1efeab0ffdbba3673f5d51f616bc8b44ae54ff1
 
         //shortestPath = findPath(interestingVertices);
         return shortestPath;
@@ -388,6 +411,10 @@ public class FXMLDocumentController implements Initializable {
     
     private double[] getInterpolatedPoint(PathGuard v1, PathGuard v2, double t) {
         double[] point = new double[2];
+        if (v1 == null || v1.getX() == 0.0|| v1.getY() == 0.0
+                || v2 == null || v2.getX() == 0.0 || v2.getY() == 0.0) {
+            System.out.println("HELP");
+        }
         double x1 = v1.getX(), y1 = v1.getY();
         double x2 = v2.getX(), y2 = v2.getY();
         double d = Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));  
@@ -568,6 +595,11 @@ public class FXMLDocumentController implements Initializable {
         double initT = 0; 
         
         observing = stopVertices.contains(firstVertex) ? 1 : 0;//observingGuard(firstVertex);
+        
+        if (verticesPathGuard.size() == 1) {
+            observing = 1;
+        }
+        
         PathGuard step = new PathGuard(initX, initY, initT, observing);
         path.add(step);
         
