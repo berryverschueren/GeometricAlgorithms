@@ -97,10 +97,31 @@ public class FXMLDocumentController implements Initializable {
     public int observing; 
     public Polygon visibilityGraph;
     
+    private List<Vertex> stopVertices = new ArrayList<>();
+    
     private dummyVis vis;
 
     private List<Vertex> getSmartSmartPath(int numGuards, int numExits){
         List<VertexInfo> infoList = vis.getVertexInfo();
+        
+        for(VertexInfo v : infoList){
+            if(v.isIsExit()){          
+                stopVertices.addAll(v.getSeeMe());
+                Vertex vv = v.getVertex();
+                stopVertices.add(vv);
+                for(Edge edge : polygon.getEdges()){
+                    if(edge.hasSameCoordinates(vv)){
+                        if(edge.getV1() != vv){
+                            stopVertices.add(edge.getV1());
+                        }
+                        if(edge.getV2() != vv){
+                            stopVertices.add(edge.getV2());
+                        }
+                    }    
+                }
+            }
+        }
+        
         List<Vertex> shortestPath = new ArrayList<>();
         
         for(VertexInfo info : infoList){
@@ -480,9 +501,9 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void handleButtonCarina(ActionEvent event) {
         numOfGuards = Integer.parseInt(Guards.getText());
-        vMaxG = Integer.parseInt(vMaxGuards.getText());
-        deltaTime = Integer.parseInt(deltaT.getText());
-        globalT = Integer.parseInt(globalTime.getText());
+        vMaxG = Double.parseDouble(vMaxGuards.getText());
+        deltaTime = Double.parseDouble(deltaT.getText());
+        globalT = Double.parseDouble(globalTime.getText());
         Gallery gallery = new Gallery(countExits, countArts, polygon, innerPolygon);
         GalleryProblem galleryProblem = new GalleryProblem(gallery, numOfGuards, vMaxG, globalT, deltaTime);
         WriteInputGallerySpecification.WriteInputGallerySpecification(galleryProblem);
@@ -545,7 +566,8 @@ public class FXMLDocumentController implements Initializable {
         double initX = firstVertex.getX();
         double initY = firstVertex.getY();
         double initT = 0; 
-        observing = observingGuard(firstVertex);
+        
+        observing = stopVertices.contains(firstVertex) ? 1 : 0;//observingGuard(firstVertex);
         PathGuard step = new PathGuard(initX, initY, initT, observing);
         path.add(step);
         
@@ -556,7 +578,7 @@ public class FXMLDocumentController implements Initializable {
             Vertex vertexTemp = verticesPathGuard.get((i + index) % verticesPathGuard.size());
             x = vertexTemp.getX();
             y = vertexTemp.getY();
-            observing = observingGuard(vertexTemp);
+            observing = stopVertices.contains(vertexTemp) ? 1 : 0;//observingGuard(vertexTemp);
             if (step.getObserving() == 1){
                 tCurrent = (distance(vertexPrevious, vertexTemp)/vMaxG ) + tPrevious + deltaTime;
             } else {
@@ -567,7 +589,7 @@ public class FXMLDocumentController implements Initializable {
             vertexPrevious = vertexTemp; 
             tPrevious = tCurrent;
         }
-        observing = observingGuard(firstVertex);
+        observing = stopVertices.contains(firstVertex) ? 1 : 0;//observingGuard(firstVertex);
         if (path.get(0).getObserving() == 1){
                 tCurrent = (distance(firstVertex, vertexPrevious)/vMaxG ) + tPrevious + deltaTime;
             } else {
