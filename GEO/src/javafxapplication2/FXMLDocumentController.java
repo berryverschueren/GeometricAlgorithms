@@ -506,7 +506,7 @@ public class FXMLDocumentController implements Initializable {
             tPrevious = tCurrent;
         }
         observing = observingGuard(firstVertex);
-        if (step.getObserving() == 1){
+        if (path.get(0).getObserving() == 1){
                 tCurrent = (distance(firstVertex, vertexPrevious)/vMaxG ) + tPrevious + deltaTime;
             } else {
                 tCurrent = distance(firstVertex, vertexPrevious)/vMaxG + tPrevious ;
