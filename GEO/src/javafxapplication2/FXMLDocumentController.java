@@ -278,12 +278,12 @@ public class FXMLDocumentController implements Initializable {
         double[] point = new double[2];
         double x1 = v1.getX(), y1 = v1.getY();
         double x2 = v2.getX(), y2 = v2.getY();
-        double d = Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
-        double travelTime = v2.getTimestamp() - v1.getTimestamp();
+        double d = Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));        
+        double travelTime = v2.getTimestamp() - v1.getTimestamp() - (v1.getObserving() == 1 ? this.deltaTime : 0);
         double stepSize = d / travelTime;
-        double n = stepSize * t;
-        point[0] = x1 + ((n / d) * (x2 - x1));
-        point[1] = y1 + ((n / d) * (y2 - y1));
+        double n = stepSize * (v1.getObserving() == 1 ? (t - this.deltaTime) : t);
+        point[0] = x1 + (((n < 0 ? 0 : n) / d) * (x2 - x1));
+        point[1] = y1 + (((n < 0 ? 0 : n) / d) * (y2 - y1));
         return point;
     }
 
