@@ -6,6 +6,7 @@
 package geo.dataStructures;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +25,19 @@ public class dummyVis {
     private Map<Integer, List<Vertex>> priorityVertexExit;
     private Map<Integer, List<Vertex>> priorityVertexArt;
     
+    
+    public List<Vertex> getBestExitGuards(){
+        List<Vertex> bestVertices = new ArrayList<>();
+
+        int key = Collections.max(priorityVertexExit.keySet());
+        bestVertices.addAll(priorityVertexExit.get(key));
+
+        return bestVertices;
+    }
+    
     public dummyVis() {
         mapFunction = new TrapezoidalMap();
+        
         //prio 1: #exits sorted on prio
         //prio 2: #arts
         //prio 3: #rest
@@ -54,11 +66,11 @@ public class dummyVis {
         //boolean mayAdd = false;
         boolean seesArt = false;
         boolean seesExit = false;
-        
-        int numberOf = 0;
+
         
         Polygon allPoly = new Polygon();
         for(Vertex vertex1 : allVertices(polygons)){
+            int numberOf = 0;
             for(Vertex vertex2 : allVertices(polygons)){
                 Edge newEdge = new Edge("", vertex1,vertex2);
 //                if(noSelfEdge(newEdge, polygons)){
