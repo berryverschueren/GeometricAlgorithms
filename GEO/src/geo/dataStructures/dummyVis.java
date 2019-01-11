@@ -22,6 +22,7 @@ public class dummyVis {
     private TrapezoidalMap mapFunction;
     //prio 1: #exits sorted on prio
     //prio 2: #arts
+    private List<VertexInfo> info;
     private Map<Integer, List<Vertex>> priorityVertexExit;
     private Map<Integer, List<Vertex>> priorityVertexArt;
     
@@ -35,9 +36,13 @@ public class dummyVis {
         return bestVertices;
     }
     
+    public List<VertexInfo> getVertexInfo(){
+        return info;
+    }
+    
     public dummyVis() {
         mapFunction = new TrapezoidalMap();
-        
+        info = new ArrayList<>();
         //prio 1: #exits sorted on prio
         //prio 2: #arts
         //prio 3: #rest
@@ -71,18 +76,26 @@ public class dummyVis {
         Polygon allPoly = new Polygon();
         for(Vertex vertex1 : allVertices(polygons)){
             int numberOf = 0;
+            VertexInfo vertexInfo = new VertexInfo();
+            vertexInfo.setVertex(vertex1);
             for(Vertex vertex2 : allVertices(polygons)){
                 Edge newEdge = new Edge("", vertex1,vertex2);
 //                if(noSelfEdge(newEdge, polygons)){
                     if(mayAdd(newEdge, allEdges(polygons))){
                         if(noSelfEdge(newEdge, polygons)){
                             allPoly.addEdge(newEdge);
+                            
+                            if(vertex1.getExitFlag()==1){
+                                vertexInfo.setIsExit(true);
+                                vertexInfo.addSeesMe(vertex2);
+                            }
                         }
                         //todo: add list of may add to check if in or out of polygon 
                         //mayAdd = true;
                         //can see (see trough walls!!!)
-                        if(vertex2.getArtFlag()==1 && !seesExit){
+                        if(vertex2.getArtFlag()==1){
                             seesArt = true;
+                            vertexInfo.addArt(vertex2);
                             numberOf++;
                         }
                        
@@ -92,10 +105,14 @@ public class dummyVis {
                                 seesArt = false;
                                 numberOf = 0;
                             }
+                            vertexInfo.addExit(vertex2);
                             numberOf++;
                         }
+                        
+                        
                     }
             }
+            info.add(vertexInfo);
             if(seesArt){
                 if(priorityVertexArt.containsKey(numberOf)){
                     List<Vertex> vertices = priorityVertexArt.get(numberOf);

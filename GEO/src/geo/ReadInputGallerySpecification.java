@@ -52,6 +52,7 @@ public class ReadInputGallerySpecification {
 
             Scanner input = new Scanner(reader);
             input.useLocale(Locale.US);
+            
             input.useDelimiter(",\\s*");
             
             /** line 1 */

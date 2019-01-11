@@ -20,6 +20,7 @@ import geo.dataStructures.Graph;
 import geo.dataStructures.Guard;
 import geo.dataStructures.PathGuard;
 import geo.dataStructures.Trapezoid;
+import geo.dataStructures.VertexInfo;
 import geo.dataStructures.dummyVis;
 import java.io.File;
 import java.io.IOException;
@@ -96,20 +97,53 @@ public class FXMLDocumentController implements Initializable {
     public Polygon visibilityGraph;
     
     private dummyVis vis;
-    //private List<Vertex> artList;
-    //private List<Vertex> exitList;
+
+    private List<Vertex> getSmartSmartPath(int numGuards, int numExits){
+        List<VertexInfo> infoList = vis.getVertexInfo();
+        List<Vertex> shortestPath = new ArrayList<>();
+        
+        for(VertexInfo info : infoList){
+            if(info.getNumExit() == numExits){
+                shortestPath.add(info.getVertex());
+                return shortestPath;
+            }
+        }
+        
+        List<Vertex> interestingVertices = new ArrayList<>(); 
+        
+        List<Vertex> verts = this.polygon.getVertices();
+        
+        for (int i = 0; i < verts.size(); i++) {
+            if (verts.get(i).getExitFlag() == 1) {
+                interestingVertices.add(verts.get(i));
+            }
+        }
+        
+        
+        
+        List<Vertex> path = new ArrayList<>();
+        interestingVertices.add(interestingVertices.get(0));
+        for (int i = 0; i < interestingVertices.size()-1; i++) {
+            List<Vertex> currentPath = new ArrayList<>();
+            currentPath = findSinglePath(interestingVertices.get(i), interestingVertices.get(i+1));
+            currentPath.remove(0);
+            if(!path.isEmpty()){
+                //currentPath = findSinglePath(interestingVertices.get(i), interestingVertices.get(i+1));
+                //currentPath.remove(0);
+                List<Vertex> inter = findSinglePath(path.get(path.size()-1), currentPath.get(0));
+                inter.remove(0);
+                shortestPath.addAll(inter);
+            }
+            path = currentPath;
+            //path.remove(0);
+            shortestPath.addAll(path);
+            
+        }
+
+        //shortestPath = findPath(interestingVertices);
+        return shortestPath;
+    }
     
-//    @FXML
-//    private void handleButtonGenerate(ActionEvent event){
-//        int numberOfVerticesToGenerate = 0;
-//        try{
-//            numberOfVerticesToGenerate = Integer.parseInt(number.getText().trim());
-//        } catch(NumberFormatException nfe){
-//            JOptionPane.showMessageDialog(new JFrame(), "Only numbers!");
-//        }
-//        
-//        //todo generator
-//    }
     @FXML
     private void handleButtonKaj(ActionEvent event) {
 
@@ -154,7 +188,6 @@ public class FXMLDocumentController implements Initializable {
         //ps.addAll(innerPolygon);
         vis =new dummyVis();
         visibilityGraph = vis.visibiliyGraph(ps);
-        g.setStroke(Color.AQUA);
         
 
 //        List<Edge> path = new Graph().dijkstraStart(vis.getEdges(), vis.getVertices().get(0), vis.getVertices().get(vis.getVertices().size()-1), vis.getVertices());
@@ -179,7 +212,19 @@ public class FXMLDocumentController implements Initializable {
         polys.add(polygon);
         polys.addAll(innerPolygon);
         vis = new dummyVis();
+        
+                g.setStroke(Color.AQUA);
+
         visibilityGraph = vis.visibiliyGraph(polys);
+        for(Edge edge : visibilityGraph.getEdges()){
+            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+        }
+    }
+    
+    public List<Vertex> findSinglePath(Vertex vertex1, Vertex vertex2){
+        List<Vertex> path = new ArrayList<>();
+        path.addAll(new Graph().dijkstraStart(visibilityGraph.getEdges(), vertex1, vertex2, visibilityGraph.getVertices()));
+        return path;
     }
     
     public List<Vertex> findPath(List<Vertex> vertices){
@@ -226,14 +271,15 @@ public class FXMLDocumentController implements Initializable {
         List<Vertex> interestingVertices = new ArrayList<>(); // vis.getBestExitGuards();
         
         List<Vertex> verts = this.polygon.getVertices();
-        
+        int exitCounter = 0;
         for (int i = 0; i < verts.size(); i++) {
             if (verts.get(i).getExitFlag() == 1) {
                 interestingVertices.add(verts.get(i));
+                exitCounter++;
             }
         }
         
-        List<Vertex> verticesForGuardPath = findPath(interestingVertices);
+        List<Vertex> verticesForGuardPath = getSmartSmartPath(numOfGuards, exitCounter); //findPath(interestingVertices);
         List<Guard> guards = makeGuardList(verticesForGuardPath);
         
         final long startNanoTime = System.nanoTime();

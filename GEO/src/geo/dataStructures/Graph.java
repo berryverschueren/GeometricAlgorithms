@@ -101,7 +101,13 @@ class VertexDijkstra {
 public class Graph {
 	public static final double INFINITY = Double.MAX_VALUE;
 	private Map<String, VertexDijkstra> vertexMap = new HashMap<String, VertexDijkstra>();
+        private double costCurrentPath = 0;
 
+    public double getCostCurrentPath() {
+        return costCurrentPath;
+    }
+ 
+        
 	/**
 	 * Add a new edge to the graph.
 	 */
@@ -311,7 +317,7 @@ public class Graph {
 
 		//BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		VertexDijkstra w = processRequest(start.getLabel(),end.getLabel(), g);
-                
+                costCurrentPath = w.dist;
                 //VertexDijkstra w = vertexMap.get(end.getLabel());
                 List<Vertex> vertexPath = new ArrayList<>();
                 while(true){
