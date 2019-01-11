@@ -68,7 +68,7 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private ChoiceBox choice;
     @FXML
-    private TextField guards;
+    private TextField Guards;
     @FXML
     private TextField vMaxGuards;
     @FXML
@@ -85,6 +85,7 @@ public class FXMLDocumentController implements Initializable {
     private GraphicsContext g; 
     private Polygon polygon;
     private List<Polygon> innerPolygon;
+    private List<Guard> guards; 
     private int numOfGuards; 
     private double vMaxG;
     private double deltaTime;
@@ -431,7 +432,7 @@ public class FXMLDocumentController implements Initializable {
     
     @FXML
     private void handleButtonCarina(ActionEvent event) {
-        numOfGuards = Integer.parseInt(guards.getText());
+        numOfGuards = Integer.parseInt(Guards.getText());
         vMaxG = Integer.parseInt(vMaxGuards.getText());
         deltaTime = Integer.parseInt(deltaT.getText());
         globalT = Integer.parseInt(globalTime.getText());
@@ -456,7 +457,7 @@ public class FXMLDocumentController implements Initializable {
             Gallery gallery = galleryProblem.getGallery();
             polygon = gallery.getOuterPolygon();
             innerPolygon = gallery.getInnerPolygons();
-            guards.setText(String.valueOf(galleryProblem.getGuards()));
+            Guards.setText(String.valueOf(galleryProblem.getGuards()));
             vMaxGuards.setText(String.valueOf(galleryProblem.getSpeed()));
             deltaT.setText(String.valueOf(galleryProblem.getObservationTime()));
             globalTime.setText(String.valueOf(galleryProblem.getGlobalTime()));
@@ -474,7 +475,7 @@ public class FXMLDocumentController implements Initializable {
     }
     
     private List<Guard> makeGuardList(List<Vertex> verticesPathGuards) {
-        List<Guard> guards = new ArrayList();
+        guards = new ArrayList();
         int plus = verticesPathGuards.size() / numOfGuards; 
         int currentIndex = 0;
         for (int i = 0; i < numOfGuards; i++ ) {
@@ -520,7 +521,7 @@ public class FXMLDocumentController implements Initializable {
             tPrevious = tCurrent;
         }
         observing = observingGuard(firstVertex);
-        if (step.getObserving() == 1){
+        if (path.get(0).getObserving() == 1){
                 tCurrent = (distance(firstVertex, vertexPrevious)/vMaxG ) + tPrevious + deltaTime;
             } else {
                 tCurrent = distance(firstVertex, vertexPrevious)/vMaxG + tPrevious ;
@@ -556,7 +557,7 @@ public class FXMLDocumentController implements Initializable {
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
             String filename = file.getName(); //"ArtGalleryV3.txt";
-            List<Guard> guards = new ArrayList();
+            //List<Guard> guards = new ArrayList();
             guards = ReadInputGuardSpecification.ReadInputGuardSpecification(filename);
         }
         
