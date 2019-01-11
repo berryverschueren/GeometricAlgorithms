@@ -15,6 +15,8 @@ import geo.dataStructures.VisibilityGraph;
 import geo.dataStructures.Gallery;
 import geo.dataStructures.GalleryProblem;
 import geo.dataStructures.Graph;
+import geo.dataStructures.Guard;
+import geo.dataStructures.PathGuard;
 import geo.dataStructures.dummyVis;
 import java.io.File;
 import java.io.IOException;
@@ -86,6 +88,7 @@ public class FXMLDocumentController implements Initializable {
     public int countArts = 0;
     public int countExits = 0;
     public final int count = 0;
+    public int observing; 
     //private List<Vertex> artList;
     //private List<Vertex> exitList;
     
@@ -411,6 +414,51 @@ public class FXMLDocumentController implements Initializable {
 
     }
     
+    private Guard makePathGuard(List<Vertex> verticesPathGuard) {
+        double x; 
+        double y; 
+        double tCurrent;
+        List<PathGuard> path = new ArrayList<>();
+        
+        Vertex firstVertex = verticesPathGuard.get(0);
+        double initX = firstVertex.getX();
+        double initY = firstVertex.getY();
+        double initT = 0; 
+        observing = observingGuard(firstVertex);
+        PathGuard step = new PathGuard(initX, initY, initT, observing);
+        path.add(step);
+        
+        double tPrevious = initT; 
+        Vertex vertexPrevious = firstVertex;
+                  
+        for (int i = 1; i < verticesPathGuard.size()+1; i++) {
+            Vertex vertexTemp = verticesPathGuard.get(i);
+            x = vertexTemp.getX();
+            y = vertexTemp.getY();
+            observing = observingGuard(vertexTemp);
+            if (step.getObserving() == 1){
+                tCurrent = (distance(vertexPrevious, vertexTemp)/vMaxG ) + tPrevious + deltaTime;
+            } else {
+                tCurrent = distance(vertexPrevious, vertexTemp)/vMaxG + tPrevious ;
+            }
+            step = new PathGuard(x, y, tCurrent, observing);
+            path.add(step);
+            vertexPrevious = vertexTemp; 
+            tPrevious = tCurrent;
+        }
+        Guard guard = new Guard(initX, initY, path);
+        
+        return guard;
+    }
+    
+    private int observingGuard(Vertex vertex) {
+        if (vertex.getArtFlag()== 1) {
+                observing = 1;
+            } else {
+                observing = 0; 
+            }
+        return observing;
+    }
     @FXML
     private void finalEdgeButton(ActionEvent event){
         List<Vertex> vertices = polygon.getVertices();
