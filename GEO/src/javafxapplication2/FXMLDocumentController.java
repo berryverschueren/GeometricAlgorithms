@@ -253,6 +253,7 @@ public class FXMLDocumentController implements Initializable {
         }.start();
         
         stage.show();
+        writeGuardFile(guards);
     }
     
     private void drawShapes(GraphicsContext gc, Canvas canvas, TrapezoidalMap tm, double t) {

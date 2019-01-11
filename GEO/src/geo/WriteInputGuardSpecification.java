@@ -17,7 +17,7 @@ public class WriteInputGuardSpecification {
     public static void WriteInputGuardSpecification(List<Guard> guards) {
         
         try {
-            String fileName = "temp.txt";
+            String fileName = "tempGuard.txt";
             FileWriter fileWriter = new FileWriter(fileName);
 
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
