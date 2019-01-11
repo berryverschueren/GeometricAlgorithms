@@ -16,12 +16,12 @@
       <Button fx:id="Clear" layoutX="913.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleButtonClear" prefHeight="25.0" prefWidth="80.0" text="Clear" />
       <ChoiceBox fx:id="choice" layoutX="913.0" layoutY="338.0" prefHeight="25.0" prefWidth="80.0" />
       <TextField fx:id="guards" layoutX="913.0" layoutY="630.0" prefHeight="25.0" prefWidth="80.0" text="1" />
-      <RadioButton fx:id="art" layoutX="923.0" layoutY="74.0" mnemonicParsing="false" onMouseReleased="#handleRadioButtonArt" text="add Art" />
+      <RadioButton fx:id="art" layoutX="923.0" layoutY="56.0" mnemonicParsing="false" onMouseReleased="#handleRadioButtonArt" text="add Art" />
       <Label layoutX="913.0" layoutY="613.0" text="#Guards" />
-      <RadioButton fx:id="exit" layoutX="923.0" layoutY="120.0" mnemonicParsing="false" onMouseReleased="#handleRadioButtonExit" text="add Exit" />
+      <RadioButton fx:id="exit" layoutX="924.0" layoutY="90.0" mnemonicParsing="false" onMouseReleased="#handleRadioButtonExit" text="add Exit" />
       <Label layoutX="914.0" layoutY="321.0" text="Inner Polygons " />
-      <Label layoutX="923.0" layoutY="57.0" text="Green" />
-      <Label layoutX="925.0" layoutY="104.0" text="Red" />
+      <Label layoutX="926.0" layoutY="39.0" text="Green" />
+      <Label layoutX="925.0" layoutY="73.0" text="Red" />
       <Button fx:id="kaj" layoutX="920.0" layoutY="151.0" mnemonicParsing="false" onAction="#handleButtonKaj" text="kaj" />
       <Button fx:id="berry" layoutX="920.0" layoutY="176.0" mnemonicParsing="false" onAction="#handleButtonBerry" text="berry" />
       <Button fx:id="carina" layoutX="920.0" layoutY="201.0" mnemonicParsing="false" onAction="#handleButtonCarina" text="carina" />
@@ -33,5 +33,7 @@
       <Label layoutX="909.0" layoutY="529.0" text="deltaT" />
       <Button fx:id="readInput" layoutX="915.0" layoutY="282.0" mnemonicParsing="false" onAction="#handleButtonInputRead" prefHeight="39.0" prefWidth="80.0" text="ReadInput" />
       <Button layoutX="910.0" layoutY="462.0" mnemonicParsing="false" onAction="#finalEdgeButton" text="Final Edge" />
+      <RadioButton fx:id="startRadio" layoutX="922.0" layoutY="129.0" mnemonicParsing="false" text="S" />
+      <RadioButton fx:id="endRadio" layoutX="958.0" layoutY="129.0" mnemonicParsing="false" text="E" />
     </children>
 </AnchorPane>
