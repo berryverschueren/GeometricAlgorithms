@@ -9,6 +9,7 @@ import java.util.StringTokenizer;
 
 import java.util.Iterator;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Queue;
@@ -287,7 +288,7 @@ public class Graph {
 	 * two vertices and runs the shortest path algorithm. The data file is a
 	 * sequence of lines of the format source destination.
 	 */
-	public List<Edge> dijkstraStart(List<Edge> edges, Vertex start, Vertex end, List<Vertex> vertices ) {
+	public List<Vertex> dijkstraStart(List<Edge> edges, Vertex start, Vertex end, List<Vertex> vertices ) {
 		Graph g = new Graph();
 
                 int counter = 0;
@@ -314,6 +315,7 @@ public class Graph {
                 //VertexDijkstra w = vertexMap.get(end.getLabel());
                 List<Vertex> vertexPath = new ArrayList<>();
                 while(true){
+                    w = w.prev;
                     if(w == null){
                         break;
                     }
@@ -324,15 +326,15 @@ public class Graph {
                         }
                     }
                     
-                    vertexPath.add(v);
-                    
-                    w = w.prev;
+                    vertexPath.add(v); 
                 }
-                List<Edge> edgePath = new ArrayList<>();
-                for (int i = 0; i <= vertexPath.size()-2; i++) {
-                    edgePath.add(new Edge("",vertexPath.get(i), vertexPath.get(i+1)));
-                }
-                return edgePath;
+                Collections.reverse(vertexPath);
+                
+//                List<Edge> edgePath = new ArrayList<>();
+//                for (int i = 0; i <= vertexPath.size()-2; i++) {
+//                    edgePath.add(new Edge("",vertexPath.get(i), vertexPath.get(i+1)));
+//                }
+                return vertexPath;
 			
 	}
 }
