@@ -141,26 +141,26 @@ public class FXMLDocumentController implements Initializable {
             }
         }
         
+        shortestPath = findPath(interestingVertices);
         
-        
-        List<Vertex> path = new ArrayList<>();
-        interestingVertices.add(interestingVertices.get(0));
-        for (int i = 0; i < interestingVertices.size()-1; i++) {
-            List<Vertex> currentPath = new ArrayList<>();
-            currentPath = findSinglePath(interestingVertices.get(i), interestingVertices.get(i+1));
-            currentPath.remove(0);
-            if(!path.isEmpty()){
-                //currentPath = findSinglePath(interestingVertices.get(i), interestingVertices.get(i+1));
-                //currentPath.remove(0);
-                List<Vertex> inter = findSinglePath(path.get(path.size()-1), currentPath.get(0));
-                inter.remove(0);
-                shortestPath.addAll(inter);
-            }
-            path = currentPath;
-            //path.remove(0);
-            shortestPath.addAll(path);
-            
-        }
+//        List<Vertex> path = new ArrayList<>();
+//        interestingVertices.add(interestingVertices.get(0));
+//        for (int i = 0; i < interestingVertices.size()-1; i++) {
+//            List<Vertex> currentPath = new ArrayList<>();
+//            currentPath = findSinglePath(interestingVertices.get(i), interestingVertices.get(i+1));
+//            currentPath.remove(0);
+//            if(!path.isEmpty()&&!currentPath.isEmpty()){
+//                //currentPath = findSinglePath(interestingVertices.get(i), interestingVertices.get(i+1));
+//                //currentPath.remove(0);
+//                List<Vertex> inter = findSinglePath(path.get(path.size()-1), currentPath.get(0));
+//                inter.remove(0);
+//                shortestPath.addAll(inter);
+//            }
+//            path = currentPath;
+//            //path.remove(0);
+//            shortestPath.addAll(path);
+//            
+//        }
 
         //shortestPath = findPath(interestingVertices);
         return shortestPath;
