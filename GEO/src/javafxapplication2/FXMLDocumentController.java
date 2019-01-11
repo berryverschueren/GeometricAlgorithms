@@ -15,6 +15,9 @@ import geo.dataStructures.VisibilityGraph;
 import geo.dataStructures.Gallery;
 import geo.dataStructures.GalleryProblem;
 import geo.dataStructures.Graph;
+import geo.dataStructures.Guard;
+import geo.dataStructures.PathGuard;
+import geo.dataStructures.Trapezoid;
 import geo.dataStructures.dummyVis;
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +42,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
@@ -228,7 +232,6 @@ public class FXMLDocumentController implements Initializable {
     
     @FXML
     private void handleButtonBerry(ActionEvent event) {
-        //finalEdge();
         Stage stage = new Stage();
         stage.setTitle( "Timeline Example" );
         Group root = new Group();
@@ -251,6 +254,11 @@ public class FXMLDocumentController implements Initializable {
         tm.removeOuterTrapezoids(this.polygon);
         tm.computePossiblePaths();
         
+        String workingDir = "file:\\\\\\" + System.getProperty("user.dir");        
+        Image guardImage = new Image(workingDir + "\\guard.png", 40, 40, false, false);
+
+        List<Guard> guards = new ArrayList<>();
+        
         final long startNanoTime = System.nanoTime();
         
         new AnimationTimer()
@@ -259,7 +267,7 @@ public class FXMLDocumentController implements Initializable {
             public void handle(long currentNanoTime)
             {
                 double t = (currentNanoTime - startNanoTime) / 1000000000.0; 
-                drawShapes(gc, canvas, tm, t);
+                drawPath(gc, canvas, tm, guards, t, guardImage);
             }
         }.start();
         
@@ -283,6 +291,58 @@ public class FXMLDocumentController implements Initializable {
                 tm.getTrapezoids().get(i).getV4().getY()
             }, 4);
         }
+    }
+    
+    private void drawPath(GraphicsContext gc, Canvas canvas, TrapezoidalMap tm, List<Guard> guards, double t, Image guardImage) {
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(1);
+        for (int i = 0; i < tm.getTrapezoids().size(); i++) {
+            Trapezoid tz = tm.getTrapezoids().get(i);
+            gc.strokePolygon(new double[] { tz.getV1().getX(), tz.getV2().getX(), tz.getV3().getX(), tz.getV4().getX() }, 
+                    new double[] { tz.getV1().getY(), tz.getV2().getY(), tz.getV3().getY(), tz.getV4().getY() }, 4);
+        }
+        gc.setStroke(Color.RED);
+        gc.setLineWidth(2);
+        for (int i = 0; i < guards.size(); i++) {
+            List<PathGuard> pg = guards.get(i).getPath();
+            for (int j = 0; j < pg.size(); j++) {
+                int next = (i + 1) % pg.size();
+                gc.strokeLine(pg.get(i).getX(), pg.get(i).getY(), pg.get(next).getX(), pg.get(next).getY());
+                double maxTime = pg.get(pg.size() - 1).getTimestamp();
+                double loopedTime = t % maxTime;
+                PathGuard[] duo = getPathGuardForTime(loopedTime, pg);
+                double[] point = getInterpolatedPoint(duo[0], duo[1], loopedTime);
+                gc.drawImage(guardImage, point[0], point[1]);
+            }
+        }
+    }
+    
+    private PathGuard[] getPathGuardForTime(double loopedTime, List<PathGuard> pathGuards) {
+        PathGuard[] pathGuardDuo = new PathGuard[2];
+        for (int i = 0; i < pathGuards.size(); i++) {
+            int next = (i + 1) % pathGuards.size();
+            if (loopedTime >= pathGuards.get(i).getTimestamp()
+                    && loopedTime <= pathGuards.get(next).getTimestamp()) {
+                pathGuardDuo[0] = pathGuards.get(i);
+                pathGuardDuo[1] = pathGuards.get(next);
+                break;
+            }
+        }        
+        return pathGuardDuo;
+    }
+    
+    private double[] getInterpolatedPoint(PathGuard v1, PathGuard v2, double t) {
+        double[] point = new double[2];
+        double x1 = v1.getX(), y1 = v1.getY();
+        double x2 = v2.getX(), y2 = v2.getY();
+        double d = Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
+        double travelTime = v2.getTimestamp() - v1.getTimestamp();
+        double stepSize = d / travelTime;
+        double n = stepSize * t;
+        point[0] = x1 + ((n / d) * (x2 - x1));
+        point[1] = y1 + ((n / d) * (y2 - y1));
+        return point;
     }
 
     private void drawShapes(Canvas canvas, TrapezoidalMap tm) {
