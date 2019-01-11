@@ -6,7 +6,10 @@
 package geo.dataStructures;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  *
@@ -15,9 +18,14 @@ import java.util.List;
 public class dummyVis {
 
     private TrapezoidalMap mapFunction;
+    private Map<Integer, List<Vertex>> priorityVertex;
     
     public dummyVis() {
         mapFunction = new TrapezoidalMap();
+        //prio 1: #exits sorted on prio
+        //prio 2: #arts
+        //prio 3: #rest
+        priorityVertex = new TreeMap<>();
     }
     
     private boolean mayAdd(Edge newEdge, List<Edge> edges){
@@ -30,15 +38,6 @@ public class dummyVis {
                         noCrossing = false;
                     }
                 }
-                
-                // note: maybe parrallel
-//                if(inter != null){
-//                    if(edge.hasSameCoordinates(inter) || newEdge.hasSameCoordinates(inter) ){
-////
-//                    }else{
-//                        noCrossing = false;
-//                    }
-//                }
         }
 
         return noCrossing;
@@ -52,7 +51,9 @@ public class dummyVis {
                 Edge newEdge = new Edge("", vertex1,vertex2);
                 if(noSelfEdge(newEdge, polygons)){
                     if(mayAdd(newEdge, allEdges(polygons))){
+//                        if(noSelfEdge(newEdge, polygons)){
                         allPoly.addEdge(newEdge);
+//                        }
                     }
                 }
                 //allPolygon

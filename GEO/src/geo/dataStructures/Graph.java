@@ -290,9 +290,17 @@ public class Graph {
 	public List<Edge> dijkstraStart(List<Edge> edges, Vertex start, Vertex end, List<Vertex> vertices ) {
 		Graph g = new Graph();
 
-                
+                int counter = 0;
                 for(Edge edge : edges){
                     double cost = Point2D.distance(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+                    if(edge.getV1().getLabel().equals("")){
+                        edge.getV1().setLabel(counter+"");
+                        counter++;
+                    }
+                    if(edge.getV2().getLabel().equals("")){
+                        edge.getV2().setLabel(counter+"");
+                        counter++;
+                    }
                     g.addEdgeDijkstra(edge.getV1().getLabel(), edge.getV2().getLabel(), cost);
                 }
                 

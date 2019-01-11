@@ -90,6 +90,8 @@ public class FXMLDocumentController implements Initializable {
     public int countArts = 0;
     public int countExits = 0;
     public final int count = 0;
+    
+    public Polygon visibilityGraph;
     //private List<Vertex> artList;
     //private List<Vertex> exitList;
     
@@ -106,128 +108,68 @@ public class FXMLDocumentController implements Initializable {
 //    }
     @FXML
     private void handleButtonKaj(ActionEvent event) {
-        
-//        List<Polygon> testPolygons = new ArrayList<>();
-////        Polygon poly1 = new Polygon();
-////        poly1.setLabel("polygon1");
-//        Vertex v1, v2, v3;
-//        Edge e1,e2,e3;
-//
-//        
-//        Polygon poly2 = new Polygon();
-//        poly2.setLabel("polygon1");
-//        
-//        v1 = new Vertex(1.0, 1.0, "p1");
-//        v2 = new Vertex(3.0, 1.0, "p2");
-//        v3 = new Vertex(2.0, 2.0, "p3");
-//        e1 = new Edge("e1", v1, v2);
-//        e2 = new Edge("e2", v2, v3);
-//        e3 = new Edge("e3", v3, v1);
-//        poly2.addVertex(v1);
-//        poly2.addVertex(v2);
-//        poly2.addVertex(v3);
-//        poly2.addEdge(e1);
-//        poly2.addEdge(e2);
-//        poly2.addEdge(e3);
-//        
-//        testPolygons.add(poly2);
-//        
-//        
-//        
-//        Polygon poly3 = new Polygon();
-//        poly3.setLabel("polygon2");
-//        
-//        v1 = new Vertex(5.0, 1.0, "pp1");
-//        v2 = new Vertex(6.0, 4.0, "pp2");
-//        v3 = new Vertex(4.0, 2.0, "pp3");
-//        e1 = new Edge("ee1", v1, v2);
-//        e2 = new Edge("ee2", v2, v3);
-//        e3 = new Edge("ee3", v3, v1);
-//        poly3.addVertex(v1);
-//        poly3.addVertex(v2);
-//        poly3.addVertex(v3);
-//        poly3.addEdge(e1);
-//        poly3.addEdge(e2);
-//        poly3.addEdge(e3);
-//                
-//        testPolygons.add(poly3);
-        
 
-        //innerPolygon = testPolygons;
-//        for(Polygon poly : testPolygons){
-//            Polygon p = new Polygon();
-//            for(Vertex vertex : poly.getVertices()){
-//                Vertex v = new Vertex(vertex.getX()*100, vertex.getY()*100, "");
-//                p.addVertex(v);
-//            }
-//            innerPolygon.add(p);
-//        }
-//        polygon.addVertex(new Vertex(0.0,0.0,""));
-//        polygon.addVertex(new Vertex(700.0,0.0,""));
-//        polygon.addVertex(new Vertex(700.0,700.0,""));
-////        polygon.addVertex(new Vertex(0.0,700.0,""));
-//        finalEdge();
-//        setUpDraw(true);
-//        finalizeDraw();        
-//        
-//
-//        VisibilityGraph graph = new VisibilityGraph();
-//
-//        Polygon poly = graph.visibilityGraphAlgorithm(innerPolygon);
-//        
-//
-//        g.setStroke(Color.AQUA);
-//
-//        for(Edge edge : poly.getEdges()){
-//            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
-//        }
         finalEdge();
-        int edgeCounter = 0;
-        int vertexCounter = 0;
-        
-        
-        Polygon p = polygon;
-        p.setLabel("Polygon");
-        for(Edge edge : p.getEdges()){
-            edge.setLabel(p.getLabel()+" : Edge."+edgeCounter+"  ");
-            edgeCounter++;
-        }
-        for(Vertex vertex : p.getVertices()){
-            vertex.setLabel(p.getLabel()+" : Vertex."+vertexCounter+"  ");
-            vertexCounter++;
-        }
-        
+//        int edgeCounter = 0;
+//        int vertexCounter = 0;
+//        
+//        
+//        Polygon p = polygon;
+//        p.setLabel("Polygon");
+//        for(Edge edge : p.getEdges()){
+//            edge.setLabel(p.getLabel()+" : Edge."+edgeCounter+"  ");
+//            edgeCounter++;
+//        }
+//        for(Vertex vertex : p.getVertices()){
+//            vertex.setLabel(p.getLabel()+" : Vertex."+vertexCounter+"  ");
+//            vertexCounter++;
+//        }
+//        
         List<Polygon> ps = innerPolygon;
-        int pcount = 0;
-        for(Polygon poly : ps){
-            poly.setLabel("inner Polygon"+pcount);
-            edgeCounter = 0;
-            vertexCounter = 0;
-            for(Edge edge : poly.getEdges()){
-                edge.setLabel(poly.getLabel()+" : Edge."+edgeCounter+"  ");
-                edgeCounter++;
-            }
-            for(Vertex vertex : poly.getVertices()){
-                vertex.setLabel(poly.getLabel()+" : Vertex."+vertexCounter+"  ");
-                vertexCounter++;
-            }
-            pcount++;
-        }
-        
+//        int pcount = 0;
+//        for(Polygon poly : ps){
+//            poly.setLabel("inner Polygon"+pcount);
+//            edgeCounter = 0;
+//            vertexCounter = 0;
+//            for(Edge edge : poly.getEdges()){
+//                edge.setLabel(poly.getLabel()+" : Edge."+edgeCounter+"  ");
+//                edgeCounter++;
+//            }
+//            for(Vertex vertex : poly.getVertices()){
+//                vertex.setLabel(poly.getLabel()+" : Vertex."+vertexCounter+"  ");
+//                vertexCounter++;
+//            }
+//            pcount++;
+//        }
+//        
         System.out.println("");
         System.out.println("");
         //System.out.println(ps.get(0).getVertices().get(0).getLabel());
         
-        ps.add(p);
-        Polygon vis = new dummyVis().visibiliyGraph(ps);
+        ps.add(polygon);
+        ps.addAll(innerPolygon);
+        visibilityGraph = new dummyVis().visibiliyGraph(ps);
         g.setStroke(Color.AQUA);
         
 
-        List<Edge> path = new Graph().dijkstraStart(vis.getEdges(), vis.getVertices().get(0), vis.getVertices().get(vis.getVertices().size()-1), vis.getVertices());
-        
-        for(Edge edge : path){
-            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+//        List<Edge> path = new Graph().dijkstraStart(vis.getEdges(), vis.getVertices().get(0), vis.getVertices().get(vis.getVertices().size()-1), vis.getVertices());
+//        
+//        for(Edge edge : path){
+//            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+//        }
+    }
+    
+    public List<Edge> findPath(List<Vertex> vertices){
+        List<Edge> path = new ArrayList<>();
+        if(!vertices.isEmpty()){
+            if(vertices.size()>2){
+                for (int i = 0; i < vertices.size()-1; i++) {
+                     path.addAll(new Graph().dijkstraStart(visibilityGraph.getEdges(), vertices.get(i), vertices.get(i+1), visibilityGraph.getVertices()));
+                }         
+            }
         }
+        path.addAll(new Graph().dijkstraStart(visibilityGraph.getEdges(), vertices.get(vertices.size()-1), vertices.get(0), visibilityGraph.getVertices()));
+        return path;
     }
     
     @FXML
@@ -473,24 +415,28 @@ public class FXMLDocumentController implements Initializable {
     
     @FXML
     private void finalEdgeButton(ActionEvent event){
-        List<Vertex> vertices = polygon.getVertices();
-        Edge edge = new Edge(vertices.get(0),vertices.get(vertices.size()-1));
-        polygon.addEdge(edge);
-        for(Polygon poly : innerPolygon){
-            List<Vertex> verticesI = poly.getVertices();
-            Edge edgeI = new Edge(verticesI.get(0),verticesI.get(verticesI.size()-1));
-            poly.addEdge(edgeI);
+        if(polygon.getEdges().size() != polygon.getVertices().size()){
+            List<Vertex> vertices = polygon.getVertices();
+            Edge edge = new Edge(vertices.get(0),vertices.get(vertices.size()-1));
+            polygon.addEdge(edge);
+            for(Polygon poly : innerPolygon){
+                List<Vertex> verticesI = poly.getVertices();
+                Edge edgeI = new Edge(verticesI.get(0),verticesI.get(verticesI.size()-1));
+                poly.addEdge(edgeI);
+            }
         }
     }
     
     private void finalEdge(){
-        List<Vertex> vertices = polygon.getVertices();
-        Edge edge = new Edge(vertices.get(0),vertices.get(vertices.size()-1));
-        polygon.addEdge(edge);
-        for(Polygon poly : innerPolygon){
-            List<Vertex> verticesI = poly.getVertices();
-            Edge edgeI = new Edge(verticesI.get(0),verticesI.get(verticesI.size()-1));
-            poly.addEdge(edgeI);
+        if(polygon.getEdges().size() != polygon.getVertices().size()){
+            List<Vertex> vertices = polygon.getVertices();
+            Edge edge = new Edge(vertices.get(0),vertices.get(vertices.size()-1));
+            polygon.addEdge(edge);
+            for(Polygon poly : innerPolygon){
+                List<Vertex> verticesI = poly.getVertices();
+                Edge edgeI = new Edge(verticesI.get(0),verticesI.get(verticesI.size()-1));
+                poly.addEdge(edgeI);
+            }
         }
     }
 
@@ -514,6 +460,8 @@ public class FXMLDocumentController implements Initializable {
     private void handleButtonClear(ActionEvent event){
         countArts = count;
         countExits = count;
+        g.setFill(Color.WHITE);
+        g.setStroke(Color.WHITE);
         g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         polygon = new Polygon();
         innerPolygon = new ArrayList<>();
@@ -556,7 +504,7 @@ public class FXMLDocumentController implements Initializable {
                     g.fillOval((int)e.getX()-5, (int)e.getY()-5, 10, 10);
                 }   
             }else{
-                JOptionPane.showMessageDialog(new JFrame(), "Same X!!!!!");
+                JOptionPane.showMessageDialog(new JFrame(), "Same X");
             }
         }
         finalizeDraw();
