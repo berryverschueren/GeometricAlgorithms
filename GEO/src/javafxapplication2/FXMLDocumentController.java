@@ -147,20 +147,32 @@ public class FXMLDocumentController implements Initializable {
         //System.out.println(ps.get(0).getVertices().get(0).getLabel());
         
         ps.add(polygon);
-        ps.addAll(innerPolygon);
+        //ps.addAll(innerPolygon);
         visibilityGraph = new dummyVis().visibiliyGraph(ps);
         g.setStroke(Color.AQUA);
         
 
 //        List<Edge> path = new Graph().dijkstraStart(vis.getEdges(), vis.getVertices().get(0), vis.getVertices().get(vis.getVertices().size()-1), vis.getVertices());
 //        
-//        for(Edge edge : path){
-//            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
-//        }
+        for(Edge edge : visibilityGraph.getEdges()){
+            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+        }
+        List<Vertex> a = new ArrayList<>();
+        a.add(visibilityGraph.getVertices().get(0));
+        visibilityGraph.getVertices().get(0).setArtFlag(1);
+        a.add(visibilityGraph.getVertices().get(visibilityGraph.getVertices().size()-1));
+        visibilityGraph.getVertices().get(visibilityGraph.getVertices().size()-1).setExitFlag(1);
+        List<Vertex> v = findPath(a);
+        
+        g.setStroke(Color.RED);
+        for (int i = 0; i < v.size()-1; i++) {
+            g.strokeLine(v.get(i).getX(), v.get(i).getY(), v.get(i+1).getX(), v.get(i+1).getY());
+        }
+        setUpDraw(false);
     }
     
-    public List<Edge> findPath(List<Vertex> vertices){
-        List<Edge> path = new ArrayList<>();
+    public List<Vertex> findPath(List<Vertex> vertices){
+        List<Vertex> path = new ArrayList<>();
         if(!vertices.isEmpty()){
             if(vertices.size()>2){
                 for (int i = 0; i < vertices.size()-1; i++) {
@@ -278,12 +290,12 @@ public class FXMLDocumentController implements Initializable {
         double[] point = new double[2];
         double x1 = v1.getX(), y1 = v1.getY();
         double x2 = v2.getX(), y2 = v2.getY();
-        double d = Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
-        double travelTime = v2.getTimestamp() - v1.getTimestamp();
+        double d = Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));        
+        double travelTime = v2.getTimestamp() - v1.getTimestamp() - (v1.getObserving() == 1 ? this.deltaTime : 0);
         double stepSize = d / travelTime;
-        double n = stepSize * t;
-        point[0] = x1 + ((n / d) * (x2 - x1));
-        point[1] = y1 + ((n / d) * (y2 - y1));
+        double n = stepSize * (v1.getObserving() == 1 ? (t - this.deltaTime) : t);
+        point[0] = x1 + (((n < 0 ? 0 : n) / d) * (x2 - x1));
+        point[1] = y1 + (((n < 0 ? 0 : n) / d) * (y2 - y1));
         return point;
     }
 
