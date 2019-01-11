@@ -28,8 +28,6 @@ public class VisibilityGraph {
     private Polygon visibilityGraph;
     private List<Polygon> innerpolygon;
     private TrapezoidalMap mapFunction;
-    
-    
 
     public VisibilityGraph() {
         innerpolygon = new ArrayList<>();
