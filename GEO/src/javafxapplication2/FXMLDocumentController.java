@@ -221,7 +221,7 @@ public class FXMLDocumentController implements Initializable {
 //        tm.computePossiblePaths();
         
         String workingDir = "file:\\\\\\" + System.getProperty("user.dir");        
-        Image guardImage = new Image(workingDir + "\\guard.png", 40, 80, false, false);
+        Image guardImage = new Image(workingDir + "\\guard.png", 30, 70, false, false);
 
         calculateVisibilityGraph();
         List<Vertex> interestingVertices = new ArrayList<>(); // vis.getBestExitGuards();
@@ -300,7 +300,7 @@ public class FXMLDocumentController implements Initializable {
             double loopedTime = t % maxTime;
             PathGuard[] duo = getPathGuardForTime(loopedTime, pg);
             double[] point = getInterpolatedPoint(duo[0], duo[1], loopedTime);
-            gc.drawImage(guardImage, point[0], point[1]);
+            gc.drawImage(guardImage, point[0] - (guardImage.getWidth() / 2), point[1] - (guardImage.getHeight() / 2));
         }
     }
     
