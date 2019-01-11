@@ -211,7 +211,9 @@ public class FXMLDocumentController implements Initializable {
         String workingDir = "file:\\\\\\" + System.getProperty("user.dir");        
         Image guardImage = new Image(workingDir + "\\guard.png", 40, 40, false, false);
 
-        List<Guard> guards = new ArrayList<>();
+        List<Vertex> interestingVertices = new ArrayList<>();
+        List<Vertex> verticesForGuardPath = findPath(interestingVertices);
+        List<Guard> guards = makeGuardList(verticesForGuardPath);
         
         final long startNanoTime = System.nanoTime();
         
