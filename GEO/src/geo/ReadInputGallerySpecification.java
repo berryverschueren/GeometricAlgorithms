@@ -91,7 +91,7 @@ public class ReadInputGallerySpecification {
             distinctX.add(x);
             distinctY.add(y);
             
-            Vertex firstVertex = new Vertex(x, y, artFlag, exitFlag, "label");
+            Vertex firstVertex = new Vertex(x, y, artFlag, exitFlag, "");
             //System.out.println("first vertex: x=" + x + ", y = " + y);
             vertices.add(firstVertex);
             Vertex oldVertex = firstVertex;
@@ -137,8 +137,8 @@ public class ReadInputGallerySpecification {
                 
                 //System.out.println("current vertex: x=" + x + ", y = " + y);
                 //System.out.println("previous vertex: x = " + oldVertex.getX() + " y = " + oldVertex.getY());
-                Vertex vertex = new Vertex(x, y, artFlag, exitFlag, "label");
-                Edge edge = new Edge("label", oldVertex, vertex);
+                Vertex vertex = new Vertex(x, y, artFlag, exitFlag, "");
+                Edge edge = new Edge("", oldVertex, vertex);
                 
                 
                 vertices.add(vertex);
@@ -146,7 +146,7 @@ public class ReadInputGallerySpecification {
                 oldVertex = vertex;
             }
             //last edge
-            Edge closingEdge = new Edge("label", oldVertex, firstVertex);
+            Edge closingEdge = new Edge("", oldVertex, firstVertex);
             edges.add(closingEdge);
             outerPolygon = new Polygon("label", edges, vertices);
             
@@ -162,7 +162,7 @@ public class ReadInputGallerySpecification {
                 y = input.nextDouble();
                 artFlag = input.nextInt();
 
-                firstVertex = new Vertex(x, y, artFlag, "label");
+                firstVertex = new Vertex(x, y, artFlag, "");
                 //System.out.println("first vertex hole: x=" + x + ", y = " + y);
                 verticesInnerPolygon.add(firstVertex);
                 oldVertex = firstVertex;
@@ -173,7 +173,7 @@ public class ReadInputGallerySpecification {
                     artFlag = input.nextInt();
                     //System.out.println("current vertex hole: x=" + x + ", y = " + y);
                     //System.out.println("previous vertex hole: x = " + oldVertex.getX() + " y = " + oldVertex.getY());
-                    Vertex vertex = new Vertex(x, y, artFlag, "label");
+                    Vertex vertex = new Vertex(x, y, artFlag, "");
                     Edge edge = new Edge("label", oldVertex, vertex);
 
                     verticesInnerPolygon.add(vertex);
