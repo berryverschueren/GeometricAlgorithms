@@ -92,6 +92,8 @@ public class FXMLDocumentController implements Initializable {
     public final int count = 0;
     public int observing; 
     public Polygon visibilityGraph;
+    
+    private dummyVis vis;
     //private List<Vertex> artList;
     //private List<Vertex> exitList;
     
@@ -179,7 +181,8 @@ public class FXMLDocumentController implements Initializable {
         List<Polygon> polys = new ArrayList<>();
         polys.add(polygon);
         polys.addAll(innerPolygon);
-        visibilityGraph = new dummyVis().visibiliyGraph(polys);
+        vis = new dummyVis();
+        visibilityGraph = vis.visibiliyGraph(polys);
     }
     
     public List<Vertex> findPath(List<Vertex> vertices){
