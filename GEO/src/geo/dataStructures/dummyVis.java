@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import javafx.util.Pair;
 
 /**
  *
@@ -18,14 +19,19 @@ import java.util.TreeMap;
 public class dummyVis {
 
     private TrapezoidalMap mapFunction;
-    private Map<Integer, List<Vertex>> priorityVertex;
+    //prio 1: #exits sorted on prio
+    //prio 2: #arts
+    private Map<Integer, List<Vertex>> priorityVertexExit;
+    private Map<Integer, List<Vertex>> priorityVertexArt;
     
     public dummyVis() {
         mapFunction = new TrapezoidalMap();
         //prio 1: #exits sorted on prio
         //prio 2: #arts
         //prio 3: #rest
-        priorityVertex = new TreeMap<>();
+        priorityVertexExit = new TreeMap<>();
+        priorityVertexArt = new TreeMap<>();
+;
     }
     
     private boolean mayAdd(Edge newEdge, List<Edge> edges){
@@ -43,20 +49,62 @@ public class dummyVis {
         return noCrossing;
     }
     
+    
     public Polygon visibiliyGraph(List<Polygon> polygons){
-        //mapFunction.GetIntersectionPointOfSegments(edge, P);
+        //boolean mayAdd = false;
+        boolean seesArt = false;
+        boolean seesExit = false;
+        
+        int numberOf = 0;
+        
         Polygon allPoly = new Polygon();
         for(Vertex vertex1 : allVertices(polygons)){
             for(Vertex vertex2 : allVertices(polygons)){
                 Edge newEdge = new Edge("", vertex1,vertex2);
-                if(noSelfEdge(newEdge, polygons)){
+//                if(noSelfEdge(newEdge, polygons)){
                     if(mayAdd(newEdge, allEdges(polygons))){
-//                        if(noSelfEdge(newEdge, polygons)){
-                        allPoly.addEdge(newEdge);
-//                        }
+                        if(noSelfEdge(newEdge, polygons)){
+                            allPoly.addEdge(newEdge);
+                        }
+                        //todo: add list of may add to check if in or out of polygon 
+                        //mayAdd = true;
+                        //can see (see trough walls!!!)
+                        if(vertex2.getArtFlag()==1 && !seesExit){
+                            seesArt = true;
+                            numberOf++;
+                        }
+                       
+                        if(vertex2.getExitFlag()==1){
+                            if(!seesExit){
+                                seesExit = true;
+                                seesArt = false;
+                                numberOf = 0;
+                            }
+                            numberOf++;
+                        }
                     }
+            }
+            if(seesArt){
+                if(priorityVertexArt.containsKey(numberOf)){
+                    List<Vertex> vertices = priorityVertexArt.get(numberOf);
+                    vertices.add(vertex1);
+                    priorityVertexArt.put(numberOf, vertices);
+                }else{
+                    List<Vertex> vertices = new ArrayList<>();
+                    vertices.add(vertex1);
+                    priorityVertexArt.put(numberOf, vertices);
                 }
-                //allPolygon
+            }
+            if(seesExit){
+                if(priorityVertexExit.containsKey(numberOf)){
+                    List<Vertex> vertices = priorityVertexExit.get(numberOf);
+                    vertices.add(vertex1);
+                    priorityVertexExit.put(numberOf, vertices);
+                }else{
+                    List<Vertex> vertices = new ArrayList<>();
+                    vertices.add(vertex1);
+                    priorityVertexExit.put(numberOf, vertices);
+                }
             }
         }
         
@@ -65,7 +113,7 @@ public class dummyVis {
             allPoly.addEdges(polygon.getEdges());
         }
 
-        
+        System.out.println("number of edge from visibility graph = "+allPoly.getEdges().size());
         return allPoly;
     }
     private List<Vertex> allVertices(List<Polygon> innerpolygon) {

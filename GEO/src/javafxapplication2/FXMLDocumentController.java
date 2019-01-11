@@ -143,20 +143,32 @@ public class FXMLDocumentController implements Initializable {
         //System.out.println(ps.get(0).getVertices().get(0).getLabel());
         
         ps.add(polygon);
-        ps.addAll(innerPolygon);
+        //ps.addAll(innerPolygon);
         visibilityGraph = new dummyVis().visibiliyGraph(ps);
         g.setStroke(Color.AQUA);
         
 
 //        List<Edge> path = new Graph().dijkstraStart(vis.getEdges(), vis.getVertices().get(0), vis.getVertices().get(vis.getVertices().size()-1), vis.getVertices());
 //        
-//        for(Edge edge : path){
-//            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
-//        }
+        for(Edge edge : visibilityGraph.getEdges()){
+            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+        }
+        List<Vertex> a = new ArrayList<>();
+        a.add(visibilityGraph.getVertices().get(0));
+        visibilityGraph.getVertices().get(0).setArtFlag(1);
+        a.add(visibilityGraph.getVertices().get(visibilityGraph.getVertices().size()-1));
+        visibilityGraph.getVertices().get(visibilityGraph.getVertices().size()-1).setExitFlag(1);
+        List<Vertex> v = findPath(a);
+        
+        g.setStroke(Color.RED);
+        for (int i = 0; i < v.size()-1; i++) {
+            g.strokeLine(v.get(i).getX(), v.get(i).getY(), v.get(i+1).getX(), v.get(i+1).getY());
+        }
+        setUpDraw(false);
     }
     
-    public List<Edge> findPath(List<Vertex> vertices){
-        List<Edge> path = new ArrayList<>();
+    public List<Vertex> findPath(List<Vertex> vertices){
+        List<Vertex> path = new ArrayList<>();
         if(!vertices.isEmpty()){
             if(vertices.size()>2){
                 for (int i = 0; i < vertices.size()-1; i++) {
