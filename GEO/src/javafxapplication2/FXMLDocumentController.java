@@ -222,7 +222,8 @@ public class FXMLDocumentController implements Initializable {
         String workingDir = "file:\\\\\\" + System.getProperty("user.dir");        
         Image guardImage = new Image(workingDir + "\\guard.png", 40, 40, false, false);
 
-        List<Vertex> interestingVertices = new ArrayList<>();
+        calculateVisibilityGraph();
+        List<Vertex> interestingVertices = null;
         List<Vertex> verticesForGuardPath = findPath(interestingVertices);
         List<Guard> guards = makeGuardList(verticesForGuardPath);
         
