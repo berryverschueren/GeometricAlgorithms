@@ -381,6 +381,17 @@ public class FXMLDocumentController implements Initializable {
 
     }
     
+    @FXML
+    private void finalEdgeButton(ActionEvent event){
+        List<Vertex> vertices = polygon.getVertices();
+        Edge edge = new Edge(vertices.get(0),vertices.get(vertices.size()-1));
+        polygon.addEdge(edge);
+        for(Polygon poly : innerPolygon){
+            List<Vertex> verticesI = poly.getVertices();
+            Edge edgeI = new Edge(verticesI.get(0),verticesI.get(verticesI.size()-1));
+            poly.addEdge(edgeI);
+        }
+    }
     
     private void finalEdge(){
         List<Vertex> vertices = polygon.getVertices();

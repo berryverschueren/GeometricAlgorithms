@@ -321,7 +321,7 @@ public class Graph {
                     w = w.prev;
                 }
                 List<Edge> edgePath = new ArrayList<>();
-                for (int i = 0; i < vertexPath.size()-2; i++) {
+                for (int i = 0; i <= vertexPath.size()-2; i++) {
                     edgePath.add(new Edge("",vertexPath.get(i), vertexPath.get(i+1)));
                 }
                 return edgePath;
