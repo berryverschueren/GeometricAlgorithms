@@ -220,7 +220,7 @@ public class FXMLDocumentController implements Initializable {
 //        tm.computePossiblePaths();
         
         String workingDir = "file:\\\\\\" + System.getProperty("user.dir");        
-        Image guardImage = new Image(workingDir + "\\guard.png", 40, 40, false, false);
+        Image guardImage = new Image(workingDir + "\\guard.png", 40, 80, false, false);
 
         calculateVisibilityGraph();
         List<Vertex> interestingVertices = new ArrayList<>(); // vis.getBestExitGuards();
@@ -309,7 +309,6 @@ public class FXMLDocumentController implements Initializable {
             int next = (i + 1) % pathGuards.size();
             if (loopedTime >= pathGuards.get(i).getTimestamp()
                     && loopedTime <= pathGuards.get(next).getTimestamp()) {
-                System.out.println(loopedTime + " -- duo: " + i + ", " + next);
                 pathGuardDuo[0] = pathGuards.get(i);
                 pathGuardDuo[1] = pathGuards.get(next);
                 break;
@@ -323,22 +322,22 @@ public class FXMLDocumentController implements Initializable {
         double x1 = v1.getX(), y1 = v1.getY();
         double x2 = v2.getX(), y2 = v2.getY();
         double d = Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));  
-        System.out.println("d : " + d);
         double travelTime = v2.getTimestamp() - v1.getTimestamp() - (v1.getObserving() == 1 ? this.deltaTime : 0);
-        System.out.println("tt : " + travelTime);
         double stepSize = d / travelTime;
-        System.out.println("ss : " + stepSize);
         double n = stepSize * (v1.getObserving() == 1 ? (t - v1.getTimestamp() - this.deltaTime) : t - v1.getTimestamp());
-        System.out.println("n : " + n);
-        if (x1 < x2) {
+        if (x1 < x2 && y1 < y2) {
             point[0] = x1 + ((Math.max(0, n) / d) * (Math.abs(x2 - x1)));
+            point[1] = y1 + ((Math.max(0, n) / d) * (Math.abs(y2 - y1)));
+        } else if (x1 < x2 && y1 > y2) {
+            point[0] = x1 + ((Math.max(0, n) / d) * (Math.abs(x2 - x1)));
+            point[1] = y1 - ((Math.max(0, n) / d) * (Math.abs(y2 - y1)));
+        } else if (x1 > x2 && y1 < y2) {
+            point[0] = x1 - ((Math.max(0, n) / d) * (Math.abs(x2 - x1)));
             point[1] = y1 + ((Math.max(0, n) / d) * (Math.abs(y2 - y1)));
         } else {
             point[0] = x1 - ((Math.max(0, n) / d) * (Math.abs(x2 - x1)));
             point[1] = y1 - ((Math.max(0, n) / d) * (Math.abs(y2 - y1)));
         }
-        System.out.println("x: " + point[0]);
-        System.out.println("y: " + point[1]);
         return point;
     }
 
