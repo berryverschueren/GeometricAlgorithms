@@ -152,29 +152,24 @@ public class FXMLDocumentController implements Initializable {
         
         ps.add(polygon);
         //ps.addAll(innerPolygon);
-        visibilityGraph = new dummyVis().visibiliyGraph(ps);
+        vis =new dummyVis();
+        visibilityGraph = vis.visibiliyGraph(ps);
         g.setStroke(Color.AQUA);
         
 
 //        List<Edge> path = new Graph().dijkstraStart(vis.getEdges(), vis.getVertices().get(0), vis.getVertices().get(vis.getVertices().size()-1), vis.getVertices());
         
-        for(Edge edge : visibilityGraph.getEdges()){
-            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
-        }
-        List<Vertex> a = new ArrayList<>();
-        a.add(visibilityGraph.getVertices().get(0));
-        visibilityGraph.getVertices().get(0).setArtFlag(1);
-        a.add(visibilityGraph.getVertices().get(visibilityGraph.getVertices().size()-1));
-        visibilityGraph.getVertices().get(visibilityGraph.getVertices().size()-1).setArtFlag(1);
-        a.add(visibilityGraph.getVertices().get(4));
-        visibilityGraph.getVertices().get(4).setArtFlag(1);
+//        for(Edge edge : visibilityGraph.getEdges()){
+//            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+//        }
         
-        List<Vertex> v = findPath(a);
+        List<Vertex> ve = vis.getBestExitGuards();
+        List<Vertex> v = findPath(ve);
         setUpDraw(false);
         g.setStroke(Color.RED);
-//        for (int i = 0; i < v.size()-1; i++) {
-//            g.strokeLine(v.get(i).getX(), v.get(i).getY(), v.get(i+1).getX(), v.get(i+1).getY());
-//        }
+        for (int i = 0; i < v.size()-1; i++) {
+            g.strokeLine(v.get(i).getX(), v.get(i).getY(), v.get(i+1).getX(), v.get(i+1).getY());
+        }
         
     }
     
@@ -525,6 +520,15 @@ public class FXMLDocumentController implements Initializable {
             vertexPrevious = vertexTemp; 
             tPrevious = tCurrent;
         }
+        observing = observingGuard(firstVertex);
+        if (step.getObserving() == 1){
+                tCurrent = (distance(firstVertex, vertexPrevious)/vMaxG ) + tPrevious + deltaTime;
+            } else {
+                tCurrent = distance(firstVertex, vertexPrevious)/vMaxG + tPrevious ;
+            }
+        step = new PathGuard(initX, initY, tCurrent, observing);
+        
+        path.add(step);
         Guard guard = new Guard(initX, initY, path);
         
         return guard;

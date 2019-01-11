@@ -13,6 +13,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class ReadInputGallerySpecification {
@@ -50,7 +51,7 @@ public class ReadInputGallerySpecification {
             FileReader reader = new FileReader(filename);
 
             Scanner input = new Scanner(reader);
-            
+            input.useLocale(Locale.US);
             input.useDelimiter(",\\s*");
             
             /** line 1 */
