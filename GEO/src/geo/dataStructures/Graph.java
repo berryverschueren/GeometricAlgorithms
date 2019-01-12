@@ -312,8 +312,8 @@ public class Graph {
                 }
                 
 
-		System.out.println("Start:"+ start.getLabel());
-		System.out.println("end:"+ end.getLabel());
+		//System.out.println("Start:"+ start.getLabel());
+		//System.out.println("end:"+ end.getLabel());
 
 		//BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		VertexDijkstra w = processRequest(start.getLabel(),end.getLabel(), g);
