@@ -34,7 +34,7 @@ public class WriteInputGallerySpecification {
     public static void WriteInputGallerySpecification(GalleryProblem galleryProblem) {
         
         try {
-            String fileName = "temp.txt";
+            String fileName = "tempGallery.txt";
             FileWriter fileWriter = new FileWriter(fileName);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
             

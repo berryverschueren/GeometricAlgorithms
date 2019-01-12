@@ -17,7 +17,7 @@ public class WriteInputRobberSpecification {
     public static void WriteInputRobberSpecification(Robber robber) {
         
         try {
-            String fileName = "temp.txt";
+            String fileName = "tempRobber.txt";
             FileWriter fileWriter = new FileWriter(fileName);
 
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
