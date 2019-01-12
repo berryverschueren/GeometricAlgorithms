@@ -449,9 +449,12 @@ public class FXMLDocumentController implements Initializable {
             }
         }
         double loopedTime = t % maxTime;
+        double[] point;
         PathRobber[] prduo = getPathRobberForTime(loopedTime, pr);
-        double[] point = getInterpolatedPoint(prduo[0], prduo[1], loopedTime);
-        gc.drawImage(robberImage, point[0] - (robberImage.getWidth() / 2), point[1] - (robberImage.getHeight() / 2));
+        if (prduo[0] != null && prduo[1] != null) {
+            point = getInterpolatedPoint(prduo[0], prduo[1], loopedTime);
+            gc.drawImage(robberImage, point[0] - (robberImage.getWidth() / 2), point[1] - (robberImage.getHeight() / 2));
+        }
         
         for (int i = 0; i < guards.size(); i++) {
             List<PathGuard> pg = guards.get(i).getPath();
@@ -644,7 +647,38 @@ public class FXMLDocumentController implements Initializable {
     }
     
     private Robber ComputeRobber(SortedMap<TimePoint, List<PathRobber>> robberPaths) {
+        // storage for robber
         Robber robber = new Robber();
+        // storage for previous timepoint
+//        TimePoint ptp = null;
+//        boolean isFirst = true;
+        // loop paths
+        for (Map.Entry pair : robberPaths.entrySet()) {
+            // take key and value from entry pair
+            TimePoint key = (TimePoint) pair.getKey();
+            List<PathRobber> path = (List<PathRobber>) pair.getValue();
+//            // first vertex must start at 0
+//            if (isFirst) {
+//                if (key.getStart() == 0.0) {
+//                    
+//                } else {
+//                    PathRobber pr = new PathRobber();
+//                    pr.setX(0.0);
+//                    pr.setY(0.0);
+//                    pr.setTimestamp(0.0);
+//                }
+//            } else {
+//                                
+//            }
+            
+            // add additional time to the path vertices to shift it to the correct timepoint
+            // this will chain paths to eachother and create a valid total path
+            for (int i = 0; i < path.size(); i++) {
+                PathRobber pr = path.get(i);
+                pr.setTimestamp(pr.getTimestamp() + key.getStart());
+            }
+            robber.getPath().addAll(path);         
+        }
         return robber;
     }
     
