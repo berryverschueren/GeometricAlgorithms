@@ -9,6 +9,7 @@ import geo.WriteInputGallerySpecification;
 import geo.ReadInputGallerySpecification;
 import geo.ReadInputGuardSpecification;
 import geo.WriteInputGuardSpecification;
+import geo.WriteInputRobberSpecification;
 import geo.dataStructures.Edge;
 import geo.dataStructures.Polygon;
 import geo.dataStructures.TrapezoidalMap;
@@ -904,6 +905,9 @@ public class FXMLDocumentController implements Initializable {
         WriteInputGuardSpecification.WriteInputGuardSpecification(guards);
     }
     
+    private void writeRobberFile(Robber robber) {
+        WriteInputRobberSpecification.WriteInputRobberSpecification(robber);
+    }
     private void readGuardFile() {
         String workingDir = System.getProperty("user.dir");
 //            String dataDir = workingDir.substring(0, workingDir.length() - 13) + "set1_data\\set1_data\\";
