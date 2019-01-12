@@ -51,7 +51,7 @@ public class VisibilityGraph {
     
     private List<Vertex> nextVertices = new ArrayList<>();
     
-    private List<Vertex> visibleVertices(Vertex vertex, List<Polygon> innerpolygon) {
+    public List<Vertex> visibleVertices(Vertex vertex, List<Polygon> innerpolygon) {
         System.out.println("Testing Vertex: " + vertex.getLabel());
         List<Vertex> visibleVertex = new ArrayList<>();
         

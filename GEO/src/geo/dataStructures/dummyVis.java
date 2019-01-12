@@ -29,7 +29,7 @@ public class dummyVis {
     private List<Vertex> artList;
     private List<Vertex> exitList;
     
-    
+    private TrapezoidalMap math;
     public List<Vertex> getBestExitGuards(){
         List<Vertex> bestVertices = new ArrayList<>();
 
@@ -60,10 +60,10 @@ public class dummyVis {
         exitList = new ArrayList<>();
         //prio 1: #exits sorted on prio
         //prio 2: #arts
-        //prio 3: #rest
+        //prio 3: #rest  doesPolygonContainVertex
         priorityVertexExit = new TreeMap<>();
         priorityVertexArt = new TreeMap<>();
-;
+        math = new TrapezoidalMap();
     }
     
     private boolean mayAdd(Edge newEdge, List<Edge> edges){
@@ -81,12 +81,25 @@ public class dummyVis {
         return noCrossing;
     }
     
+    private Polygon getPolygon(Vertex vertex, List<Polygon> pList){
+        Polygon poly = new Polygon();
+        outerloop:
+        for(Polygon p : pList){
+            poly =p;
+            for(Vertex v : p.getVertices()){
+                if(v==vertex){
+                    break outerloop;
+                }
+            }     
+        }
+        return poly;
+    }
     
     public Polygon visibiliyGraph(List<Polygon> polygons){
         //boolean mayAdd = false;
         boolean seesArt = false;
         boolean seesExit = false;
-
+        Polygon outerPolygon = polygons.get(0);
         
         Polygon allPoly = new Polygon();
         for(Vertex vertex1 : allVertices(polygons)){
@@ -98,13 +111,44 @@ public class dummyVis {
                 Edge newEdge = new Edge("", vertex1,vertex2);
 //                if(noSelfEdge(newEdge, polygons)){
                     if(mayAdd(newEdge, allEdges(polygons))){
+                        boolean isNoSelf = true;
+                        
                         if(noSelfEdge(newEdge, polygons)){
                             allPoly.addEdge(newEdge);
-                            
+                            //vertexInfo.addSeesMe(vertex2);
                             if(vertex1.getExitFlag()==1){
                                 vertexInfo.setIsExit(true);
-                                vertexInfo.addSeesMe(vertex2);
+                                //vertexInfo.addSeesMe(vertex2);
+                            }else{
+                                
                             }
+                        }else{
+                            //mayAdd+is to Same polygon
+                            isNoSelf = false;
+                            boolean outer = false;
+                            Polygon p = outerPolygon;
+                            for(Vertex vertex : outerPolygon.getVertices()){
+                                if(vertex==vertex2){
+                                    outer = true;
+                                }
+                            }
+                            Vertex halfway = math.halfwayPoint(newEdge);
+                            if(outer){
+                                if(math.doesPolygonContainVertex(p, halfway)){
+//                                    allPoly.addEdge(newEdge);
+                                    vertexInfo.addSeesMe(vertex2);
+                                }                                
+                            }else{
+                                p = getPolygon(vertex2, polygons);
+                                if(!math.doesPolygonContainVertex(p, halfway)){
+//                                    allPoly.addEdge(newEdge);
+                                    vertexInfo.addSeesMe(vertex2);
+                                }
+                            }
+                        }
+                            
+                        if(isNoSelf){
+                            vertexInfo.addSeesMe(vertex2);
                         }
                         //todo: add list of may add to check if in or out of polygon 
                         //mayAdd = true;
@@ -125,7 +169,7 @@ public class dummyVis {
                             numberOf++;
                         }
                         
-                        
+                        //vertexInfo.addSeesMe(vertex2);
                     }
             }
             info.add(vertexInfo);

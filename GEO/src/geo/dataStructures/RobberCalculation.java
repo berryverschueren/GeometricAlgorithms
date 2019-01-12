@@ -6,22 +6,21 @@
 package geo.dataStructures;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author Kaj75
  */
 public class RobberCalculation {
-    private double timeForPath;
-    private List<Vertex> robberPath;
-    
-    private List<Vertex> artList;
-    private List<Vertex> exitList;
+    private Map<Double, Vertex> eventQueue;
+    private Map<Double, Vertex> status;
     public RobberCalculation(){
         
     }
     
-    public List<Vertex> calculatePath(double allotted){
-        return null;
-    }
+//    public List<Vertex> calculatePath(List<Edge> visibilityEdges, List<Edge> ){
+//        visibilityEdges.removeAll(visibilityEdges)
+//        return null;
+//    }
 }
