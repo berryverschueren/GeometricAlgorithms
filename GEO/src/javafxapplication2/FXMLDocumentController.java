@@ -1095,6 +1095,13 @@ public class FXMLDocumentController implements Initializable {
     private void handleButtonSave(ActionEvent event) {
         calculateVisibilityGraph();
         
+        for (int i = 0; i < vis.getVertexInfo().size(); i++) {
+            VertexInfo vi = vis.getVertexInfo().get(i);
+            if(vi.getSeeMe().isEmpty()){
+                int a= 4;
+            }
+        }
+        
         List<Polygon> allPolygons = innerPolygon;
         allPolygons.add(polygon);
         

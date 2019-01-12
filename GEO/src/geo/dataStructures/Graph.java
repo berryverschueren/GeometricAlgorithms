@@ -129,9 +129,9 @@ public class Graph {
 		else if (w.dist == INFINITY)
 			System.out.println(destName + " is unreachable");
 		else {
-			System.out.print("(Cost is: " + w.dist + ") ");
+			//System.out.print("(Cost is: " + w.dist + ") ");
 			printPath(w);
-			System.out.println();
+			//System.out.println();
 		}
                 return w;
 	}
@@ -156,9 +156,9 @@ public class Graph {
 	private void printPath(VertexDijkstra dest) {
 		if (dest.prev != null) {
 			printPath(dest.prev);
-			System.out.print(" to ");
+			//System.out.print(" to ");
 		}
-		System.out.print(dest.name);
+		//System.out.print(dest.name);
 	}
 
 	/**
