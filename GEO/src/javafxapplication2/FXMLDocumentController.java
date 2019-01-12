@@ -19,6 +19,7 @@ import geo.dataStructures.GalleryProblem;
 import geo.dataStructures.Graph;
 import geo.dataStructures.Guard;
 import geo.dataStructures.PathGuard;
+import geo.dataStructures.PathRobber;
 import geo.dataStructures.Trapezoid;
 import geo.dataStructures.VertexInfo;
 import geo.dataStructures.dummyVis;
@@ -27,7 +28,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import javafx.animation.AnimationTimer;
 import javafx.beans.binding.Bindings;
@@ -663,6 +667,42 @@ public class FXMLDocumentController implements Initializable {
         }
         
         
+    }
+    
+    private Map<Double, List<PathRobber>> possiblePathsRobber(Map<Double, List<Vertex>> verticesPossPaths ) {
+        Map<Double, List<PathRobber>> possPaths = new HashMap<>();
+        
+        for(Entry<Double, List<Vertex>> entry : verticesPossPaths.entrySet()) {
+            double distanceLocal = entry.getKey();
+            double timePath = distanceLocal / vMaxG;
+            List<Vertex> verticesLocal = entry.getValue();
+            
+            List<PathRobber> pathRobber = new ArrayList();
+            PathRobber pathRobberStep = new PathRobber();
+            
+            // first vertex
+            Vertex firstVertex = verticesLocal.get(0);
+            double initX = firstVertex.getX();
+            double initY = firstVertex.getY();
+            double prevT = 0;
+            pathRobberStep = new PathRobber(initX, initY, prevT);
+            pathRobber.add(pathRobberStep);
+            Vertex previousVertex = firstVertex;
+            
+            // rest vertices
+            for (int i = 1; i < verticesLocal.size(); i++) {
+                Vertex tempVertex = verticesLocal.get(i);
+                double x = tempVertex.getX();
+                double y = tempVertex.getY();
+                double t = prevT + (distance(tempVertex, previousVertex) / vMaxG); 
+                pathRobberStep = new PathRobber(x, y, t);
+                pathRobber.add(pathRobberStep);
+                previousVertex = tempVertex;
+                prevT = t;
+            }
+            possPaths.put(timePath, pathRobber);
+        }
+        return possPaths;
     }
     
     @FXML
