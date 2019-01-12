@@ -358,25 +358,29 @@ public class FXMLDocumentController implements Initializable {
         
         String workingDir = "file:\\\\\\" + System.getProperty("user.dir");        
         Image guardImage = new Image(workingDir + "\\guard.png", 30, 70, false, false);
+        Image robberImage = new Image(workingDir + "\\robber.png", 30, 70, false, false);
 
         calculateVisibilityGraph();
-        List<Vertex> interestingVertices = new ArrayList<>(); // vis.getBestExitGuards();
 
         List<Vertex> verts = this.polygon.getVertices();
         int exitCounter = 0;
         for (int i = 0; i < verts.size(); i++) {
             if (verts.get(i).getExitFlag() == 1) {
-                interestingVertices.add(verts.get(i));
                 exitCounter++;
             }
         }
         
-        List<Vertex> verticesForGuardPath = getSmartSmartPath(numOfGuards, exitCounter); //findPath(interestingVertices);
+        List<Vertex> verticesForGuardPath = getSmartSmartPath(numOfGuards, exitCounter);
+        
         List<Guard> guards = makeGuardList(verticesForGuardPath);
         
         List<TimePoint> timePoints = ComputeTimePoints(guards);
+        
         Map<Double, List<PathRobber>> pathRobbers = null;
-        //SortedMap<TimePoint, List<PathRobber>> robberPaths = ComputePossiblePathRobbers(pathRobbers, timePoints)
+        
+        SortedMap<TimePoint, List<PathRobber>> robberPaths = ComputePossiblePathRobbers(pathRobbers, timePoints);
+        
+        Robber robber = ComputeRobber(robberPaths);
         
         final long startNanoTime = System.nanoTime();
                 
@@ -386,7 +390,7 @@ public class FXMLDocumentController implements Initializable {
             public void handle(long currentNanoTime)
             {
                 double t = (currentNanoTime - startNanoTime) / 1000000000.0; 
-                drawPath(gc, canvas, guards, t, guardImage);
+                drawPath(gc, canvas, guards, robber, t, guardImage, robberImage);
                 if (t >= globalT) {
                     this.stop();
                 }
@@ -416,7 +420,8 @@ public class FXMLDocumentController implements Initializable {
         }
     }
     
-    private void drawPath(GraphicsContext gc, Canvas canvas, List<Guard> guards, double t, Image guardImage) {
+    private void drawPath(GraphicsContext gc, Canvas canvas, List<Guard> guards, Robber robber, 
+            double t, Image guardImage, Image robberImage) {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         finalizeDraw(gc);
         setUpDraw(gc, false);
@@ -431,20 +436,40 @@ public class FXMLDocumentController implements Initializable {
             }
         }
         
+        List<PathRobber> pr = robber.getPath();
+        for (int i = 0; i < pr.size(); i++) {
+            int next = (i + 1) % pr.size();
+            gc.strokeLine(pr.get(i).getX(), pr.get(i).getY(), pr.get(next).getX(), pr.get(next).getY());
+        }
+        
+        double maxTime = 0.0;
+        for (int i = 0; i < pr.size(); i++) {
+            if (pr.get(i).getTimestamp() > maxTime) {
+                maxTime = pr.get(i).getTimestamp();
+            }
+        }
+        double loopedTime = t % maxTime;
+        double[] point;
+        PathRobber[] prduo = getPathRobberForTime(loopedTime, pr);
+        if (prduo[0] != null && prduo[1] != null) {
+            point = getInterpolatedPoint(prduo[0], prduo[1], loopedTime);
+            gc.drawImage(robberImage, point[0] - (robberImage.getWidth() / 2), point[1] - (robberImage.getHeight() / 2));
+        }
+        
         for (int i = 0; i < guards.size(); i++) {
             List<PathGuard> pg = guards.get(i).getPath();
             if (pg.size() == 2) {
                 gc.drawImage(guardImage, pg.get(0).getX() - (guardImage.getWidth() / 2), pg.get(0).getY() - (guardImage.getHeight() / 2));
             } else {
-                double maxTime = 0.0;
+                maxTime = 0.0;
                 for (int j = 0; j < pg.size(); j++) {
                     if (pg.get(j).getTimestamp() > maxTime) {
                         maxTime = pg.get(j).getTimestamp();
                     }
                 }
-                double loopedTime = t % maxTime;
+                loopedTime = t % maxTime;
                 PathGuard[] duo = getPathGuardForTime(loopedTime, pg);
-                double[] point = getInterpolatedPoint(duo[0], duo[1], loopedTime);
+                point = getInterpolatedPoint(duo[0], duo[1], loopedTime);
                 gc.drawImage(guardImage, point[0] - (guardImage.getWidth() / 2), point[1] - (guardImage.getHeight() / 2));
             }
         }
@@ -464,18 +489,52 @@ public class FXMLDocumentController implements Initializable {
         return pathGuardDuo;
     }
     
+    private PathRobber[] getPathRobberForTime(double loopedTime, List<PathRobber> pathRobbers) {
+        PathRobber[] pathRobberDuo = new PathRobber[2];
+        for (int i = 0; i < pathRobbers.size(); i++) {
+            int next = (i + 1) % pathRobbers.size();
+            if (loopedTime >= pathRobbers.get(i).getTimestamp()
+                    && loopedTime <= pathRobbers.get(next).getTimestamp()) {
+                pathRobberDuo[0] = pathRobbers.get(i);
+                pathRobberDuo[1] = pathRobbers.get(next);
+                break;
+            }
+        }        
+        return pathRobberDuo;
+    }
+    
     private double[] getInterpolatedPoint(PathGuard v1, PathGuard v2, double t) {
         double[] point = new double[2];
-        if (v1 == null || v1.getX() == 0.0|| v1.getY() == 0.0
-                || v2 == null || v2.getX() == 0.0 || v2.getY() == 0.0) {
-            System.out.println("HELP");
-        }
         double x1 = v1.getX(), y1 = v1.getY();
         double x2 = v2.getX(), y2 = v2.getY();
         double d = Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));  
         double travelTime = v2.getTimestamp() - v1.getTimestamp() - (v1.getObserving() == 1 ? this.deltaTime : 0);
         double stepSize = d / travelTime;
         double n = stepSize * (v1.getObserving() == 1 ? (t - v1.getTimestamp() - this.deltaTime) : t - v1.getTimestamp());
+        if (x1 < x2 && y1 < y2) {
+            point[0] = x1 + ((Math.max(0, n) / d) * (Math.abs(x2 - x1)));
+            point[1] = y1 + ((Math.max(0, n) / d) * (Math.abs(y2 - y1)));
+        } else if (x1 < x2 && y1 > y2) {
+            point[0] = x1 + ((Math.max(0, n) / d) * (Math.abs(x2 - x1)));
+            point[1] = y1 - ((Math.max(0, n) / d) * (Math.abs(y2 - y1)));
+        } else if (x1 > x2 && y1 < y2) {
+            point[0] = x1 - ((Math.max(0, n) / d) * (Math.abs(x2 - x1)));
+            point[1] = y1 + ((Math.max(0, n) / d) * (Math.abs(y2 - y1)));
+        } else {
+            point[0] = x1 - ((Math.max(0, n) / d) * (Math.abs(x2 - x1)));
+            point[1] = y1 - ((Math.max(0, n) / d) * (Math.abs(y2 - y1)));
+        }
+        return point;
+    }
+    
+    private double[] getInterpolatedPoint(PathRobber v1, PathRobber v2, double t) {
+        double[] point = new double[2];
+        double x1 = v1.getX(), y1 = v1.getY();
+        double x2 = v2.getX(), y2 = v2.getY();
+        double d = Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));  
+        double travelTime = v2.getTimestamp() - v1.getTimestamp();
+        double stepSize = d / travelTime;
+        double n = stepSize * (t - v1.getTimestamp());
         if (x1 < x2 && y1 < y2) {
             point[0] = x1 + ((Math.max(0, n) / d) * (Math.abs(x2 - x1)));
             point[1] = y1 + ((Math.max(0, n) / d) * (Math.abs(y2 - y1)));
@@ -549,7 +608,7 @@ public class FXMLDocumentController implements Initializable {
 
     private SortedMap<TimePoint, List<PathRobber>> ComputePossiblePathRobbers(Map<Double, List<PathRobber>> pathRobbers, List<TimePoint> timePoints) {
         // storage for possible paths
-        SortedMap<TimePoint, List<PathRobber>> prs = new TreeMap<>();
+        SortedMap<TimePoint, List<PathRobber>> prs = new TreeMap<>(new TimePointComparator());
         // storage for taken keys
         List<Double> keysTaken = new ArrayList<>();       
         // if not enough info, abort mission
@@ -585,6 +644,42 @@ public class FXMLDocumentController implements Initializable {
             }
             return prs;
         }
+    }
+    
+    private Robber ComputeRobber(SortedMap<TimePoint, List<PathRobber>> robberPaths) {
+        // storage for robber
+        Robber robber = new Robber();
+        // storage for previous timepoint
+//        TimePoint ptp = null;
+//        boolean isFirst = true;
+        // loop paths
+        for (Map.Entry pair : robberPaths.entrySet()) {
+            // take key and value from entry pair
+            TimePoint key = (TimePoint) pair.getKey();
+            List<PathRobber> path = (List<PathRobber>) pair.getValue();
+//            // first vertex must start at 0
+//            if (isFirst) {
+//                if (key.getStart() == 0.0) {
+//                    
+//                } else {
+//                    PathRobber pr = new PathRobber();
+//                    pr.setX(0.0);
+//                    pr.setY(0.0);
+//                    pr.setTimestamp(0.0);
+//                }
+//            } else {
+//                                
+//            }
+            
+            // add additional time to the path vertices to shift it to the correct timepoint
+            // this will chain paths to eachother and create a valid total path
+            for (int i = 0; i < path.size(); i++) {
+                PathRobber pr = path.get(i);
+                pr.setTimestamp(pr.getTimestamp() + key.getStart());
+            }
+            robber.getPath().addAll(path);         
+        }
+        return robber;
     }
     
     private void drawShapes(Canvas canvas, TrapezoidalMap tm) {
