@@ -19,6 +19,10 @@ import geo.dataStructures.GalleryProblem;
 import geo.dataStructures.Graph;
 import geo.dataStructures.Guard;
 import geo.dataStructures.PathGuard;
+import geo.dataStructures.PathRobber;
+import geo.dataStructures.Robber;
+import geo.dataStructures.TimePoint;
+import geo.dataStructures.TimePointComparator;
 import geo.dataStructures.Trapezoid;
 import geo.dataStructures.VertexInfo;
 import geo.dataStructures.dummyVis;
@@ -27,8 +31,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import javafx.animation.AnimationTimer;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -327,6 +336,10 @@ public class FXMLDocumentController implements Initializable {
         List<Vertex> verticesForGuardPath = getSmartSmartPath(numOfGuards, exitCounter); //findPath(interestingVertices);
         List<Guard> guards = makeGuardList(verticesForGuardPath);
         
+        List<TimePoint> timePoints = ComputeTimePoints(guards);
+        Map<Double, List<PathRobber>> pathRobbers = null;
+        SortedMap<TimePoint, List<PathRobber>> robberPaths = ComputePossiblePathRobbers(pathRobbers, timePoints)
+        
         final long startNanoTime = System.nanoTime();
                 
         new AnimationTimer()
@@ -382,16 +395,20 @@ public class FXMLDocumentController implements Initializable {
         
         for (int i = 0; i < guards.size(); i++) {
             List<PathGuard> pg = guards.get(i).getPath();
-            double maxTime = 0.0;
-            for (int j = 0; j < pg.size(); j++) {
-                if (pg.get(j).getTimestamp() > maxTime) {
-                    maxTime = pg.get(j).getTimestamp();
+            if (pg.size() == 2) {
+                gc.drawImage(guardImage, pg.get(0).getX() - (guardImage.getWidth() / 2), pg.get(0).getY() - (guardImage.getHeight() / 2));
+            } else {
+                double maxTime = 0.0;
+                for (int j = 0; j < pg.size(); j++) {
+                    if (pg.get(j).getTimestamp() > maxTime) {
+                        maxTime = pg.get(j).getTimestamp();
+                    }
                 }
+                double loopedTime = t % maxTime;
+                PathGuard[] duo = getPathGuardForTime(loopedTime, pg);
+                double[] point = getInterpolatedPoint(duo[0], duo[1], loopedTime);
+                gc.drawImage(guardImage, point[0] - (guardImage.getWidth() / 2), point[1] - (guardImage.getHeight() / 2));
             }
-            double loopedTime = t % maxTime;
-            PathGuard[] duo = getPathGuardForTime(loopedTime, pg);
-            double[] point = getInterpolatedPoint(duo[0], duo[1], loopedTime);
-            gc.drawImage(guardImage, point[0] - (guardImage.getWidth() / 2), point[1] - (guardImage.getHeight() / 2));
         }
     }
     
@@ -436,7 +453,102 @@ public class FXMLDocumentController implements Initializable {
         }
         return point;
     }
+    
+    private List<TimePoint> ComputeTimePoints(List<Guard> guards) {
+        // storage for start, end, diff for guard schedules
+        List<TimePoint> timePoints = new ArrayList<>();
+        // loop guards
+        for (int i = 0; i < guards.size(); i++) {
+            // current guard
+            Guard g = guards.get(i);
+            // storage for previous path guard
+            PathGuard ppg = null;
+            // loop current guards path
+            for (int j = 0; j < g.getPath().size(); j++) {
+                // current guards path point
+                PathGuard pg = g.getPath().get(j);
+                // if this is a stopping point
+                // connect to the previous stopping point
+                // store in timepoint the start and end timestamps
+                if (ppg == null && pg.getObserving() == 1) {
+                    ppg = pg;
+                } else if (ppg != null && pg.getObserving() == 1) {
+                    timePoints.add(new TimePoint(ppg.getTimestamp(), pg.getTimestamp()));
+                    ppg = pg;
+                }
+            }
+        }
+        // tp now contains all stopping point time differences, now we have to combine overlapping ones
+        // first we order all timepoints based on their starting timestamp
+        timePoints.sort(new TimePointComparator());
+        // storage for non overlappen timepoints
+        List<TimePoint> nonOverlappingTimePoints = new ArrayList<>();
+        // loop timepoints
+        for (int i = 0; i < timePoints.size() - 1; i++) {
+            // current timepoint
+            TimePoint tp = timePoints.get(i);
+            // next timepoint
+            TimePoint ntp = timePoints.get(i + 1);
+            // diff between starting points
+            double diffSps = ntp.getStart() - tp.getStart();
+            // if not the same starting point
+            if (diffSps > 0) {
+                // add to non overlapping time points
+                nonOverlappingTimePoints.add(new TimePoint(tp.getStart(), ntp.getStart()));
+            }
+        }
+        // manually for the last timepoint
+        TimePoint tp = timePoints.get(timePoints.size() - 1);
+        // diff between starting points
+        double diffSps = tp.getEnd() - tp.getStart();
+        // if not the same starting point
+        if (diffSps > 0) {
+            // add to non overlapping time points
+            nonOverlappingTimePoints.add(tp);
+        }
+        return nonOverlappingTimePoints;
+    }
 
+    private SortedMap<TimePoint, List<PathRobber>> ComputePossiblePathRobbers(Map<Double, List<PathRobber>> pathRobbers, List<TimePoint> timePoints) {
+        // storage for possible paths
+        SortedMap<TimePoint, List<PathRobber>> prs = new TreeMap<>();
+        // storage for taken keys
+        List<Double> keysTaken = new ArrayList<>();       
+        // if not enough info, abort mission
+        if (pathRobbers == null || pathRobbers.size() < 2 
+                || timePoints == null || timePoints.isEmpty()) {
+            return prs;
+        } 
+        // otherwise, try to find a valid path
+        else {
+            // loop timepoints
+            for (int i = 0; i < timePoints.size(); i++) {
+                // current timepoint
+                TimePoint tp = timePoints.get(i);
+                // path with least time difference from the diff of tp
+                Double ldkey = null;
+                // loop map as entry set
+                // get every key and compare it to the timepoint
+                for (Map.Entry pair : pathRobbers.entrySet()) {
+                    Double key = (Double) pair.getKey();
+                    // if the path requires less time than the available time
+                    // and it is not already used
+                    if (key <= tp.getDiff() && (ldkey == null || ldkey < key) && !keysTaken.contains(key)) {
+                        ldkey = key;
+                    }
+                }
+                // if there is a key
+                if (ldkey != null) {                    
+                    // add path to list of possible paths together with start, end, diff times
+                    prs.put(tp, pathRobbers.get(ldkey));
+                    // mark key as used
+                    keysTaken.add(ldkey);
+                }
+            }
+            return prs;
+        }
+    }
+    
     private void drawShapes(Canvas canvas, TrapezoidalMap tm) {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
