@@ -6,6 +6,7 @@
 package geo.dataStructures;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -21,10 +22,13 @@ public class VertexInfo {
     private boolean isExit = false;
     private List<Vertex> seeMe;
     
+    private List<Edge> universalSees;
+    
     public VertexInfo(){
         seesExits = new ArrayList<>();
         seesArts = new ArrayList<>();
         seeMe = new ArrayList<>();
+        universalSees = new ArrayList<>();
         numArt=0;
         numExit=0;
     }

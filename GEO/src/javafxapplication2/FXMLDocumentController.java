@@ -119,6 +119,30 @@ public class FXMLDocumentController implements Initializable {
         return robberPaths;
     }
     
+    private Map<Double, List<List<Vertex>>> getAllExitToArtPath(){
+        Map<Double, List<List<Vertex>>> robberPaths = new TreeMap();
+
+        for(Vertex exit : vis.getExitList()){
+            for(Vertex art : vis.getArtList()){
+                Graph graph = new Graph();
+                List<Vertex> path = findSinglePathWithGraph(exit,art, graph);
+                path.add(art);
+                addToTree(graph.getCostCurrentPath(), path, robberPaths);
+            } 
+        }   
+        return robberPaths;
+    }
+    
+    private void addToTree(double cost, List<Vertex> path, Map<Double, List<List<Vertex>>> tree){
+        List<List<Vertex>> allPaths = new ArrayList<>();
+        if(tree.containsKey(cost)){
+            allPaths = tree.get(cost);
+            allPaths.add(path);
+        }else{
+            allPaths.add(path);      
+        }
+        tree.put(cost, allPaths);
+    }
 
     private List<Vertex> getSmartSmartPath(int numGuards, int numExits){
         List<VertexInfo> infoList = vis.getVertexInfo();
@@ -315,15 +339,7 @@ public class FXMLDocumentController implements Initializable {
 
         calculateVisibilityGraph();
         List<Vertex> interestingVertices = new ArrayList<>(); // vis.getBestExitGuards();
-        g.setStroke(Color.DARKORANGE);
-        Map<Double, List<Vertex>> test = getExitToArtPath();
-        for(List<Vertex> v : test.values()){
-            for (int i = 0; i < v.size()-1; i++) {
-                g.strokeLine(v.get(i).getX(), v.get(i).getY(), v.get(i+1).getX(), v.get(i+1).getY());
-            }
-        }
 
-        
         List<Vertex> verts = this.polygon.getVertices();
         int exitCounter = 0;
         for (int i = 0; i < verts.size(); i++) {
@@ -703,7 +719,9 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private void handleButtonSave(ActionEvent event) {
-
+        calculateVisibilityGraph();
+        getAllExitToArtPath();
+        int a=2;
     }
     
     @FXML

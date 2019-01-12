@@ -29,6 +29,7 @@ public class dummyVis {
     private List<Vertex> artList;
     private List<Vertex> exitList;
     
+    
     public List<Vertex> getBestExitGuards(){
         List<Vertex> bestVertices = new ArrayList<>();
 
