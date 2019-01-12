@@ -424,8 +424,7 @@ public class FXMLDocumentController implements Initializable {
         }
         double loopedTime = t % maxTime;
         double[] point;
-        PathRobber[] prduo = getPathRobberForTime(loopedTime, pr);
-        
+        PathRobber[] prduo = getPathRobberForTime(t, pr);
         if (prduo[0] != null && prduo[1] != null) {
             point = getInterpolatedPoint(prduo[0], prduo[1], loopedTime);
             gc.drawImage(robberImage, point[0] - (robberImage.getWidth() / 2), point[1] - (robberImage.getHeight() / 2));
@@ -473,6 +472,7 @@ public class FXMLDocumentController implements Initializable {
                     && pathsAreAttached(pathRobbers.get(i), pathRobbers.get(next))) {
                 pathRobberDuo[0] = pathRobbers.get(i);
                 pathRobberDuo[1] = pathRobbers.get(next);
+                System.out.println(loopedTime + " -- prduo: " + i + ", " + next);
                 break;
             }
         }        
@@ -546,7 +546,7 @@ public class FXMLDocumentController implements Initializable {
                 if (ppg == null && pg.getObserving() == 1) {
                     ppg = pg;
                 } else if (ppg != null && pg.getObserving() == 1) {
-                    timePoints.add(new TimePoint(ppg.getTimestamp(), pg.getTimestamp()));
+                    timePoints.add(new TimePoint(ppg.getTimestamp(), pg.getTimestamp() - this.deltaTime));
                     ppg = pg;
                 }
             }
@@ -1113,6 +1113,13 @@ public class FXMLDocumentController implements Initializable {
     private void handleButtonSave(ActionEvent event) {
         calculateVisibilityGraph();
         
+        for (int i = 0; i < vis.getVertexInfo().size(); i++) {
+            VertexInfo vi = vis.getVertexInfo().get(i);
+            if(vi.getSeeMe().isEmpty()){
+                int a= 4;
+            }
+        }
+        
         List<Polygon> allPolygons = innerPolygon;
         allPolygons.add(polygon);
         
@@ -1422,7 +1429,6 @@ public class FXMLDocumentController implements Initializable {
                 for (int i = 0; i < seeMe.size(); i++) {
                     if (Objects.equals(seeMe.get(i).getX(), v2.getX())
                             && Objects.equals(seeMe.get(i).getY(), v2.getY())) {
-                        System.out.println("SEES ME");
                         return true;
                     }
                 }

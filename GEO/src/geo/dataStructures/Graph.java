@@ -129,9 +129,9 @@ public class Graph {
 		else if (w.dist == INFINITY)
 			System.out.println(destName + " is unreachable");
 		else {
-			System.out.print("(Cost is: " + w.dist + ") ");
+			//System.out.print("(Cost is: " + w.dist + ") ");
 			printPath(w);
-			System.out.println();
+			//System.out.println();
 		}
                 return w;
 	}
@@ -156,9 +156,9 @@ public class Graph {
 	private void printPath(VertexDijkstra dest) {
 		if (dest.prev != null) {
 			printPath(dest.prev);
-			System.out.print(" to ");
+			//System.out.print(" to ");
 		}
-		System.out.print(dest.name);
+		//System.out.print(dest.name);
 	}
 
 	/**
@@ -238,14 +238,14 @@ public class Graph {
 			// ZZZ
 			PriorityQueue<Path> pq2 = new PriorityQueue<Path>();
 			Path p;
-			System.out.print("Priority queue is ");
+			//System.out.print("Priority queue is ");
 			while (pq.size() > 0) {
 				p = pq.remove();
-				System.out.print(p.dest.name + p.cost + " ");
+				//System.out.print(p.dest.name + p.cost + " ");
 				pq2.add(p);
 			}
 			pq = pq2;
-			System.out.println();
+			//System.out.println();
 			// ZZZ
 		}
 	}
@@ -312,8 +312,8 @@ public class Graph {
                 }
                 
 
-		System.out.println("Start:"+ start.getLabel());
-		System.out.println("end:"+ end.getLabel());
+		//System.out.println("Start:"+ start.getLabel());
+		//System.out.println("end:"+ end.getLabel());
 
 		//BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		VertexDijkstra w = processRequest(start.getLabel(),end.getLabel(), g);

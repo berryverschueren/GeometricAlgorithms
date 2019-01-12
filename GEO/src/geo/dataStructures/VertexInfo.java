@@ -56,8 +56,6 @@ public class VertexInfo {
     public void setSeeMe(List<Vertex> seeMe) {
         this.seeMe = seeMe;
     }
-    
-    
 
     public Vertex getVertex() {
         return vertex;
