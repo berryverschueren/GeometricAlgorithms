@@ -10,6 +10,8 @@ public class PathRobber {
     private double y; 
     private double timestamp;
     
+    public PathRobber(){}
+    
     public PathRobber(double x, double y, double timestamp) {
         this.x = x;
         this.y = y;
