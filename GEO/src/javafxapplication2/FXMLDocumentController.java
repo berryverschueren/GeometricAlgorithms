@@ -28,7 +28,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.TreeMap;
 import javafx.animation.AnimationTimer;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -98,8 +100,25 @@ public class FXMLDocumentController implements Initializable {
     public Polygon visibilityGraph;
     
     private List<Vertex> stopVertices = new ArrayList<>();
+    private List<VertexInfo> information = new ArrayList<>();
     
     private dummyVis vis;
+    
+    
+    private Map<Double, List<Vertex>> getExitToArtPath(){
+        Map<Double, List<Vertex>> robberPaths = new TreeMap();
+
+        for(Vertex exit : vis.getExitList()){
+            for(Vertex art : vis.getArtList()){
+                Graph graph = new Graph();
+                List<Vertex> path = findSinglePathWithGraph(exit,art, graph);
+                path.add(art);
+                robberPaths.put(graph.getCostCurrentPath(), path);
+            } 
+        }   
+        return robberPaths;
+    }
+    
 
     private List<Vertex> getSmartSmartPath(int numGuards, int numExits){
         List<VertexInfo> infoList = vis.getVertexInfo();
@@ -140,31 +159,7 @@ public class FXMLDocumentController implements Initializable {
                 interestingVertices.add(verts.get(i));
             }
         }
-        
-//<<<<<<< HEAD
-//        shortestPath = findPath(interestingVertices);
-//        
-////        List<Vertex> path = new ArrayList<>();
-////        interestingVertices.add(interestingVertices.get(0));
-////        for (int i = 0; i < interestingVertices.size()-1; i++) {
-////            List<Vertex> currentPath = new ArrayList<>();
-////            currentPath = findSinglePath(interestingVertices.get(i), interestingVertices.get(i+1));
-////            currentPath.remove(0);
-////            if(!path.isEmpty()&&!currentPath.isEmpty()){
-////                //currentPath = findSinglePath(interestingVertices.get(i), interestingVertices.get(i+1));
-////                //currentPath.remove(0);
-////                List<Vertex> inter = findSinglePath(path.get(path.size()-1), currentPath.get(0));
-////                inter.remove(0);
-////                shortestPath.addAll(inter);
-////            }
-////            path = currentPath;
-////            //path.remove(0);
-////            shortestPath.addAll(path);
-////            
-////        }
-//=======
-        
-        
+         
         List<Vertex> path = new ArrayList<>();
         interestingVertices.add(interestingVertices.get(0));
         for (int i = 0; i < interestingVertices.size()-1; i++) {
@@ -272,6 +267,12 @@ public class FXMLDocumentController implements Initializable {
         return path;
     }
     
+    public List<Vertex> findSinglePathWithGraph(Vertex vertex1, Vertex vertex2, Graph graph){
+        List<Vertex> path = new ArrayList<>();
+        path.addAll(graph.dijkstraStart(visibilityGraph.getEdges(), vertex1, vertex2, visibilityGraph.getVertices()));
+        return path;
+    }
+    
     public List<Vertex> findPath(List<Vertex> vertices){
         List<Vertex> path = new ArrayList<>();
         if(!vertices.isEmpty()){
@@ -314,6 +315,14 @@ public class FXMLDocumentController implements Initializable {
 
         calculateVisibilityGraph();
         List<Vertex> interestingVertices = new ArrayList<>(); // vis.getBestExitGuards();
+        g.setStroke(Color.DARKORANGE);
+        Map<Double, List<Vertex>> test = getExitToArtPath();
+        for(List<Vertex> v : test.values()){
+            for (int i = 0; i < v.size()-1; i++) {
+                g.strokeLine(v.get(i).getX(), v.get(i).getY(), v.get(i+1).getX(), v.get(i+1).getY());
+            }
+        }
+
         
         List<Vertex> verts = this.polygon.getVertices();
         int exitCounter = 0;
