@@ -68,6 +68,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import math.geom2d.Point2D;
 
 /**
  *
@@ -302,9 +303,9 @@ public class FXMLDocumentController implements Initializable {
                 g.setStroke(Color.AQUA);
 
         visibilityGraph = vis.visibiliyGraph(polys);
-        for(Edge edge : visibilityGraph.getEdges()){
-            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
-        }
+//        for(Edge edge : visibilityGraph.getEdges()){
+//            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+//        }
     }
     
     public List<Vertex> findSinglePath(Vertex vertex1, Vertex vertex2){
@@ -973,15 +974,132 @@ public class FXMLDocumentController implements Initializable {
         }
     }
 
+    private double angleValue(Vertex a, Vertex b){
+        return Math.atan2(a.getY()-b.getY(), a.getX()-b.getX())*(180/Math.PI);
+    }
+    
+    private List<Vertex> circleSweepSort(Vertex vertex, List<Vertex> allVertices) {
+        List<Vertex> sortedList = allVertices;
+        
+        //angleValue (angle value, offset);
+        Collections.sort(sortedList, (a,b) ->         
+                angleValue(a,vertex) == angleValue(b,vertex)? 
+                    Point2D.distance(vertex.getX(), vertex.getY(), a.getX(), a.getY()) < Point2D.distance(vertex.getX(), vertex.getY(), b.getX(), b.getY())?-1:1:
+                (angleValue(a,vertex) == 0.0)?-1:
+                (angleValue(b,vertex) == 0.0)?1:
+                (angleValue(a,vertex) < 0 && angleValue(b,vertex) < 0)?(angleValue(a,vertex) > angleValue(b,vertex))?-1:1:
+                (angleValue(a,vertex) > 0 && angleValue(b,vertex) > 0)?(angleValue(a,vertex) > angleValue(b,vertex))?-1:1:        
+                (angleValue(a,vertex) < angleValue(b,vertex))?-1:1
+        );
+        //printSort(sortedList, vertex);
+        String s = ""; 
+        for(Vertex v : sortedList){
+            double angle = angleValue(v, vertex);
+            if(angle<0){
+                //nextVertices.add(v);
+                s = s+", "+v.getLabel();
+            }
+        }
+        System.out.println(s);
+        return sortedList;        
+    }
+    
+    private Polygon getPolygon(Vertex vertex, List<Polygon> pList){
+        Polygon poly = new Polygon();
+        outerloop:
+        for(Polygon p : pList){
+            poly =p;
+            for(Vertex v : p.getVertices()){
+                if(v==vertex){
+                    break outerloop;
+                }
+            }     
+        }
+        return poly;
+    }
+    
     @FXML
     private void handleButtonSave(ActionEvent event) {
         calculateVisibilityGraph();
+        
+        List<Polygon> allPolygons = innerPolygon;
+        allPolygons.add(polygon);
+        
+        List<Edge> edges = new ArrayList<>();
+        for(Polygon p : allPolygons){
+            edges.addAll(p.getEdges());
+        }
+        
+        
+        Vertex testVertex = vis.getVertexInfo().get(0).getVertex();
+        List<Edge> startEdges = new ArrayList<>();
+        for(Edge edge : edges){
+            if(edge.containsVertex(testVertex)){
+                startEdges.add(edge);
+            }
+        }
+        
+        
+        List<Vertex> visibleVertices = vis.getVertexInfo().get(0).getSeeMe();
+        
+        //order list
+        visibleVertices = circleSweepSort(testVertex, visibleVertices);
+        visibleVertices.remove(0);
+        visibleVertices.add(visibleVertices.get(0));
+        
+        List<Edge> remember = new ArrayList<>();
+        List<Edge> noGoEdge = new ArrayList<>();
+        noGoEdge.addAll(startEdges);
+        Vertex lastVertex = null;
+        for(Vertex vertex : visibleVertices){
+            //skip first
+            if(lastVertex==null){
+                lastVertex=vertex;
+                continue;
+            }
+            if(startEdges.get(0).containsVertex(vertex) || startEdges.get(1).containsVertex(vertex)){
+                
+                if(startEdges.get(0).containsVertex(lastVertex) || startEdges.get(1).containsVertex(lastVertex)){
+                    lastVertex=vertex;
+                    continue;
+                }
+            }
+            boolean noEdge = true;
+            //check if edge exists
+            Polygon p = getPolygon(vertex, allPolygons);
+            for(Edge e : p.getEdges()){
+                if(e.containsVertex(vertex) && e.containsVertex(lastVertex)){
+                    noGoEdge.add(e);
+                    noEdge = false;
+                    break;
+                }
+            }
+            if(noEdge)
+                remember.add(new Edge("",vertex, lastVertex));
+            
+            lastVertex = vertex;
+        }
+        
         g.setStroke(Color.RED);
-        for (List<Vertex> v : getShortestArtPath().values()){
-            for (int i = 0; i < v.size()-1; i++) {
-            g.strokeLine(v.get(i).getX(), v.get(i).getY(), v.get(i+1).getX(), v.get(i+1).getY());
+        for(Edge edge : remember){
+            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
         }
+        
+        g.setStroke(Color.BLUE);
+        for(Edge edge : noGoEdge){
+            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
         }
+        
+
+        g.setFill(Color.LIGHTPINK);
+        for(Vertex v : vis.getVertexInfo().get(0).getSeeMe()){
+                g.fillOval(v.getX()-10, v.getY()-10, 20, 20);
+        }
+        
+        
+        g.setFill(Color.ORANGE);
+        g.fillOval(vis.getVertexInfo().get(0).getVertex().getX()-10, vis.getVertexInfo().get(0).getVertex().getY()-10, 20, 20);
+
                 
         
     }
