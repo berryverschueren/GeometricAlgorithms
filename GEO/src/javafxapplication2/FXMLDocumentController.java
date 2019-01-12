@@ -8,6 +8,7 @@ package javafxapplication2;
 import geo.WriteInputGallerySpecification;
 import geo.ReadInputGallerySpecification;
 import geo.ReadInputGuardSpecification;
+import geo.ReadInputRobberSpecification;
 import geo.WriteInputGuardSpecification;
 import geo.WriteInputRobberSpecification;
 import geo.dataStructures.Edge;
@@ -879,6 +880,7 @@ public class FXMLDocumentController implements Initializable {
     private void writeRobberFile(Robber robber) {
         WriteInputRobberSpecification.WriteInputRobberSpecification(robber);
     }
+    
     private void readGuardFile() {
         String workingDir = System.getProperty("user.dir");
 //            String dataDir = workingDir.substring(0, workingDir.length() - 13) + "set1_data\\set1_data\\";
@@ -900,6 +902,22 @@ public class FXMLDocumentController implements Initializable {
         }
         
         
+    }
+    
+    private void readRobberFile() {
+        String workingDir = System.getProperty("user.dir");
+//            String dataDir = workingDir.substring(0, workingDir.length() - 13) + "set1_data\\set1_data\\";
+        Stage stage = (Stage) this.readInput.getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(workingDir));
+        fileChooser.setTitle("Open Folder");
+        File file = fileChooser.showOpenDialog(stage);
+        if (file != null) {
+            String filename = file.getName(); //"ArtGalleryV3.txt";
+            //List<Guard> guards = new ArrayList();
+            Robber robber = new Robber();
+            robber = ReadInputRobberSpecification.ReadInputRobberSpecification(filename);
+        }
     }
     
     private Map<Double, List<PathRobber>> possiblePathsRobber(Map<Double, List<Vertex>> verticesPossPaths ) {
