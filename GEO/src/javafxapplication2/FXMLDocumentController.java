@@ -377,9 +377,13 @@ public class FXMLDocumentController implements Initializable {
         
         List<TimePoint> timePoints = ComputeTimePoints(guards);
         
-        Map<Double, List<PathRobber>> pathRobbers = null;
+        //Map<Double, List<List<Vertex>>> allExitToArtPath = getAllExitToArtPath();
         
-        SortedMap<TimePoint, List<PathRobber>> robberPaths = ComputePossiblePathRobbers(pathRobbers, timePoints);
+        Map<Double, List<Vertex>> shortestArtPath = getShortestArtPath();
+        
+        Map<Double, List<PathRobber>> possiblePathsRobber = possiblePathsRobber(shortestArtPath);
+        
+        SortedMap<TimePoint, List<PathRobber>> robberPaths = ComputePossiblePathRobbers(possiblePathsRobber, timePoints);
         
         Robber robber = ComputeRobber(robberPaths);
         
@@ -436,13 +440,8 @@ public class FXMLDocumentController implements Initializable {
                 gc.strokeLine(pg.get(j).getX(), pg.get(j).getY(), pg.get(next).getX(), pg.get(next).getY());
             }
         }
-        
-        List<PathRobber> pr = robber.getPath();
-        for (int i = 0; i < pr.size(); i++) {
-            int next = (i + 1) % pr.size();
-            gc.strokeLine(pr.get(i).getX(), pr.get(i).getY(), pr.get(next).getX(), pr.get(next).getY());
-        }
-        
+                
+        List<PathRobber> pr = robber.getPath();        
         double maxTime = 0.0;
         for (int i = 0; i < pr.size(); i++) {
             if (pr.get(i).getTimestamp() > maxTime) {
@@ -495,7 +494,8 @@ public class FXMLDocumentController implements Initializable {
         for (int i = 0; i < pathRobbers.size(); i++) {
             int next = (i + 1) % pathRobbers.size();
             if (loopedTime >= pathRobbers.get(i).getTimestamp()
-                    && loopedTime <= pathRobbers.get(next).getTimestamp()) {
+                    && loopedTime <= pathRobbers.get(next).getTimestamp()
+                    && pathsAreAttached(pathRobbers.get(i), pathRobbers.get(next))) {
                 pathRobberDuo[0] = pathRobbers.get(i);
                 pathRobberDuo[1] = pathRobbers.get(next);
                 break;
@@ -650,6 +650,7 @@ public class FXMLDocumentController implements Initializable {
     private Robber ComputeRobber(SortedMap<TimePoint, List<PathRobber>> robberPaths) {
         // storage for robber
         Robber robber = new Robber();
+        robber.setPath(new ArrayList<>());
         // storage for previous timepoint
 //        TimePoint ptp = null;
 //        boolean isFirst = true;
@@ -777,7 +778,25 @@ public class FXMLDocumentController implements Initializable {
         vMaxG = Double.parseDouble(vMaxGuards.getText());
         deltaTime = Double.parseDouble(deltaT.getText());
         globalT = Double.parseDouble(globalTime.getText());
-        Gallery gallery = new Gallery(countExits, countArts, polygon, innerPolygon);
+        List<Vertex> vertices = this.polygon.getVertices();
+        int exitCounter = 0;
+        int artCounter = 0;
+        for (Vertex vertex : vertices){
+            if(vertex.getExitFlag()==1){
+                exitCounter++;
+            }
+            if(vertex.getArtFlag()==1){
+                artCounter++;
+            }
+        }
+        for (Polygon innerP : innerPolygon) {
+            for (Vertex vertex : innerP.getVertices()) {
+                if(vertex.getArtFlag()==1){
+                artCounter++;
+                }
+            }
+        }
+        Gallery gallery = new Gallery(exitCounter, artCounter, polygon, innerPolygon);
         GalleryProblem galleryProblem = new GalleryProblem(gallery, numOfGuards, vMaxG, globalT, deltaTime);
         WriteInputGallerySpecification.WriteInputGallerySpecification(galleryProblem);
         //finalEdge();
@@ -881,15 +900,6 @@ public class FXMLDocumentController implements Initializable {
         return guard;
     }
     
-    private int observingGuard(Vertex vertex) {
-        if (vertex.getArtFlag()== 1 || vertex.getExitFlag() == 1) {
-                observing = 1;
-            } else {
-                observing = 0; 
-            }
-        return observing;
-    }
-    
     private void writeGuardFile(List<Guard> guards) {
         WriteInputGuardSpecification.WriteInputGuardSpecification(guards);
     }
@@ -906,6 +916,12 @@ public class FXMLDocumentController implements Initializable {
             String filename = file.getName(); //"ArtGalleryV3.txt";
             //List<Guard> guards = new ArrayList();
             guards = ReadInputGuardSpecification.ReadInputGuardSpecification(filename);
+            for (Guard guard: guards) {
+                List<PathGuard> path = new ArrayList<PathGuard>();
+                path = guard.getPath(); 
+                double initX = guard.getX();
+                double initY = guard.getY();
+            }
         }
         
         
@@ -916,7 +932,7 @@ public class FXMLDocumentController implements Initializable {
         
         for(Entry<Double, List<Vertex>> entry : verticesPossPaths.entrySet()) {
             double distanceLocal = entry.getKey();
-            double timePath = distanceLocal / vMaxG;
+            double timePath = 2 *(distanceLocal / vMaxG);
             List<Vertex> verticesLocal = entry.getValue();
             
             List<PathRobber> pathRobber = new ArrayList();
@@ -934,6 +950,17 @@ public class FXMLDocumentController implements Initializable {
             // rest vertices
             for (int i = 1; i < verticesLocal.size(); i++) {
                 Vertex tempVertex = verticesLocal.get(i);
+                double x = tempVertex.getX();
+                double y = tempVertex.getY();
+                double t = prevT + (distance(tempVertex, previousVertex) / vMaxG); 
+                pathRobberStep = new PathRobber(x, y, t);
+                pathRobber.add(pathRobberStep);
+                previousVertex = tempVertex;
+                prevT = t;
+            }
+            // and back : skip last vertex and include first vertex
+            for (int i = verticesLocal.size()-1; i > 0; i--) {
+                Vertex tempVertex = verticesLocal.get(i-1);
                 double x = tempVertex.getX();
                 double y = tempVertex.getY();
                 double t = prevT + (distance(tempVertex, previousVertex) / vMaxG); 
@@ -1310,6 +1337,14 @@ public class FXMLDocumentController implements Initializable {
     
     private double distance(Vertex vertex1, Vertex vertex2){
         return Math.abs(Math.sqrt(Math.pow(vertex2.getX()-vertex1.getX(),2)+Math.pow(vertex2.getY()-vertex1.getY(),2)));
+    }
+
+    private boolean pathsAreAttached(PathRobber pr1, PathRobber pr2) {
+        Vertex v1 = new Vertex (pr1.getX(), pr1.getY(), "");
+        Vertex v2 = new Vertex (pr2.getX(), pr2.getY(), "");
+        double d = distance(v1, v2);
+        double requiredTime = d/vMaxG;
+        return ((pr2.getTimestamp() - pr1.getTimestamp()) <= requiredTime);
     }
     
     public enum Poly{
