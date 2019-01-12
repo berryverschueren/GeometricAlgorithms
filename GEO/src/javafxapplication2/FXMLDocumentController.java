@@ -912,7 +912,7 @@ public class FXMLDocumentController implements Initializable {
         
         for(Entry<Double, List<Vertex>> entry : verticesPossPaths.entrySet()) {
             double distanceLocal = entry.getKey();
-            double timePath = distanceLocal / vMaxG;
+            double timePath = 2 *(distanceLocal / vMaxG);
             List<Vertex> verticesLocal = entry.getValue();
             
             List<PathRobber> pathRobber = new ArrayList();
