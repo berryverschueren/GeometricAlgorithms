@@ -42,6 +42,7 @@ import java.util.SortedMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
 import javafx.animation.AnimationTimer;
@@ -314,7 +315,7 @@ public class FXMLDocumentController implements Initializable {
         Scene theScene = new Scene(root);
         stage.setScene(theScene);
 
-        Canvas canvas = new Canvas(1000, 1000);
+        Canvas canvas = new Canvas(1900, 1000);
         root.getChildren().add(canvas);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
@@ -424,6 +425,7 @@ public class FXMLDocumentController implements Initializable {
         double loopedTime = t % maxTime;
         double[] point;
         PathRobber[] prduo = getPathRobberForTime(loopedTime, pr);
+        
         if (prduo[0] != null && prduo[1] != null) {
             point = getInterpolatedPoint(prduo[0], prduo[1], loopedTime);
             gc.drawImage(robberImage, point[0] - (robberImage.getWidth() / 2), point[1] - (robberImage.getHeight() / 2));
@@ -567,6 +569,9 @@ public class FXMLDocumentController implements Initializable {
                 // add to non overlapping time points
                 nonOverlappingTimePoints.add(new TimePoint(tp.getStart(), ntp.getStart()));
             }
+        }
+        if (timePoints.isEmpty()) {
+            return null;
         }
         // manually for the last timepoint
         TimePoint tp = timePoints.get(timePoints.size() - 1);
@@ -1401,9 +1406,37 @@ public class FXMLDocumentController implements Initializable {
     private boolean pathsAreAttached(PathRobber pr1, PathRobber pr2) {
         Vertex v1 = new Vertex (pr1.getX(), pr1.getY(), "");
         Vertex v2 = new Vertex (pr2.getX(), pr2.getY(), "");
-        double d = distance(v1, v2);
-        double requiredTime = d/vMaxG;
-        return ((pr2.getTimestamp() - pr1.getTimestamp()) <= requiredTime);
+        
+        VertexInfo vi1 = null;
+        for (int i = 0; i < vis.getVertexInfo().size(); i++) {
+            VertexInfo vi = vis.getVertexInfo().get(i);
+            double vix = vi.getVertex().getX();
+            double viy = vi.getVertex().getY();
+            if (v1.getX() == vix && v1.getY() == viy) {
+                vi1 = vi;
+            }
+        }
+        if (vi1 != null) {
+            List<Vertex> seeMe = vi1.getSeeMe();
+            if (seeMe != null) {
+                for (int i = 0; i < seeMe.size(); i++) {
+                    if (Objects.equals(seeMe.get(i).getX(), v2.getX())
+                            && Objects.equals(seeMe.get(i).getY(), v2.getY())) {
+                        System.out.println("SEES ME");
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+//        
+//        double d = distance(v1, v2);
+//        double requiredTime = d/vMaxG;
+//        if ((Math.abs(pr2.getTimestamp() - pr1.getTimestamp() + 1) >= requiredTime) == false) {
+//            System.out.println("REQ: " + Math.abs(pr2.getTimestamp() - pr1.getTimestamp()));
+//            System.out.println("REQ: " + requiredTime);
+//        }
+//        return (Math.abs(pr2.getTimestamp() - pr1.getTimestamp() + 1) >= requiredTime);
     }
     
     public enum Poly{
