@@ -6,6 +6,7 @@
 package geo.dataStructures;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -16,15 +17,18 @@ public class VertexInfo {
     private Vertex vertex;
     private int numExit;
     private int numArt;
-    private List<Vertex> exits;
-    private List<Vertex> arts;
+    private List<Vertex> seesExits;
+    private List<Vertex> seesArts;
     private boolean isExit = false;
     private List<Vertex> seeMe;
     
+    private List<Edge> universalSees;
+    
     public VertexInfo(){
-        exits = new ArrayList<>();
-        arts = new ArrayList<>();
+        seesExits = new ArrayList<>();
+        seesArts = new ArrayList<>();
         seeMe = new ArrayList<>();
+        universalSees = new ArrayList<>();
         numArt=0;
         numExit=0;
     }
@@ -33,8 +37,8 @@ public class VertexInfo {
         this.vertex = vertex;
         this.numExit = numExit;
         this.numArt = numArt;
-        this.exits = exits;
-        this.arts = arts;
+        this.seesExits = exits;
+        this.seesArts = arts;
     }
 
     public boolean isIsExit() {
@@ -80,28 +84,28 @@ public class VertexInfo {
     }
 
     public List<Vertex> getExits() {
-        return exits;
+        return seesExits;
     }
 
     public void setExits(List<Vertex> exits) {
-        this.exits = exits;
+        this.seesExits = exits;
     }
 
     public List<Vertex> getArts() {
-        return arts;
+        return seesArts;
     }
 
     public void setArts(List<Vertex> arts) {
-        this.arts = arts;
+        this.seesArts = arts;
     }
 
     void addArt(Vertex vertex) {
-        arts.add(vertex);
+        seesArts.add(vertex);
         numArt++;
     }
 
     void addExit(Vertex vertex) {
-        exits.add(vertex);
+        seesExits.add(vertex);
         numExit++;
     }
 

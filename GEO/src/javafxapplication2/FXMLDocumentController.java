@@ -37,6 +37,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.SortedMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.ResourceBundle;
 import java.util.TreeMap;
 import javafx.animation.AnimationTimer;
 import javafx.beans.binding.Bindings;
@@ -107,8 +111,60 @@ public class FXMLDocumentController implements Initializable {
     public Polygon visibilityGraph;
     
     private List<Vertex> stopVertices = new ArrayList<>();
+    private List<VertexInfo> information = new ArrayList<>();
     
     private dummyVis vis;
+    
+    
+    private Map<Double, List<Vertex>> getShortestArtPath(){
+        Map<Double, List<Vertex>> robberPaths = new TreeMap();
+        
+        for(Vertex art : vis.getArtList()){
+            double cost = 1000000000000.0;
+            List<Vertex> shortestPath = null;
+            
+            for(Vertex exit : vis.getExitList()){
+                Graph graph = new Graph();
+                List<Vertex> path = findSinglePathWithGraph(exit,art, graph);
+                double currentCost = graph.getCostCurrentPath();
+                path.add(art);
+                if(currentCost < cost){
+                    cost=currentCost;
+                    shortestPath = path;
+                }
+            } 
+            if(shortestPath != null){
+                robberPaths.put(cost, shortestPath);
+            }
+        }   
+        
+        return robberPaths;
+    }
+    
+    private Map<Double, List<List<Vertex>>> getAllExitToArtPath(){
+        Map<Double, List<List<Vertex>>> robberPaths = new TreeMap();
+
+        for(Vertex exit : vis.getExitList()){
+            for(Vertex art : vis.getArtList()){
+                Graph graph = new Graph();
+                List<Vertex> path = findSinglePathWithGraph(exit,art, graph);
+                path.add(art);
+                addToTree(graph.getCostCurrentPath(), path, robberPaths);
+            } 
+        }   
+        return robberPaths;
+    }
+    
+    private void addToTree(double cost, List<Vertex> path, Map<Double, List<List<Vertex>>> tree){
+        List<List<Vertex>> allPaths = new ArrayList<>();
+        if(tree.containsKey(cost)){
+            allPaths = tree.get(cost);
+            allPaths.add(path);
+        }else{
+            allPaths.add(path);      
+        }
+        tree.put(cost, allPaths);
+    }
 
     private List<Vertex> getSmartSmartPath(int numGuards, int numExits){
         List<VertexInfo> infoList = vis.getVertexInfo();
@@ -149,31 +205,7 @@ public class FXMLDocumentController implements Initializable {
                 interestingVertices.add(verts.get(i));
             }
         }
-        
-//<<<<<<< HEAD
-//        shortestPath = findPath(interestingVertices);
-//        
-////        List<Vertex> path = new ArrayList<>();
-////        interestingVertices.add(interestingVertices.get(0));
-////        for (int i = 0; i < interestingVertices.size()-1; i++) {
-////            List<Vertex> currentPath = new ArrayList<>();
-////            currentPath = findSinglePath(interestingVertices.get(i), interestingVertices.get(i+1));
-////            currentPath.remove(0);
-////            if(!path.isEmpty()&&!currentPath.isEmpty()){
-////                //currentPath = findSinglePath(interestingVertices.get(i), interestingVertices.get(i+1));
-////                //currentPath.remove(0);
-////                List<Vertex> inter = findSinglePath(path.get(path.size()-1), currentPath.get(0));
-////                inter.remove(0);
-////                shortestPath.addAll(inter);
-////            }
-////            path = currentPath;
-////            //path.remove(0);
-////            shortestPath.addAll(path);
-////            
-////        }
-//=======
-        
-        
+         
         List<Vertex> path = new ArrayList<>();
         interestingVertices.add(interestingVertices.get(0));
         for (int i = 0; i < interestingVertices.size()-1; i++) {
@@ -281,6 +313,12 @@ public class FXMLDocumentController implements Initializable {
         return path;
     }
     
+    public List<Vertex> findSinglePathWithGraph(Vertex vertex1, Vertex vertex2, Graph graph){
+        List<Vertex> path = new ArrayList<>();
+        path.addAll(graph.dijkstraStart(visibilityGraph.getEdges(), vertex1, vertex2, visibilityGraph.getVertices()));
+        return path;
+    }
+    
     public List<Vertex> findPath(List<Vertex> vertices){
         List<Vertex> path = new ArrayList<>();
         if(!vertices.isEmpty()){
@@ -323,7 +361,7 @@ public class FXMLDocumentController implements Initializable {
 
         calculateVisibilityGraph();
         List<Vertex> interestingVertices = new ArrayList<>(); // vis.getBestExitGuards();
-        
+
         List<Vertex> verts = this.polygon.getVertices();
         int exitCounter = 0;
         for (int i = 0; i < verts.size(); i++) {
@@ -338,7 +376,7 @@ public class FXMLDocumentController implements Initializable {
         
         List<TimePoint> timePoints = ComputeTimePoints(guards);
         Map<Double, List<PathRobber>> pathRobbers = null;
-        SortedMap<TimePoint, List<PathRobber>> robberPaths = ComputePossiblePathRobbers(pathRobbers, timePoints)
+        //SortedMap<TimePoint, List<PathRobber>> robberPaths = ComputePossiblePathRobbers(pathRobbers, timePoints)
         
         final long startNanoTime = System.nanoTime();
                 
@@ -777,6 +815,42 @@ public class FXMLDocumentController implements Initializable {
         
     }
     
+    private Map<Double, List<PathRobber>> possiblePathsRobber(Map<Double, List<Vertex>> verticesPossPaths ) {
+        Map<Double, List<PathRobber>> possPaths = new HashMap<>();
+        
+        for(Entry<Double, List<Vertex>> entry : verticesPossPaths.entrySet()) {
+            double distanceLocal = entry.getKey();
+            double timePath = distanceLocal / vMaxG;
+            List<Vertex> verticesLocal = entry.getValue();
+            
+            List<PathRobber> pathRobber = new ArrayList();
+            PathRobber pathRobberStep = new PathRobber();
+            
+            // first vertex
+            Vertex firstVertex = verticesLocal.get(0);
+            double initX = firstVertex.getX();
+            double initY = firstVertex.getY();
+            double prevT = 0;
+            pathRobberStep = new PathRobber(initX, initY, prevT);
+            pathRobber.add(pathRobberStep);
+            Vertex previousVertex = firstVertex;
+            
+            // rest vertices
+            for (int i = 1; i < verticesLocal.size(); i++) {
+                Vertex tempVertex = verticesLocal.get(i);
+                double x = tempVertex.getX();
+                double y = tempVertex.getY();
+                double t = prevT + (distance(tempVertex, previousVertex) / vMaxG); 
+                pathRobberStep = new PathRobber(x, y, t);
+                pathRobber.add(pathRobberStep);
+                previousVertex = tempVertex;
+                prevT = t;
+            }
+            possPaths.put(timePath, pathRobber);
+        }
+        return possPaths;
+    }
+    
     @FXML
     private void finalEdgeButton(ActionEvent event){
         if(polygon.getEdges().size() != polygon.getVertices().size()){
@@ -806,7 +880,15 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private void handleButtonSave(ActionEvent event) {
-
+        calculateVisibilityGraph();
+        g.setStroke(Color.RED);
+        for (List<Vertex> v : getShortestArtPath().values()){
+            for (int i = 0; i < v.size()-1; i++) {
+            g.strokeLine(v.get(i).getX(), v.get(i).getY(), v.get(i+1).getX(), v.get(i+1).getY());
+        }
+        }
+                
+        
     }
     
     @FXML

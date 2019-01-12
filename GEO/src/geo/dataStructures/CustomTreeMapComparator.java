@@ -13,4 +13,22 @@ import java.util.Comparator;
  */
 public class CustomTreeMapComparator implements Comparator {
     
+    @Override
+    public int compare(Object o1, Object o2) {
+        TimePoint t1 = (TimePoint) o1;
+        TimePoint t2 = (TimePoint) o2;
+        
+        double x1 = t1.getStart(); 
+        double x2 = t2.getStart(); 
+        
+        if (x1 == x2) {
+            return 0;
+        } 
+        else if (x1 > x2) {
+            return 1;
+        }
+        else {
+            return -1;
+        }
+    }
 }
