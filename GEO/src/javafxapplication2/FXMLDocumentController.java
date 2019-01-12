@@ -776,7 +776,25 @@ public class FXMLDocumentController implements Initializable {
         vMaxG = Double.parseDouble(vMaxGuards.getText());
         deltaTime = Double.parseDouble(deltaT.getText());
         globalT = Double.parseDouble(globalTime.getText());
-        Gallery gallery = new Gallery(countExits, countArts, polygon, innerPolygon);
+        List<Vertex> vertices = this.polygon.getVertices();
+        int exitCounter = 0;
+        int artCounter = 0;
+        for (Vertex vertex : vertices){
+            if(vertex.getExitFlag()==1){
+                exitCounter++;
+            }
+            if(vertex.getArtFlag()==1){
+                artCounter++;
+            }
+        }
+        for (Polygon innerP : innerPolygon) {
+            for (Vertex vertex : innerP.getVertices()) {
+                if(vertex.getArtFlag()==1){
+                artCounter++;
+                }
+            }
+        }
+        Gallery gallery = new Gallery(exitCounter, artCounter, polygon, innerPolygon);
         GalleryProblem galleryProblem = new GalleryProblem(gallery, numOfGuards, vMaxG, globalT, deltaTime);
         WriteInputGallerySpecification.WriteInputGallerySpecification(galleryProblem);
         //finalEdge();
@@ -939,8 +957,8 @@ public class FXMLDocumentController implements Initializable {
                 prevT = t;
             }
             // and back : skip last vertex and include first vertex
-            for (int i = verticesLocal.size()-2; i > 1; i--) {
-                Vertex tempVertex = verticesLocal.get(i);
+            for (int i = verticesLocal.size()-1; i > 0; i--) {
+                Vertex tempVertex = verticesLocal.get(i-1);
                 double x = tempVertex.getX();
                 double y = tempVertex.getY();
                 double t = prevT + (distance(tempVertex, previousVertex) / vMaxG); 
