@@ -378,6 +378,7 @@ public class FXMLDocumentController implements Initializable {
         
         stage.show();
         writeGuardFile(guards);
+        writeRobberFile(robber);
     }
     
     private void drawShapes(GraphicsContext gc, Canvas canvas, TrapezoidalMap tm, double t) {
@@ -546,7 +547,7 @@ public class FXMLDocumentController implements Initializable {
                 if (ppg == null && pg.getObserving() == 1) {
                     ppg = pg;
                 } else if (ppg != null && pg.getObserving() == 1) {
-                    timePoints.add(new TimePoint(ppg.getTimestamp(), pg.getTimestamp() - this.deltaTime));
+                    timePoints.add(new TimePoint(ppg.getTimestamp() + this.deltaTime, pg.getTimestamp()));
                     ppg = pg;
                 }
             }
@@ -562,12 +563,17 @@ public class FXMLDocumentController implements Initializable {
             TimePoint tp = timePoints.get(i);
             // next timepoint
             TimePoint ntp = timePoints.get(i + 1);
-            // diff between starting points
-            double diffSps = ntp.getStart() - tp.getStart();
-            // if not the same starting point
-            if (diffSps > 0) {
-                // add to non overlapping time points
-                nonOverlappingTimePoints.add(new TimePoint(tp.getStart(), ntp.getStart()));
+            
+            if (tp.getEnd() <= ntp.getStart()) {
+                nonOverlappingTimePoints.add(tp);
+            } else {
+                // diff between starting points
+                double diffSps = ntp.getStart() - tp.getStart();
+                // if not the same starting point
+                if (diffSps > 0) {
+                    // add to non overlapping time points
+                    nonOverlappingTimePoints.add(new TimePoint(tp.getStart(), ntp.getStart()));
+                }
             }
         }
         if (timePoints.isEmpty()) {
