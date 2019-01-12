@@ -785,15 +785,6 @@ public class FXMLDocumentController implements Initializable {
         return guard;
     }
     
-    private int observingGuard(Vertex vertex) {
-        if (vertex.getArtFlag()== 1 || vertex.getExitFlag() == 1) {
-                observing = 1;
-            } else {
-                observing = 0; 
-            }
-        return observing;
-    }
-    
     private void writeGuardFile(List<Guard> guards) {
         WriteInputGuardSpecification.WriteInputGuardSpecification(guards);
     }
@@ -810,6 +801,12 @@ public class FXMLDocumentController implements Initializable {
             String filename = file.getName(); //"ArtGalleryV3.txt";
             //List<Guard> guards = new ArrayList();
             guards = ReadInputGuardSpecification.ReadInputGuardSpecification(filename);
+            for (Guard guard: guards) {
+                List<PathGuard> path = new ArrayList<PathGuard>();
+                path = guard.getPath(); 
+                double initX = guard.getX();
+                double initY = guard.getY();
+            }
         }
         
         
@@ -837,6 +834,17 @@ public class FXMLDocumentController implements Initializable {
             
             // rest vertices
             for (int i = 1; i < verticesLocal.size(); i++) {
+                Vertex tempVertex = verticesLocal.get(i);
+                double x = tempVertex.getX();
+                double y = tempVertex.getY();
+                double t = prevT + (distance(tempVertex, previousVertex) / vMaxG); 
+                pathRobberStep = new PathRobber(x, y, t);
+                pathRobber.add(pathRobberStep);
+                previousVertex = tempVertex;
+                prevT = t;
+            }
+            // and back : skip last vertex and include first vertex
+            for (int i = verticesLocal.size()-2; i > 1; i--) {
                 Vertex tempVertex = verticesLocal.get(i);
                 double x = tempVertex.getX();
                 double y = tempVertex.getY();

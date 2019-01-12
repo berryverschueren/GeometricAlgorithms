@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Scanner;
 import geo.dataStructures.PathRobber;
 import geo.dataStructures.Robber;
+import java.util.Locale;
 
 /**
  *
@@ -35,6 +36,7 @@ public class ReadInputRobberSpecification {
             Scanner input = new Scanner(reader);
             
             input.useDelimiter(",\\s*");
+            input.useLocale(Locale.US);
             
             /** line 1 */
             numOfVertices = input.nextInt();

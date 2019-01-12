@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Scanner;
 import geo.dataStructures.PathGuard;
 import geo.dataStructures.Guard;
+import java.util.Locale;
 
 /**
  *
@@ -36,6 +37,7 @@ public class ReadInputGuardSpecification {
             Scanner input = new Scanner(reader);
             
             input.useDelimiter(",\\s*");
+            input.useLocale(Locale.US);
             
             /** line 1 */
             numOfGuards = input.nextInt();
