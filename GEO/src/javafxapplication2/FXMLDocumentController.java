@@ -105,17 +105,28 @@ public class FXMLDocumentController implements Initializable {
     private dummyVis vis;
     
     
-    private Map<Double, List<Vertex>> getExitToArtPath(){
+    private Map<Double, List<Vertex>> getShortestArtPath(){
         Map<Double, List<Vertex>> robberPaths = new TreeMap();
-
-        for(Vertex exit : vis.getExitList()){
-            for(Vertex art : vis.getArtList()){
+        
+        for(Vertex art : vis.getArtList()){
+            double cost = 1000000000000.0;
+            List<Vertex> shortestPath = null;
+            
+            for(Vertex exit : vis.getExitList()){
                 Graph graph = new Graph();
                 List<Vertex> path = findSinglePathWithGraph(exit,art, graph);
+                double currentCost = graph.getCostCurrentPath();
                 path.add(art);
-                robberPaths.put(graph.getCostCurrentPath(), path);
+                if(currentCost < cost){
+                    cost=currentCost;
+                    shortestPath = path;
+                }
             } 
+            if(shortestPath != null){
+                robberPaths.put(cost, shortestPath);
+            }
         }   
+        
         return robberPaths;
     }
     
@@ -720,8 +731,14 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void handleButtonSave(ActionEvent event) {
         calculateVisibilityGraph();
-        getAllExitToArtPath();
-        int a=2;
+        g.setStroke(Color.RED);
+        for (List<Vertex> v : getShortestArtPath().values()){
+            for (int i = 0; i < v.size()-1; i++) {
+            g.strokeLine(v.get(i).getX(), v.get(i).getY(), v.get(i+1).getX(), v.get(i+1).getY());
+        }
+        }
+                
+        
     }
     
     @FXML
