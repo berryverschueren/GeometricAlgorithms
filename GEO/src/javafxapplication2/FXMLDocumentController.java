@@ -235,38 +235,9 @@ public class FXMLDocumentController implements Initializable {
     private void handleButtonKaj(ActionEvent event) {
 
         finalEdge();
-//        int edgeCounter = 0;
-//        int vertexCounter = 0;
-//        
-//        
-//        Polygon p = polygon;
-//        p.setLabel("Polygon");
-//        for(Edge edge : p.getEdges()){
-//            edge.setLabel(p.getLabel()+" : Edge."+edgeCounter+"  ");
-//            edgeCounter++;
-//        }
-//        for(Vertex vertex : p.getVertices()){
-//            vertex.setLabel(p.getLabel()+" : Vertex."+vertexCounter+"  ");
-//            vertexCounter++;
-//        }
-//        
+ 
         List<Polygon> ps = innerPolygon;
-//        int pcount = 0;
-//        for(Polygon poly : ps){
-//            poly.setLabel("inner Polygon"+pcount);
-//            edgeCounter = 0;
-//            vertexCounter = 0;
-//            for(Edge edge : poly.getEdges()){
-//                edge.setLabel(poly.getLabel()+" : Edge."+edgeCounter+"  ");
-//                edgeCounter++;
-//            }
-//            for(Vertex vertex : poly.getVertices()){
-//                vertex.setLabel(poly.getLabel()+" : Vertex."+vertexCounter+"  ");
-//                vertexCounter++;
-//            }
-//            pcount++;
-//        }
-//        
+  
         System.out.println("");
         System.out.println("");
         //System.out.println(ps.get(0).getVertices().get(0).getLabel());
@@ -1043,6 +1014,72 @@ public class FXMLDocumentController implements Initializable {
             }     
         }
         return poly;
+    }
+    
+    private List<Edge> findVertexRange(Vertex vertexGuard){
+        calculateVisibilityGraph();
+        
+        List<Polygon> allPolygons = innerPolygon;
+        allPolygons.add(polygon);
+        
+        List<Edge> edges = new ArrayList<>();
+        for(Polygon p : allPolygons){
+            edges.addAll(p.getEdges());
+        }
+        VertexInfo vertexInfo = new VertexInfo();
+        for(VertexInfo info : vis.getVertexInfo()){
+            if(info.getVertex()==vertexGuard){
+                vertexInfo = info;
+            }
+        }
+        List<Vertex> visibleVertices = vertexInfo.getSeeMe();
+        
+        //Vertex testVertex = vis.getVertexInfo().get(0).getVertex();
+        List<Edge> startEdges = new ArrayList<>();
+        for(Edge edge : edges){
+            if(edge.containsVertex(vertexGuard)){
+                startEdges.add(edge);
+            }
+        }
+          
+        //order list
+        visibleVertices = circleSweepSort(vertexGuard, visibleVertices);
+        visibleVertices.remove(0);
+        visibleVertices.add(visibleVertices.get(0));
+        
+
+        List<Edge> noGoEdge = new ArrayList<>();
+        noGoEdge.addAll(startEdges);
+        Vertex lastVertex = null;
+        for(Vertex vertex : visibleVertices){
+            //skip first
+            if(lastVertex==null){
+                lastVertex=vertex;
+                continue;
+            }
+            if(startEdges.get(0).containsVertex(vertex) || startEdges.get(1).containsVertex(vertex)){
+                
+                if(startEdges.get(0).containsVertex(lastVertex) || startEdges.get(1).containsVertex(lastVertex)){
+                    lastVertex=vertex;
+                    continue;
+                }
+            }
+            boolean noEdge = true;
+            //check if edge exists
+            Polygon p = getPolygon(vertex, allPolygons);
+            for(Edge e : p.getEdges()){
+                if(e.containsVertex(vertex) && e.containsVertex(lastVertex)){
+                    noGoEdge.add(e);
+                    noEdge = false;
+                    break;
+                }
+            }
+            if(noEdge)
+                noGoEdge.add(new Edge("",vertex, lastVertex));
+            
+            lastVertex = vertex;
+        }
+        return noGoEdge;
     }
     
     @FXML
