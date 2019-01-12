@@ -545,7 +545,7 @@ public class FXMLDocumentController implements Initializable {
                 if (ppg == null && pg.getObserving() == 1) {
                     ppg = pg;
                 } else if (ppg != null && pg.getObserving() == 1) {
-                    timePoints.add(new TimePoint(ppg.getTimestamp(), pg.getTimestamp()));
+                    timePoints.add(new TimePoint(ppg.getTimestamp(), pg.getTimestamp() - this.deltaTime));
                     ppg = pg;
                 }
             }
