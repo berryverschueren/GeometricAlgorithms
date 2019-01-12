@@ -26,6 +26,9 @@ public class dummyVis {
     private Map<Integer, List<Vertex>> priorityVertexExit;
     private Map<Integer, List<Vertex>> priorityVertexArt;
     
+    private List<Vertex> artList;
+    private List<Vertex> exitList;
+    
     
     public List<Vertex> getBestExitGuards(){
         List<Vertex> bestVertices = new ArrayList<>();
@@ -39,10 +42,22 @@ public class dummyVis {
     public List<VertexInfo> getVertexInfo(){
         return info;
     }
+
+    public List<Vertex> getArtList() {
+        return artList;
+    }
+
+    public List<Vertex> getExitList() {
+        return exitList;
+    }
+    
+    
     
     public dummyVis() {
         mapFunction = new TrapezoidalMap();
         info = new ArrayList<>();
+        artList = new ArrayList<>();
+        exitList = new ArrayList<>();
         //prio 1: #exits sorted on prio
         //prio 2: #arts
         //prio 3: #rest
@@ -75,6 +90,7 @@ public class dummyVis {
         
         Polygon allPoly = new Polygon();
         for(Vertex vertex1 : allVertices(polygons)){
+            storeStatus(vertex1);
             int numberOf = 0;
             VertexInfo vertexInfo = new VertexInfo();
             vertexInfo.setVertex(vertex1);
@@ -170,5 +186,14 @@ public class dummyVis {
         }
         
         return !p.contains(newEdge.getV2());
+    }
+
+    private void storeStatus(Vertex vertex) {
+        if(vertex.getArtFlag()==1){
+            artList.add(vertex);
+        }
+        if(vertex.getExitFlag()==1){
+            exitList.add(vertex);
+        }
     }
 }
