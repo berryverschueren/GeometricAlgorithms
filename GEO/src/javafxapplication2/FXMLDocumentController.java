@@ -99,6 +99,9 @@ public class FXMLDocumentController implements Initializable {
     private RadioButton exit;
     @FXML
     private Button readInput;
+    @FXML
+    private Button readGuard;
+    
     
     private GraphicsContext g; 
     private Polygon polygon;
@@ -785,6 +788,7 @@ public class FXMLDocumentController implements Initializable {
         WriteInputGallerySpecification.WriteInputGallerySpecification(galleryProblem);
         //finalEdge();
     }
+    
     @FXML
     private void handleButtonInputRead(ActionEvent event) {
         String workingDir = System.getProperty("user.dir");
@@ -892,27 +896,71 @@ public class FXMLDocumentController implements Initializable {
         WriteInputRobberSpecification.WriteInputRobberSpecification(robber);
     }
     
-    private void readGuardFile() {
+    @FXML
+    private void handleButtonGuardRead(ActionEvent event) {
         String workingDir = System.getProperty("user.dir");
-//            String dataDir = workingDir.substring(0, workingDir.length() - 13) + "set1_data\\set1_data\\";
-        Stage stage = (Stage) this.readInput.getScene().getWindow();
+        Stage stage = (Stage) this.readGuard.getScene().getWindow();
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(workingDir));
         fileChooser.setTitle("Open Folder");
         File file = fileChooser.showOpenDialog(stage);
+        
         if (file != null) {
             String filename = file.getName(); //"ArtGalleryV3.txt";
             //List<Guard> guards = new ArrayList();
             guards = ReadInputGuardSpecification.ReadInputGuardSpecification(filename);
-            for (Guard guard: guards) {
-                List<PathGuard> path = new ArrayList<PathGuard>();
-                path = guard.getPath(); 
-                double initX = guard.getX();
-                double initY = guard.getY();
-            }
+//            for (Guard guard: guards) {
+//                List<PathGuard> path = new ArrayList<PathGuard>();
+//                path = guard.getPath(); 
+//                double initX = guard.getX();
+//                double initY = guard.getY();
+//            }
         }
+        Stage stage2 = new Stage();
+        stage2.setTitle( "Timeline Example" );
+        Group root = new Group();
+        Scene theScene = new Scene(root);
+        stage2.setScene(theScene);
+
+        Canvas canvas = new Canvas(1900, 1000);
+        root.getChildren().add(canvas);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        String workingDire = "file:\\\\\\" + System.getProperty("user.dir");        
+        Image guardImage = new Image(workingDire + "\\guard.png", 30, 70, false, false);
+        Image robberImage = new Image(workingDire + "\\robber.png", 30, 70, false, false);
         
+        calculateVisibilityGraph();
         
+        List<TimePoint> timePoints = ComputeTimePoints(guards);
+        
+        Map<Double, List<Vertex>> shortestArtPath = getShortestArtPath();
+        
+        Map<Double, List<PathRobber>> possiblePathsRobber = possiblePathsRobber(shortestArtPath);
+        
+        SortedMap<TimePoint, List<PathRobber>> robberPaths = ComputePossiblePathRobbers(possiblePathsRobber, timePoints);
+        
+        Robber robber = ComputeRobber(robberPaths);
+        
+        final long startNanoTime = System.nanoTime();
+                
+        new AnimationTimer()
+        {
+            @Override
+            public void handle(long currentNanoTime)
+            {
+                double t = (currentNanoTime - startNanoTime) / 1000000000.0; 
+                drawPath(gc, canvas, guards, robber, t, guardImage, robberImage);
+                if (t >= globalT) {
+                    this.stop();
+                }
+            }
+        }.start();
+        
+        stage2.show();
+        writeGuardFile(guards);
+        writeRobberFile(robber);
+    
     }
     
     private void readRobberFile() {

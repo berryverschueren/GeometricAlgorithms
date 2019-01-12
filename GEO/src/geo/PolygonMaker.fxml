@@ -39,5 +39,6 @@
       <Button layoutX="910.0" layoutY="462.0" mnemonicParsing="false" onAction="#finalEdgeButton" text="Final Edge" />
       <RadioButton fx:id="startRadio" layoutX="922.0" layoutY="129.0" mnemonicParsing="false" text="S" />
       <RadioButton fx:id="endRadio" layoutX="958.0" layoutY="129.0" mnemonicParsing="false" text="E" />
+      <Button fx:id="readGuard" layoutX="914.0" layoutY="384.0" mnemonicParsing="false" onAction="#handleButtonGuardRead" prefHeight="39.0" prefWidth="80.0" text="ReadGuards" />
     </children>
 </AnchorPane>

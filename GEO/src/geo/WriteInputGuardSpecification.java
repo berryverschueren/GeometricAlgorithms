@@ -13,7 +13,7 @@ import geo.dataStructures.PathGuard;
  * @author carina
  */
 public class WriteInputGuardSpecification {
-    
+    public static boolean print = false;
     public static void WriteInputGuardSpecification(List<Guard> guards) {
         
         try {
@@ -22,14 +22,22 @@ public class WriteInputGuardSpecification {
 
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
             int numOfGuards = guards.size();
-            bufferedWriter.write(numOfGuards + ", ");
+            if (print) {
+                bufferedWriter.write(numOfGuards);
+            } else {
+                bufferedWriter.write(numOfGuards + ", ");
+            }
             bufferedWriter.newLine();
             
             for (Guard guard : guards) {
                 List<PathGuard> path = new ArrayList<PathGuard>();
                 path = guard.getPath();
                 int lengthPath = path.size();
-                bufferedWriter.write(lengthPath + ", ");
+                if (print) {
+                    bufferedWriter.write(lengthPath);
+                } else {
+                    bufferedWriter.write(lengthPath + ", ");
+                }
                 bufferedWriter.newLine();
                 
                 for (PathGuard pathGuard : path) {
@@ -37,7 +45,11 @@ public class WriteInputGuardSpecification {
                     double y = pathGuard.getY();
                     double timestamp = pathGuard.getTimestamp();
                     int observing = pathGuard.getObserving();
-                    bufferedWriter.write(x + ", " + y + ", " + timestamp + ", " + observing + ", ");
+                    if(print){
+                        bufferedWriter.write(x + ", " + y + ", " + timestamp + ", " + observing);
+                    } else {
+                        bufferedWriter.write(x + ", " + y + ", " + timestamp + ", " + observing + ", ");
+                    }
                     bufferedWriter.newLine();
                 }
             }

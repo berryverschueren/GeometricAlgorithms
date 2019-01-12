@@ -13,7 +13,7 @@ import geo.dataStructures.PathRobber;
  * @author carina
  */
 public class WriteInputRobberSpecification {
-    
+    public static boolean print = false;
     public static void WriteInputRobberSpecification(Robber robber) {
         
         try {
@@ -25,16 +25,25 @@ public class WriteInputRobberSpecification {
             List<PathRobber> path = new ArrayList<PathRobber>();
             path = robber.getPath();
             int lengthPath = path.size();
-            bufferedWriter.write(lengthPath + ", ");
+            if (print) {
+                bufferedWriter.write(lengthPath);
+            } else {
+                bufferedWriter.write(lengthPath + ", ");
+            }
             bufferedWriter.newLine();
                
             for (PathRobber pathRobber : path) {
                 double x = pathRobber.getX();
                 double y = pathRobber.getY();
                 double timestamp = pathRobber.getTimestamp();
-                bufferedWriter.write(x + ", " + y + ", " + timestamp + ", ");
-                bufferedWriter.newLine();
+                if (print) {
+                    bufferedWriter.write(x + ", " + y + ", " + timestamp + "");
+                } else {
+                    bufferedWriter.write(x + ", " + y + ", " + timestamp + ", ");
                 }
+                bufferedWriter.newLine();
+                
+            }
             
             
             bufferedWriter.close();
