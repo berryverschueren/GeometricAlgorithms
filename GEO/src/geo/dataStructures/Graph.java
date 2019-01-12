@@ -238,14 +238,14 @@ public class Graph {
 			// ZZZ
 			PriorityQueue<Path> pq2 = new PriorityQueue<Path>();
 			Path p;
-			System.out.print("Priority queue is ");
+			//System.out.print("Priority queue is ");
 			while (pq.size() > 0) {
 				p = pq.remove();
-				System.out.print(p.dest.name + p.cost + " ");
+				//System.out.print(p.dest.name + p.cost + " ");
 				pq2.add(p);
 			}
 			pq = pq2;
-			System.out.println();
+			//System.out.println();
 			// ZZZ
 		}
 	}
