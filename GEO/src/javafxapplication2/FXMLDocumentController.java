@@ -207,29 +207,72 @@ public class FXMLDocumentController implements Initializable {
                 interestingVertices.add(verts.get(i));
             }
         }
-         
+        //circleSweepSort(interestingVertices.get(0), interestingVertices);
+        
         List<Vertex> path = new ArrayList<>();
+        Vertex Start = new Vertex();
         interestingVertices.add(interestingVertices.get(0));
+//        String ss = "inters";
+//            for(Vertex v : interestingVertices){
+//                ss = ss+"("+v.getX()+","+v.getY()+")";
+//            }
+//            System.out.println(ss);
         for (int i = 0; i < interestingVertices.size()-1; i++) {
             List<Vertex> currentPath = new ArrayList<>();
             currentPath = findSinglePath(interestingVertices.get(i), interestingVertices.get(i+1));
+//            if(i == interestingVertices.size()-2 && currentPath.size()==1){
+//                String s = "";
+//                    for(Vertex v : currentPath){
+//                        s = s+"Inter("+v.getX()+","+v.getY()+")";
+//                    }
+//                    System.out.println(s);
+//               shortestPath.add(currentPath.get(0));
+//               continue;
+//            }
+            //if(i != interestingVertices.size()-2){
             currentPath.remove(0);
+            //}
+            
             if(!path.isEmpty() && !currentPath.isEmpty()){
                 //currentPath = findSinglePath(interestingVertices.get(i), interestingVertices.get(i+1));
                 //currentPath.remove(0);
                 List<Vertex> inter = findSinglePath(path.get(path.size()-1), currentPath.get(0));
                 if(!inter.isEmpty()){
                     inter.remove(0);
+                    
                     shortestPath.addAll(inter);
+                    String s = "";
+//                    for(Vertex v : inter){
+//                        s = s+"Inter("+v.getX()+","+v.getY()+")";
+//                    }
+                    System.out.println(s);
                 }else{
+                    if(currentPath.size()==1){
+                        path = currentPath;
+                    }
                     currentPath.remove(0);
                 }
             }
-            
-            path = currentPath;
-            //path.remove(0);
-            
-            shortestPath.addAll(path);
+            if(!currentPath.isEmpty()){
+                path = currentPath;
+            }
+            shortestPath.addAll(currentPath);
+        }
+        List<Vertex> finalStep = findSinglePath(shortestPath.get(shortestPath.size()-1), shortestPath.get(0));
+        shortestPath.get(0);
+        if(!finalStep.isEmpty()){
+                    finalStep.remove(0);
+                    
+                    shortestPath.addAll(finalStep);
+        }
+        System.out.println("guard path");
+            for(Vertex v : shortestPath){
+                System.out.println("("+v.getX()+","+v.getY()+")");
+            }
+
+        g.setStroke(Color.PURPLE);
+        for (int i = 0; i < shortestPath.size()-1; i++) {
+            g.strokeLine(shortestPath.get(i).getX(), shortestPath.get(i).getY(), shortestPath.get(i+1).getX(), shortestPath.get(i+1).getY());
         }
         return shortestPath;
     }
@@ -282,9 +325,9 @@ public class FXMLDocumentController implements Initializable {
                 g.setStroke(Color.AQUA);
 
         visibilityGraph = vis.visibiliyGraph(polys);
-        for(Edge edge : visibilityGraph.getEdges()){
-            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
-        }
+//        for(Edge edge : visibilityGraph.getEdges()){
+//            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+//        }
     }
     
     public List<Vertex> findSinglePath(Vertex vertex1, Vertex vertex2){
@@ -406,15 +449,21 @@ public class FXMLDocumentController implements Initializable {
             {
                 double t = (currentNanoTime - startNanoTime) / 1000000000.0; 
                 drawPath(gc, canvas, guards, robber, t, guardImage, robberImage);
+//                         gc.setStroke(Color.LIGHTSKYBLUE);
+//                for(Edge edge : visibilityGraph.getEdges()){
+//            gc.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+//        }
                 if (t >= globalT) {
                     this.stop();
                 }
             }
         }.start();
-        
+
         stage.show();
         writeGuardFile(guards);
         writeRobberFile(robber);
+                gc.setStroke(Color.LIGHTSKYBLUE);
+
     }
     
     private void drawShapes(GraphicsContext gc, Canvas canvas, TrapezoidalMap tm, double t) {
@@ -1380,7 +1429,7 @@ public class FXMLDocumentController implements Initializable {
     }
     
     private List<Edge> findVertexRange(double x, double y){
-        calculateVisibilityGraph();
+        //calculateVisibilityGraph();
         
         List<Polygon> allPolygons = new ArrayList<>();
         allPolygons.addAll(innerPolygon);
@@ -1463,12 +1512,31 @@ public class FXMLDocumentController implements Initializable {
         calculateVisibilityGraph();
         
         //x=342 y 105    x303 y169
-        VertexInfo vertexInfo = new VertexInfo();
+//        VertexInfo vertexInfo = new VertexInfo();
+//        for (int i = 0; i < vis.getVertexInfo().size(); i++) {
+//            if(vis.getVertexInfo().get(i).getVertex().getX()==534.0 &&vis.getVertexInfo().get(i).getVertex().getY()==177.0){
+//                vertexInfo = vis.getVertexInfo().get(i);
+//            }
+//        }
+        VertexInfo vertexInfo = null;
+        VertexInfo vertexRem = null;
+        double dist = 100000000.0;
         for (int i = 0; i < vis.getVertexInfo().size(); i++) {
             if(vis.getVertexInfo().get(i).getVertex().getX()==534.0 &&vis.getVertexInfo().get(i).getVertex().getY()==177.0){
                 vertexInfo = vis.getVertexInfo().get(i);
+            
+            }else{
+                double d = distance(new Vertex(534.0,177.0, ""), vis.getVertexInfo().get(i).getVertex());
+                if(d < dist){
+                    dist = d;
+                    vertexRem = vis.getVertexInfo().get(i);
+                }           
             }
         }
+        if(vertexInfo == null){
+            vertexInfo = vertexRem;
+        }
+        
         
         List<Polygon> allPolygons = new ArrayList<>();
         allPolygons.addAll(innerPolygon);
@@ -1684,9 +1752,18 @@ public class FXMLDocumentController implements Initializable {
     private void finalizeDraw(){
         g.setFill(Color.BLACK);
         g.fillPolygon(polygon.getXs(), polygon.getYs(), polygon.getNumberVertices());
+        g.setStroke(Color.RED);
+        for (int i = 0; i < polygon.getVertices().size(); i++) {
+            Vertex v = polygon.getVertices().get(i);
+            g.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+        }
         g.setFill(Color.WHITE);
         for(Polygon innerPolygon:innerPolygon){
             g.fillPolygon(innerPolygon.getXs(), innerPolygon.getYs(), innerPolygon.getNumberVertices());
+            for (int i = 0; i < innerPolygon.getVertices().size(); i++) {
+                Vertex v = innerPolygon.getVertices().get(i);
+                g.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+            }
         }
     }
     
@@ -1712,6 +1789,7 @@ public class FXMLDocumentController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {      
         polygon = new Polygon();
         innerPolygon = new ArrayList<>();
+
         g = canvas.getGraphicsContext2D();
         
         g.setFill(Color.WHITE);

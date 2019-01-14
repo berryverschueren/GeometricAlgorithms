@@ -53,7 +53,7 @@ public class ReadInputGuardSpecification {
                 //PathGuard step = new PathGuard(initX, initY, timestamp, observing);
                 //path.add(step);
                 
-                for (int j = 0; j < verticesGuard; j++) {
+                for (int j = 0; j < verticesGuard+1; j++) {
                     x = input.nextDouble();
                     y = input.nextDouble();
                     timestamp = input.nextDouble();
