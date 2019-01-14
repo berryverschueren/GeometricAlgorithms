@@ -122,7 +122,6 @@ public class FXMLDocumentController implements Initializable {
     
     private dummyVis vis;
     
-    
     private Map<Double, List<Vertex>> getShortestArtPath(){
         Map<Double, List<Vertex>> robberPaths = new TreeMap();
         
@@ -231,9 +230,6 @@ public class FXMLDocumentController implements Initializable {
             shortestPath.addAll(path);
             
         }
-//>>>>>>> b1efeab0ffdbba3673f5d51f616bc8b44ae54ff1
-
-        //shortestPath = findPath(interestingVertices);
         return shortestPath;
     }
     
@@ -243,31 +239,18 @@ public class FXMLDocumentController implements Initializable {
         finalEdge();
  
         List<Polygon> ps = innerPolygon;
-  
-        System.out.println("");
-        System.out.println("");
-        //System.out.println(ps.get(0).getVertices().get(0).getLabel());
         
         ps.add(polygon);
-        //ps.addAll(innerPolygon);
         vis =new dummyVis();
         visibilityGraph = vis.visibiliyGraph(ps);
-        
-
-//        List<Edge> path = new Graph().dijkstraStart(vis.getEdges(), vis.getVertices().get(0), vis.getVertices().get(vis.getVertices().size()-1), vis.getVertices());
-        
-//        for(Edge edge : visibilityGraph.getEdges()){
-//            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
-//        }
-        
+          
         List<Vertex> ve = vis.getBestExitGuards();
         List<Vertex> v = findPath(ve);
         setUpDraw(false);
         g.setStroke(Color.RED);
         for (int i = 0; i < v.size()-1; i++) {
             g.strokeLine(v.get(i).getX(), v.get(i).getY(), v.get(i+1).getX(), v.get(i+1).getY());
-        }
-        
+        }   
     }
     
     public void calculateVisibilityGraph(){
