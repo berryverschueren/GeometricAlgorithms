@@ -133,15 +133,21 @@ public class dummyVis {
                                 }
                             }
                             Vertex halfway = math.halfwayPoint(newEdge);
+                            Vertex halfHalfway1 = math.halfwayPoint(new Edge("", vertex1, halfway));
+                            Vertex halfHalfway2 = math.halfwayPoint(new Edge("", halfway, vertex2));
                             if(outer){
-                                if(math.doesPolygonContainVertex(p, halfway)){
-//                                    allPoly.addEdge(newEdge);
+                                if(math.doesPolygonContainVertex(p, halfway)
+                                        || math.doesPolygonContainVertex(p, halfHalfway1)
+                                        || math.doesPolygonContainVertex(p, halfHalfway2)){
+                                    allPoly.addEdge(newEdge);
                                     vertexInfo.addSeesMe(vertex2);
                                 }                                
                             }else{
                                 p = getPolygon(vertex2, polygons);
-                                if(!math.doesPolygonContainVertexNotEdge(p, halfway)){
-//                                    allPoly.addEdge(newEdge);
+                                if(!math.doesPolygonContainVertexNotEdge(p, halfway) && 
+                                        !math.doesPolygonContainVertexNotEdge(p, halfHalfway1) && 
+                                        !math.doesPolygonContainVertexNotEdge(p, halfHalfway2)){
+                                    allPoly.addEdge(newEdge);
                                     vertexInfo.addSeesMe(vertex2);
                                 }
                             }

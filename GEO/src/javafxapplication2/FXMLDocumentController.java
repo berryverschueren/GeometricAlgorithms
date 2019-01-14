@@ -1348,16 +1348,16 @@ public class FXMLDocumentController implements Initializable {
                 (angleValue(a,vertex) > 0 && angleValue(b,vertex) > 0)?(angleValue(a,vertex) > angleValue(b,vertex))?-1:1:        
                 (angleValue(a,vertex) < angleValue(b,vertex))?-1:1
         );
-        //printSort(sortedList, vertex);
-        String s = ""; 
-        for(Vertex v : sortedList){
-            double angle = angleValue(v, vertex);
-            if(angle<0){
-                //nextVertices.add(v);
-                s = s+", "+v.getLabel();
-            }
-        }
-        System.out.println(s);
+//        //printSort(sortedList, vertex);
+//        String s = ""; 
+//        for(Vertex v : sortedList){
+//            double angle = angleValue(v, vertex);
+//            if(angle<0){
+//                //nextVertices.add(v);
+//                s = s+", "+v.getLabel();
+//            }
+//        }
+//        System.out.println(s);
         return sortedList;        
     }
     
