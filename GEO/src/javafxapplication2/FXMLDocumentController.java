@@ -1201,7 +1201,7 @@ public class FXMLDocumentController implements Initializable {
         double tPrevious = initT; 
         Vertex vertexPrevious = firstVertex;
         
-        int j = verticesPathGuard.size() - 1;
+        int j = verticesPathGuard.size();
         for (int i = 1; i < j; i++) {
             //if remainder is zero i ++; skip double vertex of original path, and extend loop
             if((i + index) % verticesPathGuard.size()==0){
@@ -1222,16 +1222,16 @@ public class FXMLDocumentController implements Initializable {
             vertexPrevious = vertexTemp; 
             tPrevious = tCurrent;
         }
-        observing = stopVertices.contains(firstVertex) ? 1 : 0;//observingGuard(firstVertex);
-        if (path.get(0).getObserving() == 1){
-                tCurrent = (distance(firstVertex, vertexPrevious)/vMaxG ) + tPrevious + deltaTime;
-            } else {
-                tCurrent = distance(firstVertex, vertexPrevious)/vMaxG + tPrevious ;
-            }
-        step = new PathGuard(initX, initY, tCurrent, observing);
-        
-        path.add(step);
-        Guard guard = new Guard(initX, initY, path);
+//        observing = stopVertices.contains(firstVertex) ? 1 : 0;//observingGuard(firstVertex);
+//        if (path.get(0).getObserving() == 1){
+//                tCurrent = (distance(firstVertex, vertexPrevious)/vMaxG ) + tPrevious + deltaTime;
+//            } else {
+//                tCurrent = distance(firstVertex, vertexPrevious)/vMaxG + tPrevious ;
+//            }
+//        step = new PathGuard(initX, initY, tCurrent, observing);
+//        
+//        path.add(step);
+       Guard guard = new Guard(initX, initY, path);
         
         return guard;
     }
