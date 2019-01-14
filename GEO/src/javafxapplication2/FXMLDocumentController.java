@@ -1105,7 +1105,7 @@ public class FXMLDocumentController implements Initializable {
         double tPrevious = initT; 
         Vertex vertexPrevious = firstVertex;
                   
-        for (int i = 1; i < verticesPathGuard.size(); i++) {
+        for (int i = 1; i < verticesPathGuard.size() - 1; i++) {
             Vertex vertexTemp = verticesPathGuard.get((i + index) % verticesPathGuard.size());
             x = vertexTemp.getX();
             y = vertexTemp.getY();
