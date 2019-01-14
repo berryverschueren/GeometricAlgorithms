@@ -158,7 +158,7 @@ public class FXMLDocumentController implements Initializable {
                     doesIntersection = true;
                 }
             }
-            if(!doesIntersection){
+            if(doesIntersection){
                 visibleEdges.add(edge);
             }
         }
@@ -1291,15 +1291,15 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void handleButtonSave(ActionEvent event) {
         calculateVisibilityGraph();
-        
+        VertexInfo vertexInfo = new VertexInfo();
         for (int i = 0; i < vis.getVertexInfo().size(); i++) {
-            VertexInfo vi = vis.getVertexInfo().get(i);
-            if(vi.getSeeMe().isEmpty()){
-                int a= 4;
+            if(vis.getVertexInfo().get(i).getVertex().getX()==466.0 &&vis.getVertexInfo().get(i).getVertex().getY()==214.0){
+                vertexInfo = vis.getVertexInfo().get(i);
             }
         }
         
-        List<Polygon> allPolygons = innerPolygon;
+        List<Polygon> allPolygons = new ArrayList<>();
+        allPolygons.addAll(innerPolygon);
         allPolygons.add(polygon);
         
         List<Edge> edges = new ArrayList<>();
@@ -1308,7 +1308,7 @@ public class FXMLDocumentController implements Initializable {
         }
         
         
-        Vertex testVertex = vis.getVertexInfo().get(0).getVertex();
+        Vertex testVertex = vertexInfo.getVertex();
         List<Edge> startEdges = new ArrayList<>();
         for(Edge edge : edges){
             if(edge.containsVertex(testVertex)){
@@ -1317,7 +1317,7 @@ public class FXMLDocumentController implements Initializable {
         }
         
         
-        List<Vertex> visibleVertices = vis.getVertexInfo().get(0).getSeeMe();
+        List<Vertex> visibleVertices = vertexInfo.getSeeMe();
         
         //order list
         visibleVertices = circleSweepSort(testVertex, visibleVertices);
@@ -1357,6 +1357,9 @@ public class FXMLDocumentController implements Initializable {
             lastVertex = vertex;
         }
         
+        remember.addAll(noGoEdge);
+        remember = crossVisiblePath(remember);
+        
         g.setStroke(Color.RED);
         for(Edge edge : remember){
             g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
@@ -1369,13 +1372,13 @@ public class FXMLDocumentController implements Initializable {
         
 
         g.setFill(Color.LIGHTPINK);
-        for(Vertex v : vis.getVertexInfo().get(0).getSeeMe()){
+        for(Vertex v : vertexInfo.getSeeMe()){
                 g.fillOval(v.getX()-10, v.getY()-10, 20, 20);
         }
         
         
         g.setFill(Color.ORANGE);
-        g.fillOval(vis.getVertexInfo().get(0).getVertex().getX()-10, vis.getVertexInfo().get(0).getVertex().getY()-10, 20, 20);
+        g.fillOval(vertexInfo.getVertex().getX()-10, vertexInfo.getVertex().getY()-10, 20, 20);
 
                 
         
