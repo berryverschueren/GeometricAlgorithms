@@ -1105,7 +1105,7 @@ public class FXMLDocumentController implements Initializable {
         return poly;
     }
     
-    private List<Edge> findVertexRange(int x, int y){
+    private List<Edge> findVertexRange(double x, double y){
         calculateVisibilityGraph();
         
         List<Polygon> allPolygons = innerPolygon;

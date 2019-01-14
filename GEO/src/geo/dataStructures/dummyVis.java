@@ -174,6 +174,7 @@ public class dummyVis {
             }
             info.add(vertexInfo);
             if(seesArt){
+                //savePriority(priorityVertexArt)
                 if(priorityVertexArt.containsKey(numberOf)){
                     List<Vertex> vertices = priorityVertexArt.get(numberOf);
                     vertices.add(vertex1);
@@ -205,6 +206,19 @@ public class dummyVis {
         System.out.println("number of edge from visibility graph = "+allPoly.getEdges().size());
         return allPoly;
     }
+    
+//    private void savePriority(){
+//        if(priorityVertexArt.containsKey(numberOf)){
+//            List<Vertex> vertices = priorityVertexArt.get(numberOf);
+//            vertices.add(vertex1);
+//            priorityVertexArt.put(numberOf, vertices);
+//        }else{
+//            List<Vertex> vertices = new ArrayList<>();
+//            vertices.add(vertex1);
+//            priorityVertexArt.put(numberOf, vertices);
+//        }
+//    }
+    
     private List<Vertex> allVertices(List<Polygon> innerpolygon) {
         List<Vertex> vertices = new ArrayList<>();
         for(Polygon polygon : innerpolygon){
