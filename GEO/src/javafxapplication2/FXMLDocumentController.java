@@ -162,6 +162,7 @@ public class FXMLDocumentController implements Initializable {
                 visibleEdges.add(edge);
             }
         }
+        visibleEdges.addAll(visibleArea);
         return visibleEdges;
     }
 
