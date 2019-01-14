@@ -162,6 +162,7 @@ public class FXMLDocumentController implements Initializable {
                 visibleEdges.add(edge);
             }
         }
+        visibleEdges.addAll(visibleArea);
         return visibleEdges;
     }
 
@@ -1195,7 +1196,8 @@ public class FXMLDocumentController implements Initializable {
     private List<Edge> findVertexRange(double x, double y){
         calculateVisibilityGraph();
         
-        List<Polygon> allPolygons = innerPolygon;
+        List<Polygon> allPolygons = new ArrayList<>();
+        allPolygons.addAll(innerPolygon);
         allPolygons.add(polygon);
         
         List<Edge> edges = new ArrayList<>();
