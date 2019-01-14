@@ -220,12 +220,15 @@ public class FXMLDocumentController implements Initializable {
                 if(!inter.isEmpty()){
                     inter.remove(0);
                     shortestPath.addAll(inter);
+                }else{
+                    currentPath.remove(0);
                 }
             }
+            
             path = currentPath;
             //path.remove(0);
-            shortestPath.addAll(path);
             
+            shortestPath.addAll(path);
         }
         return shortestPath;
     }
