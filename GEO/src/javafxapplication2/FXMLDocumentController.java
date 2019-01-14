@@ -122,7 +122,6 @@ public class FXMLDocumentController implements Initializable {
     
     private dummyVis vis;
     
-    
     private Map<Double, List<Vertex>> getShortestArtPath(){
         Map<Double, List<Vertex>> robberPaths = new TreeMap();
         
