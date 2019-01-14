@@ -345,7 +345,8 @@ public class FXMLDocumentController implements Initializable {
 
         calculateVisibilityGraph();
 
-        List<Vertex> verts = this.polygon.getVertices();
+        List<Vertex> verts = new ArrayList<>();
+        verts.addAll(this.polygon.getVertices());
         int exitCounter = 0;
         for (int i = 0; i < verts.size(); i++) {
             if (verts.get(i).getExitFlag() == 1) {
@@ -668,11 +669,6 @@ public class FXMLDocumentController implements Initializable {
                 forbiddenEdges.put(pg, crossVisiblePath(visEdges));
             }
             
-            for (PathGuard pg : stopGuards) {
-                
-                
-            }
-            
             System.out.println("matching path robbers to avoid visibility region for guard stops");
 
             double previousTime = -1.0;
@@ -691,7 +687,8 @@ public class FXMLDocumentController implements Initializable {
                         //System.out.println("\ncurrent guard: " + currentGuard.getTimestamp() + " (" + currentGuard.getX() + ", " + currentGuard.getY() + ")");
                         //System.out.println("Time taken: " + timeTaken);
                         // if guard stops within the time required for the path robber
-                        if (currentGuard.getTimestamp() >= timeTaken && currentGuard.getTimestamp() <= timeTaken + requiredTime) {
+                        if ((currentGuard.getTimestamp() >= timeTaken && currentGuard.getTimestamp() <= timeTaken + requiredTime)
+                                || (stopGuards.size() == 1)) {
                             boolean pathAllowed = true;
                             List<Edge> edges = forbiddenEdges.get(currentGuard);
 
@@ -747,7 +744,8 @@ public class FXMLDocumentController implements Initializable {
                         //System.out.println("path not allowed");
                     }
                 }
-            } else {
+            } 
+            else {
             timepoints.sort(new TimePointComparator());
             for (int j = 0; j < timepoints.size(); j++) {
                 TimePoint tp = timepoints.get(j);
