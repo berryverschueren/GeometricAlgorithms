@@ -431,13 +431,15 @@ public class FXMLDocumentController implements Initializable {
         PathRobber[] prduo = getPathRobberForTime(t, pr);
         if (prduo[0] != null && prduo[1] != null) {
             point = getInterpolatedPoint(prduo[0], prduo[1], loopedTime);
-            gc.drawImage(robberImage, point[0] - (robberImage.getWidth() / 2), point[1] - (robberImage.getHeight() / 2));
+            gc.drawImage(robberImage, point[0] - (robberImage.getWidth() / 2), 
+                    point[1] - (robberImage.getHeight() / 2));
         }
         
         for (int i = 0; i < guards.size(); i++) {
             List<PathGuard> pg = guards.get(i).getPath();
             if (pg.size() == 2) {
-                gc.drawImage(guardImage, pg.get(0).getX() - (guardImage.getWidth() / 2), pg.get(0).getY() - (guardImage.getHeight() / 2));
+                gc.drawImage(guardImage, pg.get(0).getX() - (guardImage.getWidth() / 2), 
+                        pg.get(0).getY() - (guardImage.getHeight() / 2));
             } else {
                 maxTime = 0.0;
                 for (int j = 0; j < pg.size(); j++) {
@@ -447,8 +449,11 @@ public class FXMLDocumentController implements Initializable {
                 }
                 loopedTime = t % maxTime;
                 PathGuard[] duo = getPathGuardForTime(loopedTime, pg);
-                point = getInterpolatedPoint(duo[0], duo[1], loopedTime);
-                gc.drawImage(guardImage, point[0] - (guardImage.getWidth() / 2), point[1] - (guardImage.getHeight() / 2));
+                if (duo[0] != null && duo[1] != null) {
+                    point = getInterpolatedPoint(duo[0], duo[1], loopedTime);
+                    gc.drawImage(guardImage, point[0] - (guardImage.getWidth() / 2), 
+                            point[1] - (guardImage.getHeight() / 2));
+                }
             }
         }
     }
@@ -907,8 +912,9 @@ public class FXMLDocumentController implements Initializable {
         
         if (file != null) {
             String filename = file.getName(); //"ArtGalleryV3.txt";
+            String pathname = file.getAbsolutePath();
             //List<Guard> guards = new ArrayList();
-            guards = ReadInputGuardSpecification.ReadInputGuardSpecification(filename);
+            guards = ReadInputGuardSpecification.ReadInputGuardSpecification(pathname);
 //            for (Guard guard: guards) {
 //                List<PathGuard> path = new ArrayList<PathGuard>();
 //                path = guard.getPath(); 
