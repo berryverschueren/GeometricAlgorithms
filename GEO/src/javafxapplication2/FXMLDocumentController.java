@@ -1251,27 +1251,27 @@ public class FXMLDocumentController implements Initializable {
         
         Robber robber = ComputeRobber(robberPaths);
 
-        int artCounterStolen = 0;
-        int artCounterTotal = 0;
-        
-        for (Polygon p : this.innerPolygon) {
-            verts.addAll(p.getVertices());
-        }
-        
-        for (Vertex v : verts) {
-            for (PathRobber pr : robber.getPath()) {
-                if (v.getX() == pr.getX() && v.getY() == pr.getY() && v.getArtFlag() == 1)
-                {
-                    System.out.println("v: (" + v.getX() + ", " + v.getY() + ")");
-                    artCounterStolen++;
-                }
-            }
-            if (v.getArtFlag() == 1) {
-                artCounterTotal++;
-            }
-        }
-        System.out.println("Total stolen art pieces: " + artCounterStolen);
-        System.out.println("Out of total art pieces: " + artCounterTotal);
+//        int artCounterStolen = 0;
+//        int artCounterTotal = 0;
+//        
+//        for (Polygon p : this.innerPolygon) {
+//            verts.addAll(p.getVertices());
+//        }
+//        
+//        for (Vertex v : verts) {
+//            for (PathRobber pr : robber.getPath()) {
+//                if (v.getX() == pr.getX() && v.getY() == pr.getY() && v.getArtFlag() == 1)
+//                {
+//                    System.out.println("v: (" + v.getX() + ", " + v.getY() + ")");
+//                    artCounterStolen++;
+//                }
+//            }
+//            if (v.getArtFlag() == 1) {
+//                artCounterTotal++;
+//            }
+//        }
+//        System.out.println("Total stolen art pieces: " + artCounterStolen);
+//        System.out.println("Out of total art pieces: " + artCounterTotal);
         
         final long startNanoTime = System.nanoTime();
                 
