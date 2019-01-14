@@ -147,29 +147,22 @@ public class FXMLDocumentController implements Initializable {
         return robberPaths;
     }
     
-    private Map<Double, List<List<Vertex>>> getAllExitToArtPath(){
-        Map<Double, List<List<Vertex>>> robberPaths = new TreeMap();
-
-        for(Vertex exit : vis.getExitList()){
-            for(Vertex art : vis.getArtList()){
-                Graph graph = new Graph();
-                List<Vertex> path = findSinglePathWithGraph(exit,art, graph);
-                path.add(art);
-                addToTree(graph.getCostCurrentPath(), path, robberPaths);
-            } 
-        }   
-        return robberPaths;
-    }
-    
-    private void addToTree(double cost, List<Vertex> path, Map<Double, List<List<Vertex>>> tree){
-        List<List<Vertex>> allPaths = new ArrayList<>();
-        if(tree.containsKey(cost)){
-            allPaths = tree.get(cost);
-            allPaths.add(path);
-        }else{
-            allPaths.add(path);      
+    private List<Edge> crossVisiblePath(List<Edge> visibleArea){
+        List<Edge> visibleEdges = new ArrayList<>();
+        TrapezoidalMap tm = new TrapezoidalMap();
+        for(Edge edge : visibilityGraph.getEdges()){
+            boolean doesIntersection = false;
+            for(Edge visibleEdge : visibleArea){
+                Vertex intersection = tm.getIntersectionPointOfSegments(edge, visibleEdge);
+                if(intersection != null){
+                    doesIntersection = true;
+                }
+            }
+            if(!doesIntersection){
+                visibleEdges.add(edge);
+            }
         }
-        tree.put(cost, allPaths);
+        return visibleEdges;
     }
 
     private List<Vertex> getSmartSmartPath(int numGuards, int numExits){
@@ -236,21 +229,39 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void handleButtonKaj(ActionEvent event) {
 
+        Edge e1,e2,e3;
+        Vertex v1,v2,v3,v4;
+        v1 = new Vertex(1.0,1.0,"");
+        v2 = new Vertex(0.0,1.0,"");
+        v3 = new Vertex(2.0,1.0,"");
+        v4 = new Vertex(1.0,2.0,"");
+        e1 = new Edge(v2,v1);
+        e2 = new Edge(v1,v3);
+        e3 = new Edge(v4,v1);
+        List<Edge> test = new ArrayList<>();
+        test.add(e3);
+
+        visibilityGraph= new Polygon();
+        visibilityGraph.addEdge(e1);
+        visibilityGraph.addEdge(e2);
+        test = crossVisiblePath(test);
         finalEdge();
- 
-        List<Polygon> ps = innerPolygon;
         
-        ps.add(polygon);
-        vis =new dummyVis();
-        visibilityGraph = vis.visibiliyGraph(ps);
-          
-        List<Vertex> ve = vis.getBestExitGuards();
-        List<Vertex> v = findPath(ve);
-        setUpDraw(false);
-        g.setStroke(Color.RED);
-        for (int i = 0; i < v.size()-1; i++) {
-            g.strokeLine(v.get(i).getX(), v.get(i).getY(), v.get(i+1).getX(), v.get(i+1).getY());
-        }   
+        
+ 
+//        List<Polygon> ps = innerPolygon;
+//        
+//        ps.add(polygon);
+//        vis =new dummyVis();
+//        visibilityGraph = vis.visibiliyGraph(ps);
+//          
+//        List<Vertex> ve = vis.getBestExitGuards();
+//        List<Vertex> v = findPath(ve);
+//        setUpDraw(false);
+//        g.setStroke(Color.RED);
+//        for (int i = 0; i < v.size()-1; i++) {
+//            g.strokeLine(v.get(i).getX(), v.get(i).getY(), v.get(i+1).getX(), v.get(i+1).getY());
+//        }   
     }
     
     public void calculateVisibilityGraph(){
@@ -1180,7 +1191,7 @@ public class FXMLDocumentController implements Initializable {
         return poly;
     }
     
-    private List<Edge> findVertexRange(Vertex vertexGuard){
+    private List<Edge> findVertexRange(int x, int y){
         calculateVisibilityGraph();
         
         List<Polygon> allPolygons = innerPolygon;
@@ -1192,7 +1203,7 @@ public class FXMLDocumentController implements Initializable {
         }
         VertexInfo vertexInfo = new VertexInfo();
         for(VertexInfo info : vis.getVertexInfo()){
-            if(info.getVertex()==vertexGuard){
+            if(info.getVertex().getX()==x &&info.getVertex().getY()==y){
                 vertexInfo = info;
             }
         }
@@ -1201,13 +1212,13 @@ public class FXMLDocumentController implements Initializable {
         //Vertex testVertex = vis.getVertexInfo().get(0).getVertex();
         List<Edge> startEdges = new ArrayList<>();
         for(Edge edge : edges){
-            if(edge.containsVertex(vertexGuard)){
+            if(edge.containsVertex(vertexInfo.getVertex())){
                 startEdges.add(edge);
             }
         }
           
         //order list
-        visibleVertices = circleSweepSort(vertexGuard, visibleVertices);
+        visibleVertices = circleSweepSort(vertexInfo.getVertex(), visibleVertices);
         visibleVertices.remove(0);
         visibleVertices.add(visibleVertices.get(0));
         
