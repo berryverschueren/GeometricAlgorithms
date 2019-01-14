@@ -1948,7 +1948,7 @@ public class TrapezoidalMap {
 
         boolean onEdgeSegment = false;
         for(Edge edge : p.getEdges()){
-            onEdgeSegment = onSegment(edge.getV1(), v, edge.getV2());
+            onEdgeSegment = orientation(edge.getV1(), v, edge.getV2()) == 0 && onSegment(edge.getV1(), v, edge.getV2());
             if(onEdgeSegment)
                 break;
         }
