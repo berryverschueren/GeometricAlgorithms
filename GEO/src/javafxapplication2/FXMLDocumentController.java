@@ -353,16 +353,16 @@ public class FXMLDocumentController implements Initializable {
         
         List<Guard> guards = makeGuardList(verticesForGuardPath);
         
-        // todo update timepoints
         List<TimePoint> timePoints = ComputeTimePoints(guards);
         
-        //Map<Double, List<List<Vertex>>> allExitToArtPath = getAllExitToArtPath();
+        List<PathGuard> stopGuards = GuardsObserving(guards);
         
         Map<Double, List<Vertex>> shortestArtPath = getShortestArtPath();
         
         Map<Double, List<PathRobber>> possiblePathsRobber = possiblePathsRobber(shortestArtPath);
         
-        SortedMap<TimePoint, List<PathRobber>> robberPaths = ComputePossiblePathRobbers(possiblePathsRobber, timePoints);
+        //SortedMap<TimePoint, List<PathRobber>> robberPaths = ComputePossiblePathRobbers(possiblePathsRobber, timePoints);
+        SortedMap<TimePoint, List<PathRobber>> robberPaths = ComputePossiblePathRobbersNew(possiblePathsRobber, stopGuards);
         
         Robber robber = ComputeRobber(robberPaths);
         
@@ -538,6 +538,26 @@ public class FXMLDocumentController implements Initializable {
         return point;
     }
     
+    private List<PathGuard> GuardsObserving(List<Guard> guards) {
+        List<PathGuard> stopGuards = new ArrayList<>();
+        // loop guards
+        for (int i = 0; i < guards.size(); i++) {
+            // current guard
+            Guard g = guards.get(i);
+            // storage for previous path guard
+            PathGuard ppg = null;
+            // loop current guards path
+            for (int j = 0; j < g.getPath().size(); j++) {
+                // current guards path point
+                PathGuard pg = g.getPath().get(j);
+                if (pg.getObserving() == 1) {
+                    stopGuards.add(pg);
+                }
+            }
+        }
+        return stopGuards;                
+    }
+    
     private List<TimePoint> ComputeTimePoints(List<Guard> guards) {
         // storage for start, end, diff for guard schedules
         List<TimePoint> timePoints = new ArrayList<>();
@@ -601,6 +621,72 @@ public class FXMLDocumentController implements Initializable {
         return nonOverlappingTimePoints;
     }
 
+    private SortedMap<TimePoint, List<PathRobber>> ComputePossiblePathRobbersNew(Map<Double, List<PathRobber>> pathRobbers, List<PathGuard> stopGuards) {
+        // storage for possible paths
+        SortedMap<TimePoint, List<PathRobber>> prs = new TreeMap<>(new TimePointComparator());
+        // if not enough info, abort mission
+        if (pathRobbers == null || pathRobbers.size() < 2) {
+            return prs;
+        } 
+        // otherwise, try to find a valid path
+        else {
+            // remember time taken to not overlap paths
+            Double timeTaken = 0.0;
+            
+            // compute all forbidden edges for guard stops
+            Map<PathGuard, List<Edge>> forbiddenEdges = new HashMap<>(); 
+            for (PathGuard pg : stopGuards) {
+                forbiddenEdges.put(pg, findVertexRange(pg.getX(), pg.getY()));
+            }
+            
+            // loop to match path robbers to guard stops
+            for (Map.Entry pair : pathRobbers.entrySet()) {
+                Double requiredTime = (Double) pair.getKey();
+                boolean pathAllowedTotal = true;
+                
+                // check for every guard if the path robber is allowed
+                for (int i = 0; i < stopGuards.size(); i++) {
+                    PathGuard currentGuard = stopGuards.get(i);
+                    
+                    // if guard stops within the time required for the path robber
+                    if (currentGuard.getTimestamp() >= timeTaken && currentGuard.getTimestamp() <= timeTaken + requiredTime) {
+                        boolean pathAllowed = true;
+                        List<Edge> edges = forbiddenEdges.get(currentGuard);
+                        
+                        // find if any of the vertices in the path robber is matching with 
+                        // any of the vertices of the forbidden path for this particular guard
+                        for (PathRobber pr : pathRobbers.get(requiredTime)) {
+                            for (Edge e : edges) {
+                                if ((e.getV1().getX() == pr.getX() && e.getV1().getY() == pr.getY())
+                                        || (e.getV2().getX() == pr.getX() && e.getV2().getY() == pr.getY())) {
+                                    pathAllowed = false;
+                                    break;
+                                }
+                            }
+                            if (!pathAllowed) {
+                                break;
+                            }
+                        }
+                        pathAllowedTotal = pathAllowed;
+                        if (!pathAllowedTotal) {
+                            break;
+                        }
+                    }
+                }
+                
+                // if the path is allowed
+                if (pathAllowedTotal) {
+                    // if not exceeds total time limit
+                    if (timeTaken + requiredTime <= this.globalT) {
+                        prs.put(new TimePoint(timeTaken, timeTaken + requiredTime), pathRobbers.get(requiredTime));
+                        timeTaken = timeTaken + requiredTime;
+                    }
+                }
+            }
+        }
+        return prs;
+    }
+    
     private SortedMap<TimePoint, List<PathRobber>> ComputePossiblePathRobbers(Map<Double, List<PathRobber>> pathRobbers, List<TimePoint> timePoints) {
         // storage for possible paths
         SortedMap<TimePoint, List<PathRobber>> prs = new TreeMap<>(new TimePointComparator());
