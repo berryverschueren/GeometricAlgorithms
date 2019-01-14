@@ -108,6 +108,9 @@ public class dummyVis {
             VertexInfo vertexInfo = new VertexInfo();
             vertexInfo.setVertex(vertex1);
             for(Vertex vertex2 : allVertices(polygons)){
+                if(vertex1 == vertex2){
+                    continue;
+                }
                 Edge newEdge = new Edge("", vertex1,vertex2);
 //                if(noSelfEdge(newEdge, polygons)){
                     if(mayAdd(newEdge, allEdges(polygons))){
@@ -137,8 +140,8 @@ public class dummyVis {
                             Vertex halfHalfway2 = math.halfwayPoint(new Edge("", halfway, vertex2));
                             if(outer){
                                 if(math.doesPolygonContainVertex(p, halfway)
-                                        || math.doesPolygonContainVertex(p, halfHalfway1)
-                                        || math.doesPolygonContainVertex(p, halfHalfway2)){
+                                        && math.doesPolygonContainVertex(p, halfHalfway1)
+                                        && math.doesPolygonContainVertex(p, halfHalfway2)){
                                     allPoly.addEdge(newEdge);
                                     vertexInfo.addSeesMe(vertex2);
                                 }                                

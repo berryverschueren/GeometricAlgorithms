@@ -217,8 +217,10 @@ public class FXMLDocumentController implements Initializable {
                 //currentPath = findSinglePath(interestingVertices.get(i), interestingVertices.get(i+1));
                 //currentPath.remove(0);
                 List<Vertex> inter = findSinglePath(path.get(path.size()-1), currentPath.get(0));
+                if(!inter.isEmpty()){
                 inter.remove(0);
                 shortestPath.addAll(inter);
+                }
             }
             path = currentPath;
             //path.remove(0);
@@ -1340,7 +1342,7 @@ public class FXMLDocumentController implements Initializable {
         //x=342 y 105    x303 y169
         VertexInfo vertexInfo = new VertexInfo();
         for (int i = 0; i < vis.getVertexInfo().size(); i++) {
-            if(vis.getVertexInfo().get(i).getVertex().getX()==342.0 &&vis.getVertexInfo().get(i).getVertex().getY()==105.0){
+            if(vis.getVertexInfo().get(i).getVertex().getX()==534.0 &&vis.getVertexInfo().get(i).getVertex().getY()==177.0){
                 vertexInfo = vis.getVertexInfo().get(i);
             }
         }
