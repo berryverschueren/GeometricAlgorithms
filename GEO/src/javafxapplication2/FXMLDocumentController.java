@@ -259,18 +259,23 @@ public class FXMLDocumentController implements Initializable {
             shortestPath.addAll(currentPath);
         }
         List<Vertex> finalStep = findSinglePath(shortestPath.get(shortestPath.size()-1), shortestPath.get(0));
-        shortestPath.get(0);
         if(!finalStep.isEmpty()){
                     finalStep.remove(0);
                     
                     shortestPath.addAll(finalStep);
         }
+        
+        if(shortestPath.get(0)!= shortestPath.get(shortestPath.size()-1)){
+            shortestPath.add(shortestPath.get(0));
+       }
+            
+            
         System.out.println("guard path");
             for(Vertex v : shortestPath){
                 System.out.println("("+v.getX()+","+v.getY()+")");
             }
 
-        g.setStroke(Color.PURPLE);
+        g.setStroke(Color.YELLOW);
         for (int i = 0; i < shortestPath.size()-1; i++) {
             g.strokeLine(shortestPath.get(i).getX(), shortestPath.get(i).getY(), shortestPath.get(i+1).getX(), shortestPath.get(i+1).getY());
         }
