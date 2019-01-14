@@ -62,6 +62,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.Light;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -1389,12 +1390,24 @@ public class FXMLDocumentController implements Initializable {
         for(Polygon p : allPolygons){
             edges.addAll(p.getEdges());
         }
-        VertexInfo vertexInfo = new VertexInfo();
+        VertexInfo vertexInfo = null;
+        VertexInfo vertexRem = null;
+        double dist = 100000000.0;
         for(VertexInfo info : vis.getVertexInfo()){
             if(info.getVertex().getX()==x &&info.getVertex().getY()==y){
                 vertexInfo = info;
+            }else{
+                double d = distance(new Vertex(x,y, ""), info.getVertex());
+                if(d < dist){
+                    dist = d;
+                    vertexRem = info;
+                }           
             }
         }
+        if(vertexInfo == null){
+            vertexInfo = vertexRem;
+        }
+        
         List<Vertex> visibleVertices = vertexInfo.getSeeMe();
         
         //Vertex testVertex = vis.getVertexInfo().get(0).getVertex();
