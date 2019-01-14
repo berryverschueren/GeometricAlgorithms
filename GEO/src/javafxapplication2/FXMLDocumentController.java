@@ -1200,8 +1200,14 @@ public class FXMLDocumentController implements Initializable {
         
         double tPrevious = initT; 
         Vertex vertexPrevious = firstVertex;
-                  
-        for (int i = 1; i < verticesPathGuard.size() - 1; i++) {
+        
+        int j = verticesPathGuard.size() - 1;
+        for (int i = 1; i < j; i++) {
+            //if remainder is zero i ++; skip double vertex of original path, and extend loop
+            if((i + index) % verticesPathGuard.size()==0){
+                i++;
+                j++;
+            }
             Vertex vertexTemp = verticesPathGuard.get((i + index) % verticesPathGuard.size());
             x = vertexTemp.getX();
             y = vertexTemp.getY();
