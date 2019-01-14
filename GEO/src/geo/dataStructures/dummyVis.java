@@ -174,27 +174,28 @@ public class dummyVis {
             }
             info.add(vertexInfo);
             if(seesArt){
-                //savePriority(priorityVertexArt)
-                if(priorityVertexArt.containsKey(numberOf)){
-                    List<Vertex> vertices = priorityVertexArt.get(numberOf);
-                    vertices.add(vertex1);
-                    priorityVertexArt.put(numberOf, vertices);
-                }else{
-                    List<Vertex> vertices = new ArrayList<>();
-                    vertices.add(vertex1);
-                    priorityVertexArt.put(numberOf, vertices);
-                }
+                savePriority(numberOf, vertex1, priorityVertexArt);
+//                if(priorityVertexArt.containsKey(numberOf)){
+//                    List<Vertex> vertices = priorityVertexArt.get(numberOf);
+//                    vertices.add(vertex1);
+//                    priorityVertexArt.put(numberOf, vertices);
+//                }else{
+//                    List<Vertex> vertices = new ArrayList<>();
+//                    vertices.add(vertex1);
+//                    priorityVertexArt.put(numberOf, vertices);
+//                }
             }
             if(seesExit){
-                if(priorityVertexExit.containsKey(numberOf)){
-                    List<Vertex> vertices = priorityVertexExit.get(numberOf);
-                    vertices.add(vertex1);
-                    priorityVertexExit.put(numberOf, vertices);
-                }else{
-                    List<Vertex> vertices = new ArrayList<>();
-                    vertices.add(vertex1);
-                    priorityVertexExit.put(numberOf, vertices);
-                }
+                savePriority(numberOf, vertex1, priorityVertexExit);
+//                if(priorityVertexExit.containsKey(numberOf)){
+//                    List<Vertex> vertices = priorityVertexExit.get(numberOf);
+//                    vertices.add(vertex1);
+//                    priorityVertexExit.put(numberOf, vertices);
+//                }else{
+//                    List<Vertex> vertices = new ArrayList<>();
+//                    vertices.add(vertex1);
+//                    priorityVertexExit.put(numberOf, vertices);
+//                }
             }
         }
         
@@ -207,17 +208,17 @@ public class dummyVis {
         return allPoly;
     }
     
-//    private void savePriority(){
-//        if(priorityVertexArt.containsKey(numberOf)){
-//            List<Vertex> vertices = priorityVertexArt.get(numberOf);
-//            vertices.add(vertex1);
-//            priorityVertexArt.put(numberOf, vertices);
-//        }else{
-//            List<Vertex> vertices = new ArrayList<>();
-//            vertices.add(vertex1);
-//            priorityVertexArt.put(numberOf, vertices);
-//        }
-//    }
+    private void savePriority(int numberOf, Vertex vertex, Map<Integer, List<Vertex>> queue){
+        if(queue.containsKey(numberOf)){
+            List<Vertex> vertices = queue.get(numberOf);
+            vertices.add(vertex);
+            queue.put(numberOf, vertices);
+        }else{
+            List<Vertex> vertices = new ArrayList<>();
+            vertices.add(vertex);
+            queue.put(numberOf, vertices);
+        }
+    }
     
     private List<Vertex> allVertices(List<Polygon> innerpolygon) {
         List<Vertex> vertices = new ArrayList<>();
