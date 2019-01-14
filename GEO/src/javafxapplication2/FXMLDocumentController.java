@@ -310,6 +310,13 @@ public class FXMLDocumentController implements Initializable {
         return path;
     }
     
+    public boolean theSameVertex(Vertex v1, double x2, double y2) {
+        if (Objects.equals(v1.getX(), x2) && Objects.equals(v1.getY(), y2)) {
+            return true;
+        }
+        return false;
+    }
+    
     @FXML
     private void handleButtonBerry(ActionEvent event) {
         Stage stage = new Stage();
@@ -352,6 +359,7 @@ public class FXMLDocumentController implements Initializable {
         
         List<Guard> guards = makeGuardList(verticesForGuardPath);
         
+        // todo update timepoints
         List<TimePoint> timePoints = ComputeTimePoints(guards);
         
         //Map<Double, List<List<Vertex>>> allExitToArtPath = getAllExitToArtPath();
