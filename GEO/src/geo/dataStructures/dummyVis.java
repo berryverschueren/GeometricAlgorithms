@@ -137,7 +137,7 @@ public class dummyVis {
                             }
                             Vertex halfway = math.halfwayPoint(newEdge);
                             Vertex halfHalfway1 = math.halfwayPoint(new Edge("", vertex1, halfway));
-                            Vertex halfHalfway2 = math.halfwayPoint(new Edge("", halfway, vertex2));
+                            Vertex halfHalfway2 = math.halfwayPoint(new Edge("", halfHalfway1, vertex1));
                             if(outer){
                                 if(math.doesPolygonContainVertex(p, halfway)
                                         && math.doesPolygonContainVertex(p, halfHalfway1)
@@ -208,10 +208,10 @@ public class dummyVis {
             }
         }
         
-        for(Polygon polygon : polygons){
-            allPoly.addVertices(polygon.getVertices());
-            allPoly.addEdges(polygon.getEdges());
-        }
+//        for(Polygon polygon : polygons){
+//            allPoly.addVertices(polygon.getVertices());
+//            allPoly.addEdges(polygon.getEdges());
+//        }
 
         System.out.println("number of edge from visibility graph = "+allPoly.getEdges().size());
         return allPoly;
