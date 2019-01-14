@@ -311,9 +311,16 @@ public class Graph {
                     g.addEdgeDijkstra(edge.getV1().getLabel(), edge.getV2().getLabel(), cost);
                 }
                 
+                if(!vertices.contains(start)){
+                    System.out.println("");
+                }
+                
+                if(!vertices.contains(end)){
+                    System.out.println("");
+                }
 
-		//System.out.println("Start:"+ start.getLabel());
-		//System.out.println("end:"+ end.getLabel());
+		System.out.println("Start:"+ start.getLabel());
+		System.out.println("end:"+ end.getLabel());
 
 		//BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		VertexDijkstra w = processRequest(start.getLabel(),end.getLabel(), g);

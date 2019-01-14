@@ -218,8 +218,8 @@ public class FXMLDocumentController implements Initializable {
                 //currentPath.remove(0);
                 List<Vertex> inter = findSinglePath(path.get(path.size()-1), currentPath.get(0));
                 if(!inter.isEmpty()){
-                inter.remove(0);
-                shortestPath.addAll(inter);
+                    inter.remove(0);
+                    shortestPath.addAll(inter);
                 }
             }
             path = currentPath;

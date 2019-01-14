@@ -208,10 +208,10 @@ public class dummyVis {
             }
         }
         
-//        for(Polygon polygon : polygons){
-//            allPoly.addVertices(polygon.getVertices());
-//            allPoly.addEdges(polygon.getEdges());
-//        }
+        for(Polygon polygon : polygons){
+            allPoly.addVertices(polygon.getVertices());
+            //allPoly.addEdges(polygon.getEdges());
+        }
 
         System.out.println("number of edge from visibility graph = "+allPoly.getEdges().size());
         return allPoly;
