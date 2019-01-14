@@ -636,7 +636,7 @@ public class FXMLDocumentController implements Initializable {
             // compute all forbidden edges for guard stops
             Map<PathGuard, List<Edge>> forbiddenEdges = new HashMap<>(); 
             for (PathGuard pg : stopGuards) {
-                forbiddenEdges.put(pg, findVertexRange(new Vertex(pg.getX(), pg.getY(), "")));
+                forbiddenEdges.put(pg, findVertexRange(pg.getX(), pg.getY()));
             }
             
             // loop to match path robbers to guard stops
