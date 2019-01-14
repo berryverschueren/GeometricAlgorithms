@@ -275,9 +275,9 @@ public class FXMLDocumentController implements Initializable {
                 g.setStroke(Color.AQUA);
 
         visibilityGraph = vis.visibiliyGraph(polys);
-//        for(Edge edge : visibilityGraph.getEdges()){
-//            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
-//        }
+        for(Edge edge : visibilityGraph.getEdges()){
+            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+        }
     }
     
     public List<Vertex> findSinglePath(Vertex vertex1, Vertex vertex2){
@@ -1263,9 +1263,11 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void handleButtonSave(ActionEvent event) {
         calculateVisibilityGraph();
+        
+        //x=342 y 105    x303 y169
         VertexInfo vertexInfo = new VertexInfo();
         for (int i = 0; i < vis.getVertexInfo().size(); i++) {
-            if(vis.getVertexInfo().get(i).getVertex().getX()==466.0 &&vis.getVertexInfo().get(i).getVertex().getY()==214.0){
+            if(vis.getVertexInfo().get(i).getVertex().getX()==342.0 &&vis.getVertexInfo().get(i).getVertex().getY()==105.0){
                 vertexInfo = vis.getVertexInfo().get(i);
             }
         }
@@ -1279,7 +1281,7 @@ public class FXMLDocumentController implements Initializable {
             edges.addAll(p.getEdges());
         }
         
-        
+    
         Vertex testVertex = vertexInfo.getVertex();
         List<Edge> startEdges = new ArrayList<>();
         for(Edge edge : edges){
@@ -1603,3 +1605,4 @@ public class FXMLDocumentController implements Initializable {
         POLY,POLY1,POLY2,POLY3,POLY4,POLY5,POLY6,POLY7,POLY8
     }
 }
+//x=342 y 105    x303 y169

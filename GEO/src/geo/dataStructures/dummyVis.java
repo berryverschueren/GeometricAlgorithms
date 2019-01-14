@@ -140,7 +140,7 @@ public class dummyVis {
                                 }                                
                             }else{
                                 p = getPolygon(vertex2, polygons);
-                                if(!math.doesPolygonContainVertex(p, halfway)){
+                                if(!math.doesPolygonContainVertexNotEdge(p, halfway)){
 //                                    allPoly.addEdge(newEdge);
                                     vertexInfo.addSeesMe(vertex2);
                                 }

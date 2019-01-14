@@ -1940,6 +1940,38 @@ public class TrapezoidalMap {
         } while (i != 0);
         return count % 2 == 1;
     }
+    
+     public boolean doesPolygonContainVertexNotEdge(Polygon p, Vertex v) {
+        Vertex extreme = new Vertex(10000.0, v.getY(), "Extreme Point");
+        Vertex[] polygon = p.getVertices().toArray(new Vertex[p.getVertices().size()]);
+        int count = 0, i = 0, n = polygon.length;
+
+        boolean onEdgeSegment = false;
+        for(Edge edge : p.getEdges()){
+            onEdgeSegment = onSegment(edge.getV1(), v, edge.getV2());
+            if(onEdgeSegment)
+                break;
+        }
+
+        if(onEdgeSegment){
+            return false;
+        }
+        
+        do {
+            int next = (i + 1) % n;
+            if (doSegmentsIntersect(polygon[i], polygon[next], v, extreme)) {
+                if (orientation(polygon[i], v, polygon[next]) == 0) {
+                    return onSegment(polygon[i], v, polygon[next]);
+                }
+                count++;
+            }
+            i = next;
+        } while (i != 0);
+        
+        
+        
+        return count % 2 == 1;
+    }
 
     public Vertex getIntersectionPointOfSegments(Edge e1, Edge e2) {
         if (e1 == null || e1.getV1() == null || e1.getV2() == null
