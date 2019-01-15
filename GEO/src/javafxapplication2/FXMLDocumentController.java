@@ -867,7 +867,7 @@ public class FXMLDocumentController implements Initializable {
         List<TimePoint> multiplicatedTimePoints = new ArrayList<>();
         multiplicatedTimePoints.addAll(nonOverlappingTimePoints);
         
-        double timeTaken = nonOverlappingTimePoints.get(timePoints.size() - 1).getEnd();
+        double timeTaken = nonOverlappingTimePoints.get(nonOverlappingTimePoints.size() - 1).getEnd();
         int indexTimePoint = 0;
         while (timeTaken <= this.globalT) {
             TimePoint newTp = new TimePoint((nonOverlappingTimePoints.get((indexTimePoint % nonOverlappingTimePoints.size())).getStart() + timeTaken),
