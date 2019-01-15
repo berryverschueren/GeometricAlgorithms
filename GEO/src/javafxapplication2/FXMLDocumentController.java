@@ -27,6 +27,7 @@ import geo.dataStructures.Robber;
 import geo.dataStructures.TimePoint;
 import geo.dataStructures.TimePointComparator;
 import geo.dataStructures.Trapezoid;
+import geo.dataStructures.Triangle;
 import geo.dataStructures.VertexInfo;
 import geo.dataStructures.dummyVis;
 import java.io.File;
@@ -285,23 +286,70 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void handleButtonKaj(ActionEvent event) {
 
-        Edge e1,e2,e3;
-        Vertex v1,v2,v3,v4;
-        v1 = new Vertex(1.0,1.0,"");
-        v2 = new Vertex(0.0,1.0,"");
-        v3 = new Vertex(2.0,1.0,"");
-        v4 = new Vertex(1.0,2.0,"");
-        e1 = new Edge(v2,v1);
-        e2 = new Edge(v1,v3);
-        e3 = new Edge(v4,v1);
-        List<Edge> test = new ArrayList<>();
-        test.add(e3);
+        Stage stage = new Stage();
+        stage.setTitle( "Timeline Example" );
+        Group root = new Group();
+        Scene theScene = new Scene(root);
+        stage.setScene(theScene);
 
-        visibilityGraph= new Polygon();
-        visibilityGraph.addEdge(e1);
-        visibilityGraph.addEdge(e2);
-        test = crossVisiblePath(test);
-        finalEdge();
+        Canvas canvas = new Canvas(1900, 1000);
+        root.getChildren().add(canvas);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        TrapezoidalMap tm = new TrapezoidalMap();
+        List<Edge> segments = new ArrayList<>();
+        segments.addAll(this.polygon.getEdges());
+        for (int i = 0; i < this.innerPolygon.size(); i++) {
+            segments.addAll(this.innerPolygon.get(i).getEdges());
+        }
+        
+        tm.construct(segments);
+        tm.removeInnerTrapezoids(this.innerPolygon);
+        tm.removeOuterTrapezoids(this.polygon);
+        tm.computePossiblePaths();
+        tm.triangulateTrapezoids();
+        //tm.getPossiblePathEdges()
+        gc.setStroke(Color.AQUA);
+        for(Triangle tri : tm.getTriangles()){
+            gc.strokeLine(tri.getE1().getV1().getX(), tri.getE1().getV1().getY(), tri.getE1().getV2().getX(), tri.getE1().getV2().getY());
+            gc.strokeLine(tri.getE2().getV1().getX(), tri.getE2().getV1().getY(), tri.getE2().getV2().getX(), tri.getE2().getV2().getY());
+            gc.strokeLine(tri.getE3().getV1().getX(), tri.getE3().getV1().getY(), tri.getE3().getV2().getX(), tri.getE3().getV2().getY());
+        }
+        
+        //polygon = new Polygon();
+        //innerPolygon = new ArrayList<>();
+        gc.setStroke(Color.RED);
+        for(Edge edge : tm.getPossiblePathEdges()){
+            gc.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+            //polygon.addEdge(edge);
+        }
+
+        gc.setStroke(Color.BLACK);
+        for(Edge edge : segments){
+            gc.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+            //polygon.addEdge(edge);
+        }
+        //setUpDraw(gc, true);
+        //finalizeDraw(gc);
+        //setUpDraw(gc, false);
+        stage.show();
+//        Edge e1,e2,e3;
+//        Vertex v1,v2,v3,v4;
+//        v1 = new Vertex(1.0,1.0,"");
+//        v2 = new Vertex(0.0,1.0,"");
+//        v3 = new Vertex(2.0,1.0,"");
+//        v4 = new Vertex(1.0,2.0,"");
+//        e1 = new Edge(v2,v1);
+//        e2 = new Edge(v1,v3);
+//        e3 = new Edge(v4,v1);
+//        List<Edge> test = new ArrayList<>();
+//        test.add(e3);
+//
+//        visibilityGraph= new Polygon();
+//        visibilityGraph.addEdge(e1);
+//        visibilityGraph.addEdge(e2);
+//        test = crossVisiblePath(test);
+//        finalEdge();
         
         
  
@@ -327,12 +375,12 @@ public class FXMLDocumentController implements Initializable {
         polys.addAll(innerPolygon);
         vis = new dummyVis();
         
-                g.setStroke(Color.AQUA);
+        g.setStroke(Color.AQUA);
 
         visibilityGraph = vis.visibiliyGraph(polys);
-//        for(Edge edge : visibilityGraph.getEdges()){
-//            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
-//        }
+        for(Edge edge : visibilityGraph.getEdges()){
+            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+        }
     }
     
     public List<Vertex> findSinglePath(Vertex vertex1, Vertex vertex2){
@@ -1510,7 +1558,8 @@ public class FXMLDocumentController implements Initializable {
             vertexInfo = vertexRem;
         }
         
-        List<Vertex> visibleVertices = vertexInfo.getSeeMe();
+        List<Vertex> visibleVertices = new ArrayList<>();
+        visibleVertices.addAll(vertexInfo.getSeeMe());
         
         //Vertex testVertex = vis.getVertexInfo().get(0).getVertex();
         List<Edge> startEdges = new ArrayList<>();
@@ -1575,7 +1624,7 @@ public class FXMLDocumentController implements Initializable {
         VertexInfo vertexRem = null;
         double dist = 100000000.0;
         for (int i = 0; i < vis.getVertexInfo().size(); i++) {
-            if(vis.getVertexInfo().get(i).getVertex().getX()==534.0 &&vis.getVertexInfo().get(i).getVertex().getY()==177.0){
+            if(vis.getVertexInfo().get(i).getVertex().getX()==583.0 &&vis.getVertexInfo().get(i).getVertex().getY()==386.0){
                 vertexInfo = vis.getVertexInfo().get(i);
             
             }else{
@@ -1610,7 +1659,9 @@ public class FXMLDocumentController implements Initializable {
         }
         
         
-        List<Vertex> visibleVertices = vertexInfo.getSeeMe();
+        List<Vertex> visibleVertices = new ArrayList<>(); 
+                
+        visibleVertices.addAll(vertexInfo.getSeeMe());
         
         //order list
         visibleVertices = circleSweepSort(testVertex, visibleVertices);
@@ -1808,14 +1859,14 @@ public class FXMLDocumentController implements Initializable {
         g.setStroke(Color.RED);
         for (int i = 0; i < polygon.getVertices().size(); i++) {
             Vertex v = polygon.getVertices().get(i);
-            g.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+//            g.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
         }
         g.setFill(Color.WHITE);
         for(Polygon innerPolygon:innerPolygon){
             g.fillPolygon(innerPolygon.getXs(), innerPolygon.getYs(), innerPolygon.getNumberVertices());
             for (int i = 0; i < innerPolygon.getVertices().size(); i++) {
                 Vertex v = innerPolygon.getVertices().get(i);
-                g.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+//                g.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
             }
         }
     }

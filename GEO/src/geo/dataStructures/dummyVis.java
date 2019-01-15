@@ -108,6 +108,10 @@ public class dummyVis {
             VertexInfo vertexInfo = new VertexInfo();
             vertexInfo.setVertex(vertex1);
             for(Vertex vertex2 : allVertices(polygons)){
+                if(vertex1.getX() == 583.0 && vertex1.getY() == 386.0 
+                        && vertex2.getX() == 765.0 && vertex2.getY() == 331.0){
+                    int a =2;
+                }
                 if(vertex1 == vertex2){
                     continue;
                 }
