@@ -104,12 +104,14 @@ public class FXMLDocumentController implements Initializable {
     private Button readInput;
     @FXML
     private Button readGuard;
-    
+    @FXML
+    private Button readrobber;
     
     private GraphicsContext g; 
     private Polygon polygon;
     private List<Polygon> innerPolygon;
     private List<Guard> guards; 
+    private Robber robber;
     private int numOfGuards; 
     private double vMaxG;
     private double deltaTime;
@@ -127,7 +129,106 @@ public class FXMLDocumentController implements Initializable {
     
     @FXML
     private void handleButtonRobber(ActionEvent event) {
-        int a = 5;
+        String workingDir = System.getProperty("user.dir");
+        Stage stage = (Stage) this.readrobber.getScene().getWindow();
+        FileChooser fileChooser0 = new FileChooser();
+        fileChooser0.setInitialDirectory(new File(workingDir));
+        fileChooser0.setTitle("Open Folder");
+        File file0 = fileChooser0.showOpenDialog(stage);
+        
+        if (file0 != null) {
+            String filename = file0.getName(); //"ArtGalleryV3.txt";
+            String pathname = file0.getAbsolutePath();
+            guards = ReadInputGuardSpecification.ReadInputGuardSpecification(pathname);
+        }
+        
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(workingDir));
+        fileChooser.setTitle("Open Folder");
+        File file = fileChooser.showOpenDialog(stage);
+        
+        if (file != null) {
+            String filename = file.getName(); //"ArtGalleryV3.txt";
+            String pathname = file.getAbsolutePath();
+            robber = ReadInputRobberSpecification.ReadInputRobberSpecification(pathname);
+        }
+        Stage stage2 = new Stage();
+        stage2.setTitle( "Timeline Example" );
+        Group root = new Group();
+        Scene theScene = new Scene(root);
+        stage2.setScene(theScene);
+
+        Canvas canvas = new Canvas(1900, 1000);
+        root.getChildren().add(canvas);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        String workingDire = "file:\\\\\\" + System.getProperty("user.dir");        
+        Image guardImage = new Image(workingDire + "\\guard.png", 30, 70, false, false);
+        Image robberImage = new Image(workingDire + "\\robber.png", 30, 70, false, false);
+        
+        calculateVisibilityGraph();
+
+//        List<Vertex> verts = this.polygon.getVertices();
+//        int exitCounter = 0;
+//        for (int i = 0; i < verts.size(); i++) {
+//            if (verts.get(i).getExitFlag() == 1) {
+//                exitCounter++;
+//            }
+//        }
+//        
+//        List<Vertex> verticesForGuardPath = getSmartSmartPath(numOfGuards, exitCounter);
+//                
+//        List<TimePoint> timePoints = ComputeTimePoints(guards);
+//        
+//        List<PathGuard> stopGuards = GuardsObserving(guards);
+//        
+//        Map<Double, List<Vertex>> shortestArtPath = getShortestArtPath();
+//        
+//        Map<Double, List<PathRobber>> possiblePathsRobber = possiblePathsRobber(shortestArtPath);
+//        
+//        //SortedMap<TimePoint, List<PathRobber>> robberPaths = ComputePossiblePathRobbers(possiblePathsRobber, timePoints);
+//        SortedMap<TimePoint, List<PathRobber>> robberPaths = ComputePossiblePathRobbersNew(possiblePathsRobber, stopGuards, timePoints);
+//        
+//        Robber robber = ComputeRobber(robberPaths);
+
+//        int artCounterStolen = 0;
+//        int artCounterTotal = 0;
+//        
+//        for (Polygon p : this.innerPolygon) {
+//            verts.addAll(p.getVertices());
+//        }
+//        
+//        for (Vertex v : verts) {
+//            for (PathRobber pr : robber.getPath()) {
+//                if (v.getX() == pr.getX() && v.getY() == pr.getY() && v.getArtFlag() == 1)
+//                {
+//                    System.out.println("v: (" + v.getX() + ", " + v.getY() + ")");
+//                    artCounterStolen++;
+//                }
+//            }
+//            if (v.getArtFlag() == 1) {
+//                artCounterTotal++;
+//            }
+//        }
+//        System.out.println("Total stolen art pieces: " + artCounterStolen);
+//        System.out.println("Out of total art pieces: " + artCounterTotal);
+        
+        final long startNanoTime = System.nanoTime();
+                
+        new AnimationTimer()
+        {
+            @Override
+            public void handle(long currentNanoTime)
+            {
+                double t = (currentNanoTime - startNanoTime) / 1000000000.0; 
+                drawPath(gc, canvas, guards, robber, t, guardImage, robberImage);
+                if (t >= globalT) {
+                    this.stop();
+                }
+            }
+        }.start();
+        
+        stage2.show();
     }
     
     private Map<Double, List<Vertex>> getShortestArtPath(){
