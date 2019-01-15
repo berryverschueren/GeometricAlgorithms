@@ -1987,14 +1987,14 @@ public class FXMLDocumentController implements Initializable {
         g.setStroke(Color.RED);
         for (int i = 0; i < polygon.getVertices().size(); i++) {
             Vertex v = polygon.getVertices().get(i);
-            g.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+//            g.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
         }
         g.setFill(Color.WHITE);
         for(Polygon innerPolygon:innerPolygon){
             g.fillPolygon(innerPolygon.getXs(), innerPolygon.getYs(), innerPolygon.getNumberVertices());
             for (int i = 0; i < innerPolygon.getVertices().size(); i++) {
                 Vertex v = innerPolygon.getVertices().get(i);
-                g.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+//                g.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
             }
         }
     }
