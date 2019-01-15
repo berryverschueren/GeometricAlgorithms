@@ -106,6 +106,8 @@ public class FXMLDocumentController implements Initializable {
     private Button readGuard;
     @FXML
     private Button readrobber;
+    @FXML
+    private Button carina;
     
     private GraphicsContext g; 
     private Polygon polygon;
@@ -128,9 +130,9 @@ public class FXMLDocumentController implements Initializable {
     private dummyVis vis;
     
     @FXML
-    private void handleButtonRobber(ActionEvent event) {
+    private void handleButtonCarina(ActionEvent event) {
         String workingDir = System.getProperty("user.dir");
-        Stage stage = (Stage) this.readrobber.getScene().getWindow();
+        Stage stage = (Stage) this.carina.getScene().getWindow();
         FileChooser fileChooser0 = new FileChooser();
         fileChooser0.setInitialDirectory(new File(workingDir));
         fileChooser0.setTitle("Open Folder");
@@ -1254,7 +1256,7 @@ public class FXMLDocumentController implements Initializable {
     }
     
     @FXML
-    private void handleButtonCarina(ActionEvent event) {
+    private void handleButtonRobber(ActionEvent event) {
         numOfGuards = Integer.parseInt(Guards.getText());
         vMaxG = Double.parseDouble(vMaxGuards.getText());
         deltaTime = Double.parseDouble(deltaT.getText());
