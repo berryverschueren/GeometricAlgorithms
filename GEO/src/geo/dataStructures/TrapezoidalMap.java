@@ -1979,6 +1979,10 @@ public class TrapezoidalMap {
             return null;
         }
         
+        if(e1.getV1().getY()== 6.850000000000001){
+            int a = 4;
+        }
+        
         Vertex intersectionPoint = null;
         
         Vector2D p = new Vector2D(e1.getV1().getX(), e1.getV1().getY());
@@ -2018,7 +2022,10 @@ public class TrapezoidalMap {
             }
             return intersectionPoint;
         }
-        
+        if(e1.getV1().getY()== 6.850000000000001){
+            int a = 4;
+        }
+
         return intersectionPoint;
     }
 

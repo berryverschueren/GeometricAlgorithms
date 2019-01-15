@@ -274,6 +274,10 @@ public class FXMLDocumentController implements Initializable {
             }
         }
         visibleEdges.addAll(visibleArea);
+        g.setStroke(Color.BLANCHEDALMOND);
+        for(Edge edge : visibleEdges){
+            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+        }
         return visibleEdges;
     }
 
