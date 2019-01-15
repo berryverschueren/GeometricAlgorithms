@@ -378,9 +378,9 @@ public class FXMLDocumentController implements Initializable {
         g.setStroke(Color.AQUA);
 
         visibilityGraph = vis.visibiliyGraph(polys);
-        for(Edge edge : visibilityGraph.getEdges()){
-            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
-        }
+//        for(Edge edge : visibilityGraph.getEdges()){
+//            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+//        }
     }
     
     public List<Vertex> findSinglePath(Vertex vertex1, Vertex vertex2){
@@ -1698,19 +1698,23 @@ public class FXMLDocumentController implements Initializable {
             
             lastVertex = vertex;
         }
-        
         remember.addAll(noGoEdge);
-        remember = crossVisiblePath(remember);
-        
         g.setStroke(Color.RED);
         for(Edge edge : remember){
             g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
         }
         
-        g.setStroke(Color.BLUE);
-        for(Edge edge : noGoEdge){
-            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
-        }
+        remember = crossVisiblePath(remember);
+        
+//        g.setStroke(Color.RED);
+//        for(Edge edge : remember){
+//            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+//        }
+        
+//        g.setStroke(Color.BLUE);
+//        for(Edge edge : noGoEdge){
+//            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+//        }
         
 
         g.setFill(Color.LIGHTPINK);
