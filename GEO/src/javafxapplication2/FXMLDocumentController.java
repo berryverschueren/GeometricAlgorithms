@@ -646,10 +646,12 @@ public class FXMLDocumentController implements Initializable {
     private List<TimePoint> ComputeTimePoints(List<Guard> guards) {
         // storage for start, end, diff for guard schedules
         List<TimePoint> timePoints = new ArrayList<>();
+                        
         // loop guards
         for (int i = 0; i < guards.size(); i++) {
             // current guard
             Guard g = guards.get(i);
+            
             // storage for previous path guard
             PathGuard ppg = g.getPath().stream().filter(path -> path.getObserving() == 1).findFirst().orElse(null);
             
@@ -660,7 +662,7 @@ public class FXMLDocumentController implements Initializable {
                 // if this is a stopping point
                 // connect to the previous stopping point
                 // store in timepoint the start and end timestamps
-                if (pg.getObserving() == 1) {
+                if (ppg != pg && pg.getObserving() == 1) {
                     timePoints.add(new TimePoint(ppg.getTimestamp() + this.deltaTime, pg.getTimestamp()));
                     ppg = pg;
                 }
@@ -669,6 +671,7 @@ public class FXMLDocumentController implements Initializable {
         // tp now contains all stopping point time differences, now we have to combine overlapping ones
         // first we order all timepoints based on their starting timestamp
         timePoints.sort(new TimePointComparator());
+        
         // storage for non overlappen timepoints
         List<TimePoint> nonOverlappingTimePoints = new ArrayList<>();
         // loop timepoints
@@ -702,7 +705,23 @@ public class FXMLDocumentController implements Initializable {
             // add to non overlapping time points
             nonOverlappingTimePoints.add(tp);
         }
-        return nonOverlappingTimePoints;
+        
+        nonOverlappingTimePoints.sort(new TimePointComparator());
+        
+        List<TimePoint> multiplicatedTimePoints = new ArrayList<>();
+        multiplicatedTimePoints.addAll(nonOverlappingTimePoints);
+        
+        double timeTaken = nonOverlappingTimePoints.get(timePoints.size() - 1).getEnd();
+        int indexTimePoint = 0;
+        while (timeTaken <= this.globalT) {
+            TimePoint newTp = new TimePoint((nonOverlappingTimePoints.get((indexTimePoint % nonOverlappingTimePoints.size())).getStart() + timeTaken),
+                (nonOverlappingTimePoints.get((indexTimePoint % nonOverlappingTimePoints.size())).getEnd() + timeTaken));
+            timeTaken = timeTaken + nonOverlappingTimePoints.get(indexTimePoint % nonOverlappingTimePoints.size()).getDiff();
+            multiplicatedTimePoints.add(newTp);
+            indexTimePoint++;
+        }
+        
+        return multiplicatedTimePoints.subList(0, multiplicatedTimePoints.size() - 2); //nonOverlappingTimePoints;
     }
 
     private SortedMap<TimePoint, List<PathRobber>> ComputePossiblePathRobbersNew(Map<Double, List<PathRobber>> pathRobbers, List<PathGuard> stopGuards, List<TimePoint> timepoints) {
@@ -770,37 +789,81 @@ public class FXMLDocumentController implements Initializable {
                 
                 // tag loop has run
                 boolean loopRan = false;
+
+                Double maxTime = 0.0;
+                for (int j = 0; j < stopGuards.size(); j++) {
+                    if (stopGuards.get(j).getTimestamp() > maxTime) {
+                        maxTime = stopGuards.get(j).getTimestamp();
+                    }
+                }
                 
+                maxTime = maxTime + this.deltaTime;
+                
+                boolean timeUpdated = true;
+                while (timeTaken <= this.globalT) {
                 // for every possible time point
-                for (TimePoint tp : timepoints) {
-                    
-                    System.out.println("tp: " + tp.getStart());
+//                for (TimePoint tp : timepoints) {
                     
                     // if the time was not updated by the loop, find the next starting position and continue the search
-                    if (tp.getStart() >= timeTaken && (timeTaken > 0 || loopRan)) {
-                        
-                        System.out.println("updating timestamps by timepoint");
+//                    if (tp.getStart() >= timeTaken && (timeTaken > 0 || loopRan)) {
                                 
                         // update timestamps
-                        timeTaken = tp.getStart();
+//                        timeTaken = tp.getStart();
+//                    }
+                    if (!timeUpdated) {
+                        timeTaken++;
                     }
                     
-                    // tag loop ran
-                    loopRan = true;
+                    timeUpdated = false;
                     
-                    // for every guard stop point
-                    for (PathGuard g : stopGuards) {
+                    // tag loop ran
+//                    loopRan = true;                    
+                        
+//                    System.out.println("---");
+//                    System.out.println("timepoint loop : " + timeTaken);
 
-                        // for every robber path
-                        for (Map.Entry prPair : pathRobbers.entrySet()) {
+                    // for every robber path
+                    for (Map.Entry prPair : pathRobbers.entrySet()) {
 
-                            // time it takes to walk the entire path
-                            Double requiredTime = (Double) prPair.getKey();
-
+                        // time it takes to walk the entire path
+                        Double requiredTime = (Double) prPair.getKey();
+                        
+                        if (keysTaken.contains(requiredTime)) {
+                            continue;
+                        }
+                        
+                        Double timeTakenLooped = timeTaken % maxTime;
+                        Double timeTakenRequiredLoopedMax = (timeTakenLooped + requiredTime);
+                        Double timeTakenRequiredLoopedMin = (timeTaken + requiredTime) % maxTime;
+                        
+//                        System.out.println("---");
+//                        if (pathRobbers.get(requiredTime).get(0).getY() < 200) {
+//                            System.out.println("top side path");
+//                        } else {
+//                            System.out.println("bottom side path");
+//                        }
+//                        System.out.println("key: " + requiredTime);
+//                        System.out.println("robber path loop time taken        : " + timeTaken);
+//                        System.out.println("robber path loop time taken loop   : " + timeTakenLooped);
+//                        System.out.println("robber path loop time taken req max: " + timeTakenRequiredLoopedMax);
+//                        System.out.println("robber path loop time taken req min: " + timeTakenRequiredLoopedMin);
+//                        System.out.println("---");
+                        
+                        boolean validCombination = true;
+                        
+                        // for every guard stop point
+                        guardloop:
+                        for (PathGuard g : stopGuards) {
+//                            System.out.println("---");
+//                            System.out.println("guard path loop timestamp  : " + g.getTimestamp());
+                        
                             // worth checking if guard watches when path is walked on
-                            if (g.getTimestamp() >= timeTaken && g.getTimestamp() <= (timeTaken + requiredTime)) {
-                                boolean validCombination = true;
+                            if ((g.getTimestamp() >= timeTakenLooped && g.getTimestamp() <= timeTakenRequiredLoopedMax)
+                                    || ((timeTakenRequiredLoopedMin - timeTakenRequiredLoopedMax < 0) 
+                                    && g.getTimestamp() >= 0.0 && g.getTimestamp() <= timeTakenRequiredLoopedMin)) {
 
+//                                System.out.println("time matches, checking edges..");
+                                
                                 // paths the guard can see
                                 List<Edge> guardCanSee = forbiddenEdges.get(g);
 
@@ -808,130 +871,65 @@ public class FXMLDocumentController implements Initializable {
                                 List<Edge> robberWalksOn = getPathsAtSpecificTime(timeTaken, g.getTimestamp(), pathRobbers.get(requiredTime));
 
                                 // if any of the paths match, this combination is not valid
-                                outerloop:
                                 for (Edge e1 : guardCanSee) {
                                     for (Edge e2 : robberWalksOn) {
                                         if (e1 == e2) {
+//                                            e1.print();
+//                                            e2.print();
                                             validCombination = false;
-                                            break outerloop;
+                                            break guardloop;
                                         }
                                     }
                                 }
-
-                                // if eventually combination is valid
-                                // and the time does not exceed the global time limit
-                                // and the path is not already taken
-                                if (validCombination && (timeTaken + requiredTime <= this.globalT) && !keysTaken.contains(requiredTime)) {
-
-                                    System.out.println("timeTaken                  : " + timeTaken);
-                                    System.out.println("requiredTime               : " + requiredTime);
-                                    System.out.println("timeTaken + requiredTime   : " + (timeTaken + requiredTime));
-                                    System.out.println("Path totally allowed, start: " + pathRobbers.get(requiredTime).get(0).getX() + ", " + pathRobbers.get(requiredTime).get(0).getY());
-                                    System.out.println("Path totally allowed, goal : " + pathRobbers.get(requiredTime).get(((int)(pathRobbers.get(requiredTime).size()/2))).getX()
-                                            + ", " + pathRobbers.get(requiredTime).get(((int)(pathRobbers.get(requiredTime).size()/2))).getY());
-
-                                    // add path for the given timepoint
-                                    prs.put(new TimePoint(timeTaken, timeTaken + requiredTime), pathRobbers.get(requiredTime));
-
-                                    // increase the time to make sure the next path does not overlap this one
-                                    timeTaken = timeTaken + requiredTime;
-
-                                    // add the path to the list of used paths
-                                    keysTaken.add(requiredTime);
-                                }
                             }
+                        }
+
+                        // if eventually combination is valid
+                        // and the time does not exceed the global time limit
+                        // and the path is not already taken
+                        if (validCombination && (timeTaken + requiredTime <= this.globalT) && !keysTaken.contains(requiredTime)) {
+
+                            System.out.println("-------------------------------------------");
+                            System.out.println("key: " + requiredTime);
+                            if (pathRobbers.get(requiredTime).get(0).getY() < 200) {
+                                System.out.println("top side path");
+                            } else {
+                                System.out.println("bottom side path");
+                            }
+//                            System.out.println("path still valid, adding it to the set..");
+                            System.out.println("start time           : " + timeTaken);
+                            System.out.println("end time             : " + (timeTaken + requiredTime));
+                            System.out.println("start time looped    : " + timeTakenLooped);
+                            System.out.println("end time looped max  : " + (timeTakenRequiredLoopedMax));
+                            System.out.println("end time looped min  : " + (timeTakenRequiredLoopedMin));
+                            System.out.println("-------------------------------------------");
+                            
+                            // add path for the given timepoint
+                            prs.put(new TimePoint(timeTaken, timeTaken + requiredTime), pathRobbers.get(requiredTime));
+
+                            // increase the time to make sure the next path does not overlap this one
+                            timeTaken = timeTaken + requiredTime;
+                            timeUpdated = true;
+                            // add the path to the list of used paths
+                            keysTaken.add(requiredTime);
+                            break;
                         }
                     }
                 }
-                
-//                timepoints.sort(new TimePointComparator());
-//                for (int j = 0; j < timepoints.size(); j++) {
-//                    TimePoint tp = timepoints.get(j);
-//                    if (previousTime == timeTaken && timeTaken <= tp.getStart()) {
-//                        previousTime = timeTaken;
-//                        System.out.println("Previous time: " + previousTime);
-//                        timeTaken = tp.getStart();
-//                        System.out.println("timeTaken: " + timeTaken);
-//                    }
-//                    for (Map.Entry pair : pathRobbers.entrySet()) {
-//                        Double requiredTime = (Double) pair.getKey();
-//                        System.out.println("\n--------------------");
-//                        System.out.println("Testing path, start: " + pathRobbers.get(requiredTime).get(0).getX() + ", " + pathRobbers.get(requiredTime).get(0).getY());
-//                        System.out.println("Testing path, goal : " + pathRobbers.get(requiredTime).get(((int)(pathRobbers.get(requiredTime).size()/2))).getX()
-//                                + ", " + pathRobbers.get(requiredTime).get(((int)(pathRobbers.get(requiredTime).size()/2))).getY());
-//                        boolean pathAllowedTotal = true;
-//                        for (int i = 0; i < stopGuards.size(); i++) {
-//                            PathGuard currentGuard = stopGuards.get(i);
-//                            //if (currentGuard.getTimestamp() >= timeTaken && currentGuard.getTimestamp() <= timeTaken + requiredTime) {
-//                                boolean pathAllowed = true;
-//                                List<Edge> edges = forbiddenEdges.get(currentGuard);                                
-//                                List<Edge> atTime = getPathsAtSpecificTime(timeTaken, currentGuard.getTimestamp(), pathRobbers.get(requiredTime));
-//                                
-//                                //System.out.println("at the time on edges : " + atTime.size());
-////                                int sameCount = 0;
-//                                
-//                                outerloop:
-//                                for (int k = 0; k < edges.size(); k++) {
-//                                    Edge e1 = edges.get(k);
-//                                    
-//                                    for (int l = 0; l < atTime.size(); l++) {
-//                                        Edge e2 = atTime.get(l);
-//                                        if (e1 == e2) {
-//                                            System.out.println("Match, so we go to the next path.");
-//                                            pathAllowed = false;
-//                                            break outerloop;
-//                                        }
-//                                    }
-//                                }
-//                                //System.out.println("shared edges count   : " + sameCount);
-//                                
-////                                if (sameCount > 0) {
-////                                    pathAllowedTotal = false;
-////                                    //System.out.println("edge not allowed, move on to next edge");
-////                                    break;
-////                                }
-////                                
-////                                for (PathRobber pr : pathRobbers.get(requiredTime)) {
-////                                    for (Edge e : edges) {
-////                                    //for (Edge e : atTime) {
-////                                        if ((e.getV1().getX() == pr.getX() && e.getV1().getY() == pr.getY())
-////                                                || (e.getV2().getX() == pr.getX() && e.getV2().getY() == pr.getY())) {
-////                                            pathAllowed = false;
-////                                            break;
-////                                        }
-////                                    }
-////                                    if (!pathAllowed) {
-////                                        break;
-////                                    }
-////                                }
-////                                pathAllowedTotal = pathAllowed;
-////                                if (!pathAllowedTotal) {
-////                                    break;
-////                                }
-//                            //}
-//                        }
-//                        if (pathAllowedTotal) {
-//                            if (timeTaken + requiredTime <= this.globalT && !keysTaken.contains(requiredTime)) {
-//                                System.out.println("Path totally allowed, start: " + pathRobbers.get(requiredTime).get(0).getX() + ", " + pathRobbers.get(requiredTime).get(0).getY());
-//                                System.out.println("Path totally allowed, goal : " + pathRobbers.get(requiredTime).get(((int)(pathRobbers.get(requiredTime).size()/2))).getX()
-//                                + ", " + pathRobbers.get(requiredTime).get(((int)(pathRobbers.get(requiredTime).size()/2))).getY());
-//                                System.out.println("Starting: " + timeTaken);
-//                                System.out.println("Ending  : " + (timeTaken + requiredTime));
-//                                prs.put(new TimePoint(timeTaken, timeTaken + requiredTime), pathRobbers.get(requiredTime));
-//                                previousTime = timeTaken;
-//                                timeTaken = timeTaken + requiredTime;
-//                                System.out.println("timeTaken: " + timeTaken);
-//                                keysTaken.add(requiredTime);
-//                            }
-//                        }
-//                    }
-//                    if (timeTaken == 0.0) {
-//                        previousTime = timeTaken;
-//                        j--;
-//                        System.out.println("Previous time: " + previousTime);
-//                    }
-//                }
             }
+        }
+        if (prs != null) {
+            System.out.println("--------------------------------------------");
+            System.out.println("--------------------------------------------");
+            System.out.println("TOTAL ART PIECES STOLEN: " + prs.size());
+            System.out.println("TOTAL ART PIECES       : " + pathRobbers.size());
+            Double totalTime = 0.0;
+            for (Double d : pathRobbers.keySet()){ 
+                totalTime = totalTime + d;
+            }
+            System.out.println("MINIMUM REQUIRED TIME  : " + totalTime);
+            System.out.println("--------------------------------------------");
+            System.out.println("--------------------------------------------");
         }
         return prs;
     }
