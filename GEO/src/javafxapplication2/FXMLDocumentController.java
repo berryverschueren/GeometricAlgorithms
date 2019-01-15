@@ -422,28 +422,28 @@ public class FXMLDocumentController implements Initializable {
         SortedMap<TimePoint, List<PathRobber>> robberPaths = ComputePossiblePathRobbersNew(possiblePathsRobber, stopGuards, timePoints);
         
         Robber robber = ComputeRobber(robberPaths);
-
-        int artCounterStolen = 0;
-        int artCounterTotal = 0;
-        
-        for (Polygon p : this.innerPolygon) {
-            verts.addAll(p.getVertices());
-        }
-        
-        for (Vertex v : verts) {
-            for (PathRobber pr : robber.getPath()) {
-                if (v.getX() == pr.getX() && v.getY() == pr.getY() && v.getArtFlag() == 1)
-                {
-                    System.out.println("v: (" + v.getX() + ", " + v.getY() + ")");
-                    artCounterStolen++;
-                }
-            }
-            if (v.getArtFlag() == 1) {
-                artCounterTotal++;
-            }
-        }
-        System.out.println("Total stolen art pieces: " + artCounterStolen);
-        System.out.println("Out of total art pieces: " + artCounterTotal);
+//
+//        int artCounterStolen = 0;
+//        int artCounterTotal = 0;
+//        
+//        for (Polygon p : this.innerPolygon) {
+//            verts.addAll(p.getVertices());
+//        }
+//        
+//        for (Vertex v : verts) {
+//            for (PathRobber pr : robber.getPath()) {
+//                if (v.getX() == pr.getX() && v.getY() == pr.getY() && v.getArtFlag() == 1)
+//                {
+//                    System.out.println("v: (" + v.getX() + ", " + v.getY() + ")");
+//                    artCounterStolen++;
+//                }
+//            }
+//            if (v.getArtFlag() == 1) {
+//                artCounterTotal++;
+//            }
+//        }
+//        System.out.println("Total stolen art pieces: " + artCounterStolen);
+//        System.out.println("Out of total art pieces: " + artCounterTotal);
         
         final long startNanoTime = System.nanoTime();
                 
@@ -651,8 +651,8 @@ public class FXMLDocumentController implements Initializable {
             // current guard
             Guard g = guards.get(i);
             // storage for previous path guard
-            PathGuard ppg = null;
-                       
+            PathGuard ppg = g.getPath().stream().filter(path -> path.getObserving() == 1).findFirst().orElse(null);
+            
             // loop current guards path
             for (int j = 0; j < g.getPath().size(); j++) {
                 // current guards path point
@@ -660,9 +660,7 @@ public class FXMLDocumentController implements Initializable {
                 // if this is a stopping point
                 // connect to the previous stopping point
                 // store in timepoint the start and end timestamps
-                if (ppg == null && pg.getObserving() == 1) {
-                    ppg = pg;
-                } else if (ppg != null && pg.getObserving() == 1) {
+                if (pg.getObserving() == 1) {
                     timePoints.add(new TimePoint(ppg.getTimestamp() + this.deltaTime, pg.getTimestamp()));
                     ppg = pg;
                 }
@@ -734,162 +732,206 @@ public class FXMLDocumentController implements Initializable {
                 for (Map.Entry pair : pathRobbers.entrySet()) {
                     Double requiredTime = (Double) pair.getKey();
                     boolean pathAllowedTotal = true;
-                    //System.out.println("\n\nrequired time: " + requiredTime);
-                    //System.out.println("path starts at: (" + pathRobbers.get(requiredTime).get(0).getX() + ", " + pathRobbers.get(requiredTime).get(0).getY() + ")");
-                    //int lastItemIndex = (int)(Math.floor(pathRobbers.get(requiredTime).size() / 2));
-                    //System.out.println("path goal is at: (" + pathRobbers.get(requiredTime).get(lastItemIndex).getX() + ", " + pathRobbers.get(requiredTime).get(lastItemIndex).getY() + ")");
-                    // check for every guard if the path robber is allowed
                     for (int i = 0; i < stopGuards.size(); i++) {
                         PathGuard currentGuard = stopGuards.get(i);
-
-                        //System.out.println("\ncurrent guard: " + currentGuard.getTimestamp() + " (" + currentGuard.getX() + ", " + currentGuard.getY() + ")");
-                        //System.out.println("Time taken: " + timeTaken);
-                        // if guard stops within the time required for the path robber
                         if ((currentGuard.getTimestamp() >= timeTaken && currentGuard.getTimestamp() <= timeTaken + requiredTime)
                                 || (stopGuards.size() == 1)) {
                             boolean pathAllowed = true;
                             List<Edge> edges = forbiddenEdges.get(currentGuard);
-
-                            //System.out.println("time matches -> check if paths also match");
-
-                            // find if any of the vertices in the path robber is matching with 
-                            // any of the vertices of the forbidden path for this particular guard
                             for (PathRobber pr : pathRobbers.get(requiredTime)) {
                                 for (Edge e : edges) {
-                                    if (e.getV1().getX() == pr.getX() && e.getV1().getY() == pr.getY()) {
-                                        //System.out.println("paths match v1: (" + e.getV1().getX() + ", " + e.getV1().getY() + ") == (" + pr.getX() + ", " + pr.getY() + ")");
-                                        //System.out.println("with v2: (" + e.getV2().getX() + ", " + e.getV2().getY() + ") == (" + pr.getX() + ", " + pr.getY() + ")");
-                                        //System.out.println("break loop, no more edges needed to check");
+                                    if ((e.getV1().getX() == pr.getX() && e.getV1().getY() == pr.getY())
+                                            || (e.getV2().getX() == pr.getX() && e.getV2().getY() == pr.getY())) {
                                         pathAllowed = false;
                                         break;
                                     }
-                                    if (e.getV2().getX() == pr.getX() && e.getV2().getY() == pr.getY()) {
-                                        //System.out.println("paths match v2: (" + e.getV2().getX() + ", " + e.getV2().getY() + ") == (" + pr.getX() + ", " + pr.getY() + ")");
-                                        //System.out.println("with v1: (" + e.getV1().getX() + ", " + e.getV1().getY() + ") == (" + pr.getX() + ", " + pr.getY() + ")");
-                                        //System.out.println("break loop, no more edges needed to check");
-                                        pathAllowed = false;
-                                        break;                                    
-                                    }
                                 }
                                 if (!pathAllowed) {
-                                    //System.out.println("break loop, no more path robber vertices needed to check");
                                     break;
                                 }
                             }
                             pathAllowedTotal = pathAllowed;
-                            if (pathAllowedTotal) {
-                                //System.out.println("for this setup, path is allowed (for now)");
-                            }
                             if (!pathAllowedTotal) {
-                                //System.out.println("break loop, no more stop vertices needed to check");
                                 break;
                             }
                         }
                     }
-
-                    // if the path is allowed
                     if (pathAllowedTotal) {
-                        //System.out.println("path allowed");
-                        // if not exceeds total time limit
                         if (timeTaken + requiredTime <= this.globalT && !keysTaken.contains(requiredTime)) {
-                            //System.out.println("path also fits within global time --> add to list");
                             prs.put(new TimePoint(timeTaken, timeTaken + requiredTime), pathRobbers.get(requiredTime));
                             previousTime = timeTaken;
                             timeTaken = timeTaken + requiredTime;
                             keysTaken.add(requiredTime);
                         }
-                    } else {
-                        //System.out.println("path not allowed");
                     }
                 }
             } 
             else {
-            timepoints.sort(new TimePointComparator());
-            for (int j = 0; j < timepoints.size(); j++) {
-                TimePoint tp = timepoints.get(j);
-                if (previousTime == timeTaken && timeTaken <= tp.getStart()) {
-                    previousTime = timeTaken;
-                    timeTaken = tp.getStart();
-                    //System.out.println("-----------");
-                    //System.out.println("Starting to check for timepoint: " + timeTaken);
-                    //System.out.println("-----------");
-                }
-                for (Map.Entry pair : pathRobbers.entrySet()) {
-                    Double requiredTime = (Double) pair.getKey();
-                    boolean pathAllowedTotal = true;
-                    //System.out.println("\n\nrequired time: " + requiredTime);
-                    //System.out.println("path starts at: (" + pathRobbers.get(requiredTime).get(0).getX() + ", " + pathRobbers.get(requiredTime).get(0).getY() + ")");
-                    //int lastItemIndex = (int)(Math.floor(pathRobbers.get(requiredTime).size() / 2));
-                    //System.out.println("path goal is at: (" + pathRobbers.get(requiredTime).get(lastItemIndex).getX() + ", " + pathRobbers.get(requiredTime).get(lastItemIndex).getY() + ")");
-                    // check for every guard if the path robber is allowed
-                    for (int i = 0; i < stopGuards.size(); i++) {
-                        PathGuard currentGuard = stopGuards.get(i);
+                
+                // tag loop has run
+                boolean loopRan = false;
+                
+                // for every possible time point
+                for (TimePoint tp : timepoints) {
+                    
+                    System.out.println("tp: " + tp.getStart());
+                    
+                    // if the time was not updated by the loop, find the next starting position and continue the search
+                    if (tp.getStart() >= timeTaken && (timeTaken > 0 || loopRan)) {
+                        
+                        System.out.println("updating timestamps by timepoint");
+                                
+                        // update timestamps
+                        timeTaken = tp.getStart();
+                    }
+                    
+                    // tag loop ran
+                    loopRan = true;
+                    
+                    // for every guard stop point
+                    for (PathGuard g : stopGuards) {
 
-                        //System.out.println("\ncurrent guard: " + currentGuard.getTimestamp() + " (" + currentGuard.getX() + ", " + currentGuard.getY() + ")");
-                        //System.out.println("Time taken: " + timeTaken);
-                        // if guard stops within the time required for the path robber
-                        if (currentGuard.getTimestamp() >= timeTaken && currentGuard.getTimestamp() <= timeTaken + requiredTime) {
-                            boolean pathAllowed = true;
-                            List<Edge> edges = forbiddenEdges.get(currentGuard);
+                        // for every robber path
+                        for (Map.Entry prPair : pathRobbers.entrySet()) {
 
-                            //System.out.println("time matches -> check if paths also match");
+                            // time it takes to walk the entire path
+                            Double requiredTime = (Double) prPair.getKey();
 
-                            // find if any of the vertices in the path robber is matching with 
-                            // any of the vertices of the forbidden path for this particular guard
-                            for (PathRobber pr : pathRobbers.get(requiredTime)) {
-                                for (Edge e : edges) {
-                                    if (e.getV1().getX() == pr.getX() && e.getV1().getY() == pr.getY()) {
-                                        //System.out.println("paths match v1: (" + e.getV1().getX() + ", " + e.getV1().getY() + ") == (" + pr.getX() + ", " + pr.getY() + ")");
-                                        //System.out.println("with v2: (" + e.getV2().getX() + ", " + e.getV2().getY() + ") == (" + pr.getX() + ", " + pr.getY() + ")");
-                                        //System.out.println("break loop, no more edges needed to check");
-                                        pathAllowed = false;
-                                        break;
-                                    }
-                                    if (e.getV2().getX() == pr.getX() && e.getV2().getY() == pr.getY()) {
-                                        //System.out.println("paths match v2: (" + e.getV2().getX() + ", " + e.getV2().getY() + ") == (" + pr.getX() + ", " + pr.getY() + ")");
-                                        //System.out.println("with v1: (" + e.getV1().getX() + ", " + e.getV1().getY() + ") == (" + pr.getX() + ", " + pr.getY() + ")");
-                                        //System.out.println("break loop, no more edges needed to check");
-                                        pathAllowed = false;
-                                        break;                                    
+                            // worth checking if guard watches when path is walked on
+                            if (g.getTimestamp() >= timeTaken && g.getTimestamp() <= (timeTaken + requiredTime)) {
+                                boolean validCombination = true;
+
+                                // paths the guard can see
+                                List<Edge> guardCanSee = forbiddenEdges.get(g);
+
+                                // paths the robber walks on during the time the guard is looking
+                                List<Edge> robberWalksOn = getPathsAtSpecificTime(timeTaken, g.getTimestamp(), pathRobbers.get(requiredTime));
+
+                                // if any of the paths match, this combination is not valid
+                                outerloop:
+                                for (Edge e1 : guardCanSee) {
+                                    for (Edge e2 : robberWalksOn) {
+                                        if (e1 == e2) {
+                                            validCombination = false;
+                                            break outerloop;
+                                        }
                                     }
                                 }
-                                if (!pathAllowed) {
-                                    //System.out.println("break loop, no more path robber vertices needed to check");
-                                    break;
+
+                                // if eventually combination is valid
+                                // and the time does not exceed the global time limit
+                                // and the path is not already taken
+                                if (validCombination && (timeTaken + requiredTime <= this.globalT) && !keysTaken.contains(requiredTime)) {
+
+                                    System.out.println("timeTaken                  : " + timeTaken);
+                                    System.out.println("requiredTime               : " + requiredTime);
+                                    System.out.println("timeTaken + requiredTime   : " + (timeTaken + requiredTime));
+                                    System.out.println("Path totally allowed, start: " + pathRobbers.get(requiredTime).get(0).getX() + ", " + pathRobbers.get(requiredTime).get(0).getY());
+                                    System.out.println("Path totally allowed, goal : " + pathRobbers.get(requiredTime).get(((int)(pathRobbers.get(requiredTime).size()/2))).getX()
+                                            + ", " + pathRobbers.get(requiredTime).get(((int)(pathRobbers.get(requiredTime).size()/2))).getY());
+
+                                    // add path for the given timepoint
+                                    prs.put(new TimePoint(timeTaken, timeTaken + requiredTime), pathRobbers.get(requiredTime));
+
+                                    // increase the time to make sure the next path does not overlap this one
+                                    timeTaken = timeTaken + requiredTime;
+
+                                    // add the path to the list of used paths
+                                    keysTaken.add(requiredTime);
                                 }
-                            }
-                            pathAllowedTotal = pathAllowed;
-                            if (pathAllowedTotal) {
-                                //System.out.println("for this setup, path is allowed (for now)");
-                            }
-                            if (!pathAllowedTotal) {
-                                //System.out.println("break loop, no more stop vertices needed to check");
-                                break;
                             }
                         }
                     }
-
-                    // if the path is allowed
-                    if (pathAllowedTotal) {
-                        //System.out.println("path allowed");
-                        // if not exceeds total time limit
-                        if (timeTaken + requiredTime <= this.globalT && !keysTaken.contains(requiredTime)) {
-                            //System.out.println("path also fits within global time --> add to list");
-                            prs.put(new TimePoint(timeTaken, timeTaken + requiredTime), pathRobbers.get(requiredTime));
-                            previousTime = timeTaken;
-                            timeTaken = timeTaken + requiredTime;
-                            keysTaken.add(requiredTime);
-                        }
-                    } else {
-                        //System.out.println("path not allowed");
-                    }
                 }
-                if (timeTaken == 0.0) {
-                    previousTime = timeTaken;
-                    j--;
-                }
+                
+//                timepoints.sort(new TimePointComparator());
+//                for (int j = 0; j < timepoints.size(); j++) {
+//                    TimePoint tp = timepoints.get(j);
+//                    if (previousTime == timeTaken && timeTaken <= tp.getStart()) {
+//                        previousTime = timeTaken;
+//                        System.out.println("Previous time: " + previousTime);
+//                        timeTaken = tp.getStart();
+//                        System.out.println("timeTaken: " + timeTaken);
+//                    }
+//                    for (Map.Entry pair : pathRobbers.entrySet()) {
+//                        Double requiredTime = (Double) pair.getKey();
+//                        System.out.println("\n--------------------");
+//                        System.out.println("Testing path, start: " + pathRobbers.get(requiredTime).get(0).getX() + ", " + pathRobbers.get(requiredTime).get(0).getY());
+//                        System.out.println("Testing path, goal : " + pathRobbers.get(requiredTime).get(((int)(pathRobbers.get(requiredTime).size()/2))).getX()
+//                                + ", " + pathRobbers.get(requiredTime).get(((int)(pathRobbers.get(requiredTime).size()/2))).getY());
+//                        boolean pathAllowedTotal = true;
+//                        for (int i = 0; i < stopGuards.size(); i++) {
+//                            PathGuard currentGuard = stopGuards.get(i);
+//                            //if (currentGuard.getTimestamp() >= timeTaken && currentGuard.getTimestamp() <= timeTaken + requiredTime) {
+//                                boolean pathAllowed = true;
+//                                List<Edge> edges = forbiddenEdges.get(currentGuard);                                
+//                                List<Edge> atTime = getPathsAtSpecificTime(timeTaken, currentGuard.getTimestamp(), pathRobbers.get(requiredTime));
+//                                
+//                                //System.out.println("at the time on edges : " + atTime.size());
+////                                int sameCount = 0;
+//                                
+//                                outerloop:
+//                                for (int k = 0; k < edges.size(); k++) {
+//                                    Edge e1 = edges.get(k);
+//                                    
+//                                    for (int l = 0; l < atTime.size(); l++) {
+//                                        Edge e2 = atTime.get(l);
+//                                        if (e1 == e2) {
+//                                            System.out.println("Match, so we go to the next path.");
+//                                            pathAllowed = false;
+//                                            break outerloop;
+//                                        }
+//                                    }
+//                                }
+//                                //System.out.println("shared edges count   : " + sameCount);
+//                                
+////                                if (sameCount > 0) {
+////                                    pathAllowedTotal = false;
+////                                    //System.out.println("edge not allowed, move on to next edge");
+////                                    break;
+////                                }
+////                                
+////                                for (PathRobber pr : pathRobbers.get(requiredTime)) {
+////                                    for (Edge e : edges) {
+////                                    //for (Edge e : atTime) {
+////                                        if ((e.getV1().getX() == pr.getX() && e.getV1().getY() == pr.getY())
+////                                                || (e.getV2().getX() == pr.getX() && e.getV2().getY() == pr.getY())) {
+////                                            pathAllowed = false;
+////                                            break;
+////                                        }
+////                                    }
+////                                    if (!pathAllowed) {
+////                                        break;
+////                                    }
+////                                }
+////                                pathAllowedTotal = pathAllowed;
+////                                if (!pathAllowedTotal) {
+////                                    break;
+////                                }
+//                            //}
+//                        }
+//                        if (pathAllowedTotal) {
+//                            if (timeTaken + requiredTime <= this.globalT && !keysTaken.contains(requiredTime)) {
+//                                System.out.println("Path totally allowed, start: " + pathRobbers.get(requiredTime).get(0).getX() + ", " + pathRobbers.get(requiredTime).get(0).getY());
+//                                System.out.println("Path totally allowed, goal : " + pathRobbers.get(requiredTime).get(((int)(pathRobbers.get(requiredTime).size()/2))).getX()
+//                                + ", " + pathRobbers.get(requiredTime).get(((int)(pathRobbers.get(requiredTime).size()/2))).getY());
+//                                System.out.println("Starting: " + timeTaken);
+//                                System.out.println("Ending  : " + (timeTaken + requiredTime));
+//                                prs.put(new TimePoint(timeTaken, timeTaken + requiredTime), pathRobbers.get(requiredTime));
+//                                previousTime = timeTaken;
+//                                timeTaken = timeTaken + requiredTime;
+//                                System.out.println("timeTaken: " + timeTaken);
+//                                keysTaken.add(requiredTime);
+//                            }
+//                        }
+//                    }
+//                    if (timeTaken == 0.0) {
+//                        previousTime = timeTaken;
+//                        j--;
+//                        System.out.println("Previous time: " + previousTime);
+//                    }
+//                }
             }
-        }
         }
         return prs;
     }
@@ -1158,8 +1200,14 @@ public class FXMLDocumentController implements Initializable {
         
         double tPrevious = initT; 
         Vertex vertexPrevious = firstVertex;
-                  
-        for (int i = 1; i < verticesPathGuard.size() - 1; i++) {
+        
+        int j = verticesPathGuard.size();
+        for (int i = 1; i < j; i++) {
+            //if remainder is zero i ++; skip double vertex of original path, and extend loop
+            if((i + index) % verticesPathGuard.size()==0){
+                i++;
+                j++;
+            }
             Vertex vertexTemp = verticesPathGuard.get((i + index) % verticesPathGuard.size());
             x = vertexTemp.getX();
             y = vertexTemp.getY();
@@ -1174,16 +1222,16 @@ public class FXMLDocumentController implements Initializable {
             vertexPrevious = vertexTemp; 
             tPrevious = tCurrent;
         }
-        observing = stopVertices.contains(firstVertex) ? 1 : 0;//observingGuard(firstVertex);
-        if (path.get(0).getObserving() == 1){
-                tCurrent = (distance(firstVertex, vertexPrevious)/vMaxG ) + tPrevious + deltaTime;
-            } else {
-                tCurrent = distance(firstVertex, vertexPrevious)/vMaxG + tPrevious ;
-            }
-        step = new PathGuard(initX, initY, tCurrent, observing);
-        
-        path.add(step);
-        Guard guard = new Guard(initX, initY, path);
+//        observing = stopVertices.contains(firstVertex) ? 1 : 0;//observingGuard(firstVertex);
+//        if (path.get(0).getObserving() == 1){
+//                tCurrent = (distance(firstVertex, vertexPrevious)/vMaxG ) + tPrevious + deltaTime;
+//            } else {
+//                tCurrent = distance(firstVertex, vertexPrevious)/vMaxG + tPrevious ;
+//            }
+//        step = new PathGuard(initX, initY, tCurrent, observing);
+//        
+//        path.add(step);
+       Guard guard = new Guard(initX, initY, path);
         
         return guard;
     }
@@ -1880,6 +1928,80 @@ public class FXMLDocumentController implements Initializable {
 //            System.out.println("REQ: " + requiredTime);
 //        }
 //        return (Math.abs(pr2.getTimestamp() - pr1.getTimestamp() + 1) >= requiredTime);
+    }
+
+    private List<Edge> getPathsAtSpecificTime(Double startTime, Double watchTime, List<PathRobber> pathRobbers) {
+        Double traveledTimeSoW = watchTime - startTime;
+        Double traveledTimeEoW = watchTime - startTime + this.deltaTime;
+        
+        //System.out.println("Watch time                  : " + watchTime);
+        //System.out.println("Start time                  : " + startTime);
+        //System.out.println("traveled time start of watch: " + traveledTimeSoW);
+        //System.out.println("traveled time end of watch  : " + traveledTimeEoW);
+        
+        Double traveledDistanceSoW = traveledTimeSoW * this.vMaxG;
+        Double traveledDistanceEoW = traveledTimeEoW * this.vMaxG;
+        
+        //System.out.println("traveled distance start of watch: " + traveledDistanceSoW);
+        //System.out.println("traveled distance end of watch: " + traveledDistanceEoW);
+                
+        int startSow = 0, endSow = 0, startEow = 0, endEow = 0;
+        Double totalDistanceTraveled = 0.0;
+        for (int i = 0; i < pathRobbers.size() - 1; i++) {
+            int next = i + 1;
+            PathRobber currentPr = pathRobbers.get(i);
+            PathRobber nextPr = pathRobbers.get(next);
+            Double actualDistance = Math.abs(Math.sqrt(Math.pow(nextPr.getX()-currentPr.getX(),2)+Math.pow(nextPr.getY()-currentPr.getY(),2)));
+            //System.out.println("Distance between (" + currentPr.getX() + ", " + currentPr.getY() + ") and (" + nextPr.getX() + ", " + nextPr.getY() + ") == " + actualDistance);
+            if (traveledDistanceSoW >= totalDistanceTraveled && traveledDistanceSoW <= totalDistanceTraveled + actualDistance) {
+                startSow = i;
+                endSow = next;
+                //System.out.println("Start of watch between " + totalDistanceTraveled + " and " + (totalDistanceTraveled + actualDistance));
+            } 
+            if (traveledDistanceEoW >= totalDistanceTraveled && traveledDistanceEoW <= totalDistanceTraveled + actualDistance) {
+                startEow = i;
+                endEow = next;
+                //System.out.println("End of watch between " + totalDistanceTraveled + " and " + (totalDistanceTraveled + actualDistance));
+            }
+            totalDistanceTraveled = totalDistanceTraveled + actualDistance;
+            //System.out.println("Total distance: " + totalDistanceTraveled);
+        }
+        
+        List<Edge> foundEdges = new ArrayList<>();
+        List<Edge> tempEdges = getEdgeForPathRobber(pathRobbers.get(startSow));
+        tempEdges.addAll(getEdgeForPathRobber(pathRobbers.get(endSow)));
+        tempEdges.addAll(getEdgeForPathRobber(pathRobbers.get(startEow)));
+        tempEdges.addAll(getEdgeForPathRobber(pathRobbers.get(endEow)));
+        for (int i = 0; i < tempEdges.size(); i++) {
+            if (!foundEdges.contains(tempEdges.get(i))) {
+                foundEdges.add(tempEdges.get(i));
+            }
+        }
+        
+        return foundEdges;
+    }
+    
+    private List<Edge> getEdgeForPathRobber(PathRobber pr) {
+        List<Edge> foundEdges = new ArrayList<>();
+        for (int i = 0; i < this.polygon.getEdges().size(); i++) {
+            Edge e = this.polygon.getEdges().get(i);
+            if (theSameVertex(e.getV1(), pr.getX(), pr.getY())) {
+                foundEdges.add(e);
+            } else if (theSameVertex(e.getV2(), pr.getX(), pr.getY())) {
+                foundEdges.add(e);
+            }
+        }
+        for (int i = 0; i < this.innerPolygon.size(); i++) {
+            for (int j = 0; j < this.innerPolygon.get(i).getEdges().size(); j++) {
+                Edge e = this.innerPolygon.get(i).getEdges().get(j);
+                if (theSameVertex(e.getV1(), pr.getX(), pr.getY())) {
+                    foundEdges.add(e);
+                } else if (theSameVertex(e.getV2(), pr.getX(), pr.getY())) {
+                    foundEdges.add(e);
+                }
+            }
+        }
+        return foundEdges;
     }
     
     public enum Poly{
