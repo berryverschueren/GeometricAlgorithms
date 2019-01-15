@@ -27,6 +27,7 @@ import geo.dataStructures.Robber;
 import geo.dataStructures.TimePoint;
 import geo.dataStructures.TimePointComparator;
 import geo.dataStructures.Trapezoid;
+import geo.dataStructures.Triangle;
 import geo.dataStructures.VertexInfo;
 import geo.dataStructures.dummyVis;
 import java.io.File;
@@ -103,12 +104,16 @@ public class FXMLDocumentController implements Initializable {
     private Button readInput;
     @FXML
     private Button readGuard;
-    
+    @FXML
+    private Button readrobber;
+    @FXML
+    private Button carina;
     
     private GraphicsContext g; 
     private Polygon polygon;
     private List<Polygon> innerPolygon;
     private List<Guard> guards; 
+    private Robber robber;
     private int numOfGuards; 
     private double vMaxG;
     private double deltaTime;
@@ -123,6 +128,110 @@ public class FXMLDocumentController implements Initializable {
     private List<VertexInfo> information = new ArrayList<>();
     
     private dummyVis vis;
+    
+    @FXML
+    private void handleButtonCarina(ActionEvent event) {
+        String workingDir = System.getProperty("user.dir");
+        Stage stage = (Stage) this.carina.getScene().getWindow();
+        FileChooser fileChooser0 = new FileChooser();
+        fileChooser0.setInitialDirectory(new File(workingDir));
+        fileChooser0.setTitle("Open Folder");
+        File file0 = fileChooser0.showOpenDialog(stage);
+        
+        if (file0 != null) {
+            String filename = file0.getName(); //"ArtGalleryV3.txt";
+            String pathname = file0.getAbsolutePath();
+            guards = ReadInputGuardSpecification.ReadInputGuardSpecification(pathname);
+        }
+        
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(workingDir));
+        fileChooser.setTitle("Open Folder");
+        File file = fileChooser.showOpenDialog(stage);
+        
+        if (file != null) {
+            String filename = file.getName(); //"ArtGalleryV3.txt";
+            String pathname = file.getAbsolutePath();
+            robber = ReadInputRobberSpecification.ReadInputRobberSpecification(pathname);
+        }
+        Stage stage2 = new Stage();
+        stage2.setTitle( "Timeline Example" );
+        Group root = new Group();
+        Scene theScene = new Scene(root);
+        stage2.setScene(theScene);
+
+        Canvas canvas = new Canvas(1900, 1000);
+        root.getChildren().add(canvas);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        String workingDire = "file:\\\\\\" + System.getProperty("user.dir");        
+        Image guardImage = new Image(workingDire + "\\guard.png", 30, 70, false, false);
+        Image robberImage = new Image(workingDire + "\\robber.png", 30, 70, false, false);
+        
+        calculateVisibilityGraph();
+
+//        List<Vertex> verts = this.polygon.getVertices();
+//        int exitCounter = 0;
+//        for (int i = 0; i < verts.size(); i++) {
+//            if (verts.get(i).getExitFlag() == 1) {
+//                exitCounter++;
+//            }
+//        }
+//        
+//        List<Vertex> verticesForGuardPath = getSmartSmartPath(numOfGuards, exitCounter);
+//                
+//        List<TimePoint> timePoints = ComputeTimePoints(guards);
+//        
+//        List<PathGuard> stopGuards = GuardsObserving(guards);
+//        
+//        Map<Double, List<Vertex>> shortestArtPath = getShortestArtPath();
+//        
+//        Map<Double, List<PathRobber>> possiblePathsRobber = possiblePathsRobber(shortestArtPath);
+//        
+//        //SortedMap<TimePoint, List<PathRobber>> robberPaths = ComputePossiblePathRobbers(possiblePathsRobber, timePoints);
+//        SortedMap<TimePoint, List<PathRobber>> robberPaths = ComputePossiblePathRobbersNew(possiblePathsRobber, stopGuards, timePoints);
+//        
+//        Robber robber = ComputeRobber(robberPaths);
+
+//        int artCounterStolen = 0;
+//        int artCounterTotal = 0;
+//        
+//        for (Polygon p : this.innerPolygon) {
+//            verts.addAll(p.getVertices());
+//        }
+//        
+//        for (Vertex v : verts) {
+//            for (PathRobber pr : robber.getPath()) {
+//                if (v.getX() == pr.getX() && v.getY() == pr.getY() && v.getArtFlag() == 1)
+//                {
+//                    System.out.println("v: (" + v.getX() + ", " + v.getY() + ")");
+//                    artCounterStolen++;
+//                }
+//            }
+//            if (v.getArtFlag() == 1) {
+//                artCounterTotal++;
+//            }
+//        }
+//        System.out.println("Total stolen art pieces: " + artCounterStolen);
+//        System.out.println("Out of total art pieces: " + artCounterTotal);
+        
+        final long startNanoTime = System.nanoTime();
+                
+        new AnimationTimer()
+        {
+            @Override
+            public void handle(long currentNanoTime)
+            {
+                double t = (currentNanoTime - startNanoTime) / 1000000000.0; 
+                drawPath(gc, canvas, guards, robber, t, guardImage, robberImage);
+                if (t >= globalT) {
+                    this.stop();
+                }
+            }
+        }.start();
+        
+        stage2.show();
+    }
     
     private Map<Double, List<Vertex>> getShortestArtPath(){
         Map<Double, List<Vertex>> robberPaths = new TreeMap();
@@ -285,23 +394,70 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private void handleButtonKaj(ActionEvent event) {
 
-        Edge e1,e2,e3;
-        Vertex v1,v2,v3,v4;
-        v1 = new Vertex(1.0,1.0,"");
-        v2 = new Vertex(0.0,1.0,"");
-        v3 = new Vertex(2.0,1.0,"");
-        v4 = new Vertex(1.0,2.0,"");
-        e1 = new Edge(v2,v1);
-        e2 = new Edge(v1,v3);
-        e3 = new Edge(v4,v1);
-        List<Edge> test = new ArrayList<>();
-        test.add(e3);
+        Stage stage = new Stage();
+        stage.setTitle( "Timeline Example" );
+        Group root = new Group();
+        Scene theScene = new Scene(root);
+        stage.setScene(theScene);
 
-        visibilityGraph= new Polygon();
-        visibilityGraph.addEdge(e1);
-        visibilityGraph.addEdge(e2);
-        test = crossVisiblePath(test);
-        finalEdge();
+        Canvas canvas = new Canvas(1900, 1000);
+        root.getChildren().add(canvas);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        TrapezoidalMap tm = new TrapezoidalMap();
+        List<Edge> segments = new ArrayList<>();
+        segments.addAll(this.polygon.getEdges());
+        for (int i = 0; i < this.innerPolygon.size(); i++) {
+            segments.addAll(this.innerPolygon.get(i).getEdges());
+        }
+        
+        tm.construct(segments);
+        tm.removeInnerTrapezoids(this.innerPolygon);
+        tm.removeOuterTrapezoids(this.polygon);
+        tm.computePossiblePaths();
+        tm.triangulateTrapezoids();
+        //tm.getPossiblePathEdges()
+        gc.setStroke(Color.AQUA);
+        for(Triangle tri : tm.getTriangles()){
+            gc.strokeLine(tri.getE1().getV1().getX(), tri.getE1().getV1().getY(), tri.getE1().getV2().getX(), tri.getE1().getV2().getY());
+            gc.strokeLine(tri.getE2().getV1().getX(), tri.getE2().getV1().getY(), tri.getE2().getV2().getX(), tri.getE2().getV2().getY());
+            gc.strokeLine(tri.getE3().getV1().getX(), tri.getE3().getV1().getY(), tri.getE3().getV2().getX(), tri.getE3().getV2().getY());
+        }
+        
+        //polygon = new Polygon();
+        //innerPolygon = new ArrayList<>();
+        gc.setStroke(Color.RED);
+        for(Edge edge : tm.getPossiblePathEdges()){
+            gc.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+            //polygon.addEdge(edge);
+        }
+
+        gc.setStroke(Color.BLACK);
+        for(Edge edge : segments){
+            gc.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+            //polygon.addEdge(edge);
+        }
+        //setUpDraw(gc, true);
+        //finalizeDraw(gc);
+        //setUpDraw(gc, false);
+        stage.show();
+//        Edge e1,e2,e3;
+//        Vertex v1,v2,v3,v4;
+//        v1 = new Vertex(1.0,1.0,"");
+//        v2 = new Vertex(0.0,1.0,"");
+//        v3 = new Vertex(2.0,1.0,"");
+//        v4 = new Vertex(1.0,2.0,"");
+//        e1 = new Edge(v2,v1);
+//        e2 = new Edge(v1,v3);
+//        e3 = new Edge(v4,v1);
+//        List<Edge> test = new ArrayList<>();
+//        test.add(e3);
+//
+//        visibilityGraph= new Polygon();
+//        visibilityGraph.addEdge(e1);
+//        visibilityGraph.addEdge(e2);
+//        test = crossVisiblePath(test);
+//        finalEdge();
         
         
  
@@ -327,7 +483,7 @@ public class FXMLDocumentController implements Initializable {
         polys.addAll(innerPolygon);
         vis = new dummyVis();
         
-                g.setStroke(Color.AQUA);
+        g.setStroke(Color.AQUA);
 
         visibilityGraph = vis.visibiliyGraph(polys);
 //        for(Edge edge : visibilityGraph.getEdges()){
@@ -1121,7 +1277,7 @@ public class FXMLDocumentController implements Initializable {
     }
     
     @FXML
-    private void handleButtonCarina(ActionEvent event) {
+    private void handleButtonRobber(ActionEvent event) {
         numOfGuards = Integer.parseInt(Guards.getText());
         vMaxG = Double.parseDouble(vMaxGuards.getText());
         deltaTime = Double.parseDouble(deltaT.getText());
@@ -1529,7 +1685,8 @@ public class FXMLDocumentController implements Initializable {
             vertexInfo = vertexRem;
         }
         
-        List<Vertex> visibleVertices = vertexInfo.getSeeMe();
+        List<Vertex> visibleVertices = new ArrayList<>();
+        visibleVertices.addAll(vertexInfo.getSeeMe());
         
         //Vertex testVertex = vis.getVertexInfo().get(0).getVertex();
         List<Edge> startEdges = new ArrayList<>();
@@ -1594,7 +1751,7 @@ public class FXMLDocumentController implements Initializable {
         VertexInfo vertexRem = null;
         double dist = 100000000.0;
         for (int i = 0; i < vis.getVertexInfo().size(); i++) {
-            if(vis.getVertexInfo().get(i).getVertex().getX()==534.0 &&vis.getVertexInfo().get(i).getVertex().getY()==177.0){
+            if(vis.getVertexInfo().get(i).getVertex().getX()==583.0 &&vis.getVertexInfo().get(i).getVertex().getY()==386.0){
                 vertexInfo = vis.getVertexInfo().get(i);
             
             }else{
@@ -1629,7 +1786,9 @@ public class FXMLDocumentController implements Initializable {
         }
         
         
-        List<Vertex> visibleVertices = vertexInfo.getSeeMe();
+        List<Vertex> visibleVertices = new ArrayList<>(); 
+                
+        visibleVertices.addAll(vertexInfo.getSeeMe());
         
         //order list
         visibleVertices = circleSweepSort(testVertex, visibleVertices);
@@ -1668,19 +1827,25 @@ public class FXMLDocumentController implements Initializable {
             
             lastVertex = vertex;
         }
-        
+        remember.remove(remember.size()-1);
         remember.addAll(noGoEdge);
-        remember = crossVisiblePath(remember);
-        
         g.setStroke(Color.RED);
+        remember = crossVisiblePath(remember);
         for(Edge edge : remember){
             g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
         }
         
-        g.setStroke(Color.BLUE);
-        for(Edge edge : noGoEdge){
-            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
-        }
+        
+        
+//        g.setStroke(Color.RED);
+//        for(Edge edge : remember){
+//            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+//        }
+        
+//        g.setStroke(Color.BLUE);
+//        for(Edge edge : noGoEdge){
+//            g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
+//        }
         
 
         g.setFill(Color.LIGHTPINK);
@@ -1827,14 +1992,14 @@ public class FXMLDocumentController implements Initializable {
         g.setStroke(Color.RED);
         for (int i = 0; i < polygon.getVertices().size(); i++) {
             Vertex v = polygon.getVertices().get(i);
-            g.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+//            g.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
         }
         g.setFill(Color.WHITE);
         for(Polygon innerPolygon:innerPolygon){
             g.fillPolygon(innerPolygon.getXs(), innerPolygon.getYs(), innerPolygon.getNumberVertices());
             for (int i = 0; i < innerPolygon.getVertices().size(); i++) {
                 Vertex v = innerPolygon.getVertices().get(i);
-                g.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+//                g.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
             }
         }
     }
@@ -1845,14 +2010,14 @@ public class FXMLDocumentController implements Initializable {
         g.setStroke(Color.RED);
         for (int i = 0; i < polygon.getVertices().size(); i++) {
             Vertex v = polygon.getVertices().get(i);
-            g.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+//            g.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
         }
         g.setFill(Color.WHITE);
         for(Polygon innerPolygon:innerPolygon){
             g.fillPolygon(innerPolygon.getXs(), innerPolygon.getYs(), innerPolygon.getNumberVertices());
             for (int i = 0; i < innerPolygon.getVertices().size(); i++) {
                 Vertex v = innerPolygon.getVertices().get(i);
-                g.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
+//                g.strokeText("(" + Math.floor(v.getX()) + ", " + Math.floor(v.getY()) + ")", v.getX(), v.getY() - 10);
             }
         }
     }
