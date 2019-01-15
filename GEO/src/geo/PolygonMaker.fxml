@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.scene.canvas.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
@@ -12,7 +8,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane id="AnchorPane" fx:id="ap" prefHeight="829.0" prefWidth="1445.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="javafxapplication2.FXMLDocumentController">
+<AnchorPane id="AnchorPane" fx:id="ap" prefHeight="829.0" prefWidth="1445.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="javafxapplication2.FXMLDocumentController">
     <children>
         <Button fx:id="Save" layoutX="913.0" layoutY="661.0" onAction="#handleButtonSave" prefHeight="25.0" prefWidth="80.0" text="Save!" AnchorPane.rightAnchor="9.0" />
         <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
@@ -37,7 +33,7 @@
       <Label layoutX="909.0" layoutY="529.0" text="deltaT" AnchorPane.rightAnchor="9.0" />
       <Button fx:id="readInput" layoutX="1358.0" layoutY="321.0" mnemonicParsing="false" onAction="#handleButtonInputRead" prefHeight="39.0" prefWidth="80.0" text="ReadInput" AnchorPane.rightAnchor="7.0" />
       <Button layoutX="910.0" layoutY="462.0" mnemonicParsing="false" onAction="#finalEdgeButton" text="Final Edge" AnchorPane.rightAnchor="9.0" />
-      <Button fx:id="readGuard" layoutX="1356.0" layoutY="360.0" mnemonicParsing="false" onAction="#handleButtonGuardRead" prefHeight="25.0" prefWidth="80.0" text="ReadGuards" AnchorPane.rightAnchor="9.0" />
-      <Button fx:id="readrobber" layoutX="1356.0" layoutY="395.0" mnemonicParsing="false" onAction="#handleButtonRobber" prefHeight="25.0" prefWidth="80.0" text="ReadRobber" />
+      <Button fx:id="readGuard" layoutX="1363.0" layoutY="390.0" mnemonicParsing="false" onAction="#handleButtonGuardRead" prefHeight="25.0" prefWidth="80.0" text="ReadGuards" AnchorPane.rightAnchor="2.0" />
+      <Button fx:id="readrobber" layoutX="1359.0" layoutY="426.0" mnemonicParsing="false" onAction="#handleButtonRobber" prefHeight="25.0" prefWidth="80.0" text="ReadRobber" />
     </children>
 </AnchorPane>
