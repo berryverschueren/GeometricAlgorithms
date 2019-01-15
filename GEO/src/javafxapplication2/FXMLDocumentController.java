@@ -748,39 +748,60 @@ public class FXMLDocumentController implements Initializable {
 
             double previousTime = -1.0;
             if (timepoints == null || timepoints.isEmpty()) {
-                for (Map.Entry pair : pathRobbers.entrySet()) {
-                    Double requiredTime = (Double) pair.getKey();
-                    boolean pathAllowedTotal = true;
-                    for (int i = 0; i < stopGuards.size(); i++) {
-                        PathGuard currentGuard = stopGuards.get(i);
-                        if ((currentGuard.getTimestamp() >= timeTaken && currentGuard.getTimestamp() <= timeTaken + requiredTime)
-                                || (stopGuards.size() == 1)) {
-                            boolean pathAllowed = true;
-                            List<Edge> edges = forbiddenEdges.get(currentGuard);
-                            for (PathRobber pr : pathRobbers.get(requiredTime)) {
-                                for (Edge e : edges) {
-                                    if ((e.getV1().getX() == pr.getX() && e.getV1().getY() == pr.getY())
-                                            || (e.getV2().getX() == pr.getX() && e.getV2().getY() == pr.getY())) {
-                                        pathAllowed = false;
-                                        break;
+                Double maxTime = 0.0;
+                for (int j = 0; j < stopGuards.size(); j++) {
+                    if (stopGuards.get(j).getTimestamp() > maxTime) {
+                        maxTime = stopGuards.get(j).getTimestamp();
+                    }
+                }
+                maxTime = maxTime + this.deltaTime;
+                boolean timeUpdated = true;
+                while (timeTaken <= this.globalT) {
+                    if (!timeUpdated) {
+                        timeTaken++;
+                    }
+                    timeUpdated = false;
+                    for (Map.Entry prPair : pathRobbers.entrySet()) {
+                        Double requiredTime = (Double) prPair.getKey();
+                        if (keysTaken.contains(requiredTime)) {
+                            continue;
+                        }
+                        Double timeTakenLooped = timeTaken % maxTime;
+                        Double timeTakenRequiredLoopedMax = (timeTakenLooped + requiredTime);
+                        Double timeTakenRequiredLoopedMin = (timeTaken + requiredTime) % maxTime;
+                        boolean validCombination = true;
+                        guardloop:
+                        for (PathGuard g : stopGuards) {
+                            List<Edge> guardCanSee = forbiddenEdges.get(g);
+                            List<Edge> robberWalksOn = getPathsAtSpecificTime(timeTaken, g.getTimestamp(), pathRobbers.get(requiredTime));
+                            for (Edge e1 : guardCanSee) {
+                                for (Edge e2 : robberWalksOn) {
+                                    if (e1 == e2) {
+                                        validCombination = false;
+                                        break guardloop;
                                     }
                                 }
-                                if (!pathAllowed) {
-                                    break;
-                                }
-                            }
-                            pathAllowedTotal = pathAllowed;
-                            if (!pathAllowedTotal) {
-                                break;
                             }
                         }
-                    }
-                    if (pathAllowedTotal) {
-                        if (timeTaken + requiredTime <= this.globalT && !keysTaken.contains(requiredTime)) {
+                        if (validCombination && (timeTaken + requiredTime <= this.globalT) && !keysTaken.contains(requiredTime)) {
+                            System.out.println("-------------------------------------------");
+                            System.out.println("key: " + requiredTime);
+                            if (pathRobbers.get(requiredTime).get(0).getY() < 200) {
+                                System.out.println("top side path");
+                            } else {
+                                System.out.println("bottom side path");
+                            }
+                            System.out.println("start time           : " + timeTaken);
+                            System.out.println("end time             : " + (timeTaken + requiredTime));
+                            System.out.println("start time looped    : " + timeTakenLooped);
+                            System.out.println("end time looped max  : " + (timeTakenRequiredLoopedMax));
+                            System.out.println("end time looped min  : " + (timeTakenRequiredLoopedMin));
+                            System.out.println("-------------------------------------------");                            
                             prs.put(new TimePoint(timeTaken, timeTaken + requiredTime), pathRobbers.get(requiredTime));
-                            previousTime = timeTaken;
                             timeTaken = timeTaken + requiredTime;
+                            timeUpdated = true;
                             keysTaken.add(requiredTime);
+                            break;
                         }
                     }
                 }
