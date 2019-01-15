@@ -125,6 +125,11 @@ public class FXMLDocumentController implements Initializable {
     
     private dummyVis vis;
     
+    @FXML
+    private void handleButtonRobber(ActionEvent event) {
+        int a = 5;
+    }
+    
     private Map<Double, List<Vertex>> getShortestArtPath(){
         Map<Double, List<Vertex>> robberPaths = new TreeMap();
         
@@ -1698,13 +1703,15 @@ public class FXMLDocumentController implements Initializable {
             
             lastVertex = vertex;
         }
+        remember.remove(remember.size()-1);
         remember.addAll(noGoEdge);
         g.setStroke(Color.RED);
+        remember = crossVisiblePath(remember);
         for(Edge edge : remember){
             g.strokeLine(edge.getV1().getX(), edge.getV1().getY(), edge.getV2().getX(), edge.getV2().getY());
         }
         
-        remember = crossVisiblePath(remember);
+        
         
 //        g.setStroke(Color.RED);
 //        for(Edge edge : remember){

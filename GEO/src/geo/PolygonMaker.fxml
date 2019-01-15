@@ -33,6 +33,7 @@
       <Label layoutX="909.0" layoutY="529.0" text="deltaT" AnchorPane.rightAnchor="9.0" />
       <Button fx:id="readInput" layoutX="915.0" layoutY="282.0" mnemonicParsing="false" onAction="#handleButtonInputRead" prefHeight="39.0" prefWidth="80.0" text="ReadInput" AnchorPane.rightAnchor="6.0" />
       <Button layoutX="910.0" layoutY="462.0" mnemonicParsing="false" onAction="#finalEdgeButton" text="Final Edge" AnchorPane.rightAnchor="9.0" />
-      <Button fx:id="readGuard" layoutX="914.0" layoutY="384.0" mnemonicParsing="false" onAction="#handleButtonGuardRead" prefHeight="39.0" prefWidth="80.0" text="ReadGuards" AnchorPane.rightAnchor="6.0" />
+      <Button fx:id="readGuard" layoutX="1358.0" layoutY="376.0" mnemonicParsing="false" onAction="#handleButtonGuardRead" prefHeight="25.0" prefWidth="80.0" text="ReadGuards" AnchorPane.rightAnchor="7.0" />
+      <Button fx:id="readrobber" layoutX="1358.0" layoutY="402.0" mnemonicParsing="false" onAction="#handleButtonRobber" prefHeight="25.0" prefWidth="80.0" text="ReadRobber" />
     </children>
 </AnchorPane>
