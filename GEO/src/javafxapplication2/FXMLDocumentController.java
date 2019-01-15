@@ -866,6 +866,10 @@ public class FXMLDocumentController implements Initializable {
             nonOverlappingTimePoints.add(tp);
         }
         
+        if (nonOverlappingTimePoints == null || nonOverlappingTimePoints.isEmpty()){
+            return null;
+        }
+        
         nonOverlappingTimePoints.sort(new TimePointComparator());
         
         List<TimePoint> multiplicatedTimePoints = new ArrayList<>();
@@ -906,63 +910,47 @@ public class FXMLDocumentController implements Initializable {
             
             System.out.println("matching path robbers to avoid visibility region for guard stops");
 
-            double previousTime = -1.0;
             if (timepoints == null || timepoints.isEmpty()) {
-                Double maxTime = 0.0;
-                for (int j = 0; j < stopGuards.size(); j++) {
-                    if (stopGuards.get(j).getTimestamp() > maxTime) {
-                        maxTime = stopGuards.get(j).getTimestamp();
-                    }
-                }
-                maxTime = maxTime + this.deltaTime;
-                boolean timeUpdated = true;
-                while (timeTaken <= this.globalT) {
-                    if (!timeUpdated) {
-                        timeTaken++;
-                    }
-                    timeUpdated = false;
-                    for (Map.Entry prPair : pathRobbers.entrySet()) {
-                        Double requiredTime = (Double) prPair.getKey();
-                        if (keysTaken.contains(requiredTime)) {
-                            continue;
+                for (Map.Entry prPair : pathRobbers.entrySet()) {
+                    Double requiredTime = (Double) prPair.getKey();
+                    System.out.println("required time: " + requiredTime);
+                    boolean validCombination = true;
+                    guardloop:
+                    for (PathGuard g : stopGuards) {
+                        List<Edge> guardCanSee = forbiddenEdges.get(g);
+                        
+                        VertexInfo vi = vis.getVertexInfo().stream().filter(k -> (k.getVertex().getX() == g.getX()) && 
+                                (k.getVertex().getY() == g.getY())).findFirst().orElse(null);
+                        if (vi != null) {
+                            for (Vertex v : vi.getSeeMe()) {
+                                System.out.println("V: " + v.getX() + ", " + v.getY());
+                            }
                         }
-                        Double timeTakenLooped = timeTaken % maxTime;
-                        Double timeTakenRequiredLoopedMax = (timeTakenLooped + requiredTime);
-                        Double timeTakenRequiredLoopedMin = (timeTaken + requiredTime) % maxTime;
-                        boolean validCombination = true;
-                        guardloop:
-                        for (PathGuard g : stopGuards) {
-                            List<Edge> guardCanSee = forbiddenEdges.get(g);
-                            List<Edge> robberWalksOn = getPathsAtSpecificTime(timeTaken, g.getTimestamp(), pathRobbers.get(requiredTime));
-                            for (Edge e1 : guardCanSee) {
-                                for (Edge e2 : robberWalksOn) {
-                                    if (e1 == e2) {
-                                        validCombination = false;
-                                        break guardloop;
-                                    }
+                        
+                        for (Edge e1 : guardCanSee) {
+                            for (PathRobber pr : pathRobbers.get(requiredTime)) {
+                                if ((e1.getV1().getX() == pr.getX() && e1.getV1().getY() == pr.getY()) 
+                                        || e1.getV2().getX() == pr.getX() && e1.getV2().getY() == pr.getY()) {
+                                    e1.print();
+                                    validCombination = false;
+                                    break guardloop;
                                 }
                             }
                         }
-                        if (validCombination && (timeTaken + requiredTime <= this.globalT) && !keysTaken.contains(requiredTime)) {
-                            System.out.println("-------------------------------------------");
-                            System.out.println("key: " + requiredTime);
-                            if (pathRobbers.get(requiredTime).get(0).getY() < 200) {
-                                System.out.println("top side path");
-                            } else {
-                                System.out.println("bottom side path");
-                            }
-                            System.out.println("start time           : " + timeTaken);
-                            System.out.println("end time             : " + (timeTaken + requiredTime));
-                            System.out.println("start time looped    : " + timeTakenLooped);
-                            System.out.println("end time looped max  : " + (timeTakenRequiredLoopedMax));
-                            System.out.println("end time looped min  : " + (timeTakenRequiredLoopedMin));
-                            System.out.println("-------------------------------------------");                            
-                            prs.put(new TimePoint(timeTaken, timeTaken + requiredTime), pathRobbers.get(requiredTime));
-                            timeTaken = timeTaken + requiredTime;
-                            timeUpdated = true;
-                            keysTaken.add(requiredTime);
-                            break;
+                    }
+                    if (validCombination && (timeTaken + requiredTime <= this.globalT)) {
+                        System.out.println("-------------------------------------------");
+                        System.out.println("key: " + requiredTime);
+                        if (pathRobbers.get(requiredTime).get(0).getY() < 200) {
+                            System.out.println("top side path");
+                        } else {
+                            System.out.println("bottom side path");
                         }
+                        System.out.println("start time           : " + timeTaken);
+                        System.out.println("end time             : " + (timeTaken + requiredTime));
+                        System.out.println("-------------------------------------------");                            
+                        prs.put(new TimePoint(timeTaken, timeTaken + requiredTime), pathRobbers.get(requiredTime));
+                        timeTaken = timeTaken + requiredTime;
                     }
                 }
             } 
