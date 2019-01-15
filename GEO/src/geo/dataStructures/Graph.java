@@ -1,5 +1,5 @@
 package geo.dataStructures;
-
+// Retrieved and adapted from https://users.cs.fiu.edu/~weiss/dsj3/code/Graph.java
 import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
