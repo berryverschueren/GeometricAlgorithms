@@ -17,7 +17,7 @@ import javafx.util.Pair;
  *
  * @author Kaj75
  */
-public class dummyVis {
+public class SimpleVisibility {
 
     private TrapezoidalMap mapFunction;
     //prio 1: #exits sorted on prio
@@ -53,7 +53,7 @@ public class dummyVis {
     
     
     
-    public dummyVis() {
+    public SimpleVisibility() {
         mapFunction = new TrapezoidalMap();
         info = new ArrayList<>();
         artList = new ArrayList<>();

@@ -29,7 +29,7 @@ import geo.dataStructures.TimePointComparator;
 import geo.dataStructures.Trapezoid;
 import geo.dataStructures.Triangle;
 import geo.dataStructures.VertexInfo;
-import geo.dataStructures.dummyVis;
+import geo.dataStructures.SimpleVisibility;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -127,7 +127,7 @@ public class FXMLDocumentController implements Initializable {
     private List<Vertex> stopVertices = new ArrayList<>();
     private List<VertexInfo> information = new ArrayList<>();
     
-    private dummyVis vis;
+    private SimpleVisibility vis;
     
     @FXML
     private void handleButtonCarina(ActionEvent event) {
@@ -490,7 +490,7 @@ public class FXMLDocumentController implements Initializable {
         List<Polygon> polys = new ArrayList<>();
         polys.add(polygon);
         polys.addAll(innerPolygon);
-        vis = new dummyVis();
+        vis = new SimpleVisibility();
         
         g.setStroke(Color.AQUA);
 
