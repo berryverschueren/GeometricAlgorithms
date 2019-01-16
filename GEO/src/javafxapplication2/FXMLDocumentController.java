@@ -1070,6 +1070,8 @@ public class FXMLDocumentController implements Initializable {
                             } else {
                                 System.out.println("bottom side path");
                             }
+                            System.out.println("start location       : (" + pathRobbers.get(requiredTime).get(0).getX() + ", " + pathRobbers.get(requiredTime).get(0).getY() + ")");
+                            System.out.println("art   location       : (" + pathRobbers.get(requiredTime).get(pathRobbers.get(requiredTime).size() / 2).getX() + ", " + pathRobbers.get(requiredTime).get(pathRobbers.get(requiredTime).size() / 2).getY() + ")");
 //                            System.out.println("path still valid, adding it to the set..");
                             System.out.println("start time           : " + timeTaken);
                             System.out.println("end time             : " + (timeTaken + requiredTime));
@@ -1394,9 +1396,9 @@ public class FXMLDocumentController implements Initializable {
             vertexPrevious = vertexTemp; 
             tPrevious = tCurrent;
         }
-        step = new PathGuard(initX, initY, tPrevious, 0);
-        int lengthpath = path.size();
-        path.set(lengthpath-1, step);
+//        step = new PathGuard(initX, initY, tPrevious, 0);
+//        int lengthpath = path.size();
+//        path.set(lengthpath-1, step);
 //        observing = stopVertices.contains(firstVertex) ? 1 : 0;//observingGuard(firstVertex);
 //        if (path.get(0).getObserving() == 1){
 //                tCurrent = (distance(firstVertex, vertexPrevious)/vMaxG ) + tPrevious + deltaTime;
