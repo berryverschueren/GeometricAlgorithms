@@ -19,7 +19,7 @@
       <RadioButton fx:id="art" layoutX="923.0" layoutY="56.0" mnemonicParsing="false" onMouseReleased="#handleRadioButtonArt" text="add Art" AnchorPane.rightAnchor="6.0" />
       <Label layoutX="913.0" layoutY="613.0" text="#Guards" AnchorPane.rightAnchor="9.0" />
       <RadioButton fx:id="exit" layoutX="924.0" layoutY="90.0" mnemonicParsing="false" onMouseReleased="#handleRadioButtonExit" text="add Exit" AnchorPane.rightAnchor="6.0" />
-      <Label layoutX="1307.0" layoutY="254.0" text="Inner Polygons " AnchorPane.rightAnchor="14.0" />
+      <Label layoutX="1357.0" layoutY="250.0" text="Inner Polygons " AnchorPane.rightAnchor="5.0" />
       <Label layoutX="926.0" layoutY="39.0" text="Green" AnchorPane.rightAnchor="6.0" />
       <Label layoutX="925.0" layoutY="73.0" text="Red" AnchorPane.rightAnchor="6.0" />
       <Button fx:id="kaj" layoutX="920.0" layoutY="151.0" mnemonicParsing="false" onAction="#handleButtonKaj" text="kaj" AnchorPane.rightAnchor="6.0" />
@@ -32,8 +32,7 @@
       <Label layoutX="913.0" layoutY="487.0" text="globalTime" AnchorPane.rightAnchor="9.0" />
       <Label layoutX="909.0" layoutY="529.0" text="deltaT" AnchorPane.rightAnchor="9.0" />
       <Button fx:id="readInput" layoutX="1358.0" layoutY="321.0" mnemonicParsing="false" onAction="#handleButtonInputRead" prefHeight="39.0" prefWidth="80.0" text="ReadInput" AnchorPane.rightAnchor="7.0" />
-      <Button layoutX="910.0" layoutY="462.0" mnemonicParsing="false" onAction="#finalEdgeButton" text="Final Edge" AnchorPane.rightAnchor="9.0" />
       <Button fx:id="readGuard" layoutX="1363.0" layoutY="390.0" mnemonicParsing="false" onAction="#handleButtonGuardRead" prefHeight="25.0" prefWidth="80.0" text="ReadGuards" AnchorPane.rightAnchor="2.0" />
-      <Button fx:id="readrobber" layoutX="1359.0" layoutY="426.0" mnemonicParsing="false" onAction="#handleButtonRobber" prefHeight="25.0" prefWidth="80.0" text="ReadRobber" />
+      <Button fx:id="readrobber" layoutX="1363.0" layoutY="424.0" mnemonicParsing="false" onAction="#handleButtonRobber" prefHeight="25.0" prefWidth="80.0" text="ReadRobber" />
     </children>
 </AnchorPane>
